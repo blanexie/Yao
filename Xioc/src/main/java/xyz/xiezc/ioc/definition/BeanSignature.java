@@ -2,6 +2,7 @@ package xyz.xiezc.ioc.definition;
 
 
 import lombok.Data;
+import xyz.xiezc.ioc.enums.BeanTypeEnum;
 
 import java.util.Objects;
 

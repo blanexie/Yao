@@ -10,8 +10,8 @@ import xyz.xiezc.ioc.annotation.Inject;
 import xyz.xiezc.ioc.annotation.Value;
 import xyz.xiezc.ioc.definition.BeanDefinition;
 import xyz.xiezc.ioc.definition.BeanSignature;
-import xyz.xiezc.ioc.definition.BeanStatusEnum;
-import xyz.xiezc.ioc.definition.BeanTypeEnum;
+import xyz.xiezc.ioc.enums.BeanStatusEnum;
+import xyz.xiezc.ioc.enums.BeanTypeEnum;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;

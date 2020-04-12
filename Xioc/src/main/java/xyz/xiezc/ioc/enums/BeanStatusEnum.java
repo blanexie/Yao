@@ -1,4 +1,4 @@
-package xyz.xiezc.ioc.definition;
+package xyz.xiezc.ioc.enums;
 
 import lombok.Getter;
 

@@ -21,7 +21,6 @@ public class AnnoUtil {
      */
     private String annoPath = "xyz.xiezc.ioc.annotationHandler";
 
-
     /**
      * 作用于类上面的注解
      */

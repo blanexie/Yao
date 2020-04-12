@@ -1,15 +1,17 @@
 package xyz.xiezc.ioc;
 
+import cn.hutool.core.lang.Singleton;
+import cn.hutool.core.util.ClassUtil;
 import lombok.Data;
 import xyz.xiezc.ioc.common.BeanScanUtil;
 import xyz.xiezc.ioc.common.ContextUtil;
 import xyz.xiezc.ioc.definition.BeanDefinition;
 import xyz.xiezc.ioc.definition.BeanSignature;
-import xyz.xiezc.ioc.definition.BeanTypeEnum;
-import xyz.xiezc.ioc.test.TestB;
+import xyz.xiezc.ioc.enums.BeanTypeEnum;
 import xyz.xiezc.ioc.test.TestC;
 
 import java.lang.annotation.Annotation;
+import java.util.Set;
 
 /**
  * 超级简单的依赖注入小框架
@@ -24,14 +26,12 @@ import java.lang.annotation.Annotation;
 public final class Xioc {
 
     public static void main(String[] args) {
-        Xioc.run(Xioc.class);
-
+        Xioc xioc = Xioc.run(Xioc.class);
         BeanSignature beanSignature = new BeanSignature();
         beanSignature.setBeanClass(TestC.class);
         beanSignature.setBeanTypeEnum(BeanTypeEnum.bean);
         beanSignature.setBeanName("testc");
-
-        BeanDefinition beanDefinition = contextUtil.getComplatedBeanDefinitionBySignature(beanSignature);
+        BeanDefinition beanDefinition = xioc.contextUtil.getComplatedBeanDefinitionBySignature(beanSignature);
         TestC bean = (TestC) beanDefinition.getBean();
         bean.print();
     }
@@ -39,30 +39,57 @@ public final class Xioc {
     /**
      * 装载依赖的容器. 当依赖全部注入完成的时候,这个集合会清空
      */
-    private static final ContextUtil contextUtil = new ContextUtil();
+    private final ContextUtil contextUtil = new ContextUtil();
 
     /**
      * 扫描工具
      */
-    private static final BeanScanUtil beanScanUtil = new BeanScanUtil(contextUtil);
-
+    private final BeanScanUtil beanScanUtil = new BeanScanUtil(contextUtil);
 
     /**
-     * 启动方法
-     *
-     * @param clazz 传入的启动类
+     * 加载其他starter需要扫描的package路径
      */
-    public static void run(Class<?> clazz) {
+    public final String starterPackage = "xyz.xiezc.ioc.starter";
+
+    /**
+     * 单例模式
+     */
+    private static Xioc xioc = new Xioc();
+
+    /**
+     *
+     */
+    private Xioc() {
+    }
+
+    /**
+     * 单例模式的获取
+     *
+     * @return
+     */
+    public static Xioc getSingleton() {
+        return xioc;
+    }
+
+    /**
+     * 启动方法,
+     *
+     * @param clazz 传入的启动类, 以这个启动类所在目录为根目录开始扫描bean类
+     */
+    public static Xioc run(Class<?> clazz) {
+
+        BeanScanUtil beanScanUtil = xioc.getBeanScanUtil();
         //加载配置
         beanScanUtil.loadPropertie();
         //加载注解信息
         beanScanUtil.loadAnnotation();
 
-
+        //加载starter中的bean
+        beanScanUtil.loadBeanDefinition(xioc.starterPackage);
 
         //加载bean信息
-        beanScanUtil.loadBeanDefinition(clazz);
-
+        String packagePath = ClassUtil.getPackage(clazz);
+        beanScanUtil.loadBeanDefinition(packagePath);
 
         //扫描容器中的bean， 处理所有在bean类上的注解
         beanScanUtil.scanClass();
@@ -72,6 +99,7 @@ public final class Xioc {
         beanScanUtil.initAndInjectBeans();
         //扫描容器中的bean, 处理方法
         beanScanUtil.scanMethod();
+        return xioc;
     }
 
     /**
@@ -79,8 +107,9 @@ public final class Xioc {
      *
      * @param annotationHandler
      */
-    public static void addAnnoHandler(AnnotationHandler<? extends Annotation> annotationHandler) {
-        contextUtil.getAnnoUtil().addAnnotationHandler(annotationHandler);
+    public static Xioc addAnnoHandler(AnnotationHandler<? extends Annotation> annotationHandler) {
+        xioc.contextUtil.getAnnoUtil().addAnnotationHandler(annotationHandler);
+        return xioc;
     }
 
 }

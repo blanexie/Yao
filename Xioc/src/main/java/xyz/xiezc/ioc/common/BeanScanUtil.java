@@ -3,7 +3,6 @@ package xyz.xiezc.ioc.common;
 
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.convert.Convert;
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ReflectUtil;
@@ -12,6 +11,7 @@ import cn.hutool.setting.Setting;
 import xyz.xiezc.ioc.AnnotationHandler;
 import xyz.xiezc.ioc.annotation.*;
 import xyz.xiezc.ioc.definition.*;
+import xyz.xiezc.ioc.enums.BeanStatusEnum;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -44,11 +44,10 @@ public class BeanScanUtil {
     /**
      * 加载所有的bean信息
      *
-     * @param clazz
+     * @param packagePath 需要扫描的路径
      */
-    public void loadBeanDefinition(Class clazz) {
+    public void loadBeanDefinition(String packagePath) {
         //扫描到类
-        String packagePath = ClassUtil.getPackage(clazz);
         Set<Class<?>> classes = ClassUtil.scanPackage(packagePath);
         for (Class<?> aClass : classes) {
             //获取上面的component 注解

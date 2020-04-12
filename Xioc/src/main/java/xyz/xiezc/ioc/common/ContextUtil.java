@@ -6,7 +6,7 @@ import cn.hutool.setting.Setting;
 import lombok.Data;
 import xyz.xiezc.ioc.definition.BeanDefinition;
 import xyz.xiezc.ioc.definition.BeanSignature;
-import xyz.xiezc.ioc.definition.BeanStatusEnum;
+import xyz.xiezc.ioc.enums.BeanStatusEnum;
 
 import java.util.HashSet;
 import java.util.Optional;

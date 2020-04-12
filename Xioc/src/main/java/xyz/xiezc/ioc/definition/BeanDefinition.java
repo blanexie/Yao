@@ -5,6 +5,7 @@ import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 import lombok.Getter;
 import lombok.Setter;
+import xyz.xiezc.ioc.enums.BeanStatusEnum;
 
 import java.lang.reflect.Method;
 import java.util.List;
