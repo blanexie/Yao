@@ -24,6 +24,8 @@
     </properties>
     <modules>
         <module>Xioc</module>
+        <module>starter</module>
+        <module>example</module>
     </modules>
 
     <dependencyManagement>
@@ -37,7 +39,7 @@
             <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
-                <version>1.16.20</version>
+                <version>1.18.12</version>
                 <scope>provided</scope>
             </dependency>
 

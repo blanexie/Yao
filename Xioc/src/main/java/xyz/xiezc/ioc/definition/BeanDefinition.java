@@ -52,6 +52,15 @@ public class BeanDefinition extends BeanSignature {
      */
     private Object bean;
 
+    /**
+     * 返回具体的bean实例
+     *
+     * @param <T>
+     * @return
+     */
+    public <T> T getBean() {
+        return (T) bean;
+    }
 
     public void setBeanSignature(BeanSignature beanSignature) {
         this.setBeanName(beanSignature.getBeanName());

@@ -65,7 +65,6 @@ public class BeanScanUtil {
         }
     }
 
-
     /**
      * 开始开始初始化bean 并且 注入依赖
      */
@@ -75,15 +74,17 @@ public class BeanScanUtil {
         }
     }
 
-
     /**
      * 扫描所有容器中的类的注解，并处理
      */
     public void scanClass() {
         Map<Class<? extends Annotation>, AnnotationHandler> classAnnoAndHandlerMap = annoUtil.classAnnoAndHandlerMap;
         //扫描到类
-        contextUtil.context.forEach(beanDefinition -> {
+        Iterator<BeanDefinition> iterator = contextUtil.context.iterator();
+        while (iterator.hasNext()) {
+            BeanDefinition beanDefinition = iterator.next();
             Class cla = beanDefinition.getBeanClass();
+
             //获取这个类上所有的注解
             Annotation[] annotations = AnnotationUtil.getAnnotations(cla, true);
             //获取注解和handler
@@ -109,14 +110,13 @@ public class BeanScanUtil {
                     })
                     .collect(Collectors.toList());
 
-
             //遍历排好序的handler， 并且调用处理方法
             for (AnnotationAndHandler annotationAndHandler : collect) {
                 AnnotationHandler annotationHandler = annotationAndHandler.getAnnotationHandler();
                 Annotation annotation = annotationAndHandler.getAnnotation();
                 annotationHandler.processClass(annotation, cla, contextUtil);
             }
-        });
+        }
     }
 
 
@@ -129,7 +129,10 @@ public class BeanScanUtil {
 
         Map<Class<? extends Annotation>, AnnotationHandler> fieldAnnoAndHandlerMap = annoUtil.getFieldAnnoAndHandlerMap();
 
-        contextUtil.context.forEach(beanDefinition -> {
+        Iterator<BeanDefinition> iterator = contextUtil.context.iterator();
+        while (iterator.hasNext()) {
+            BeanDefinition beanDefinition = iterator.next();
+
             Class<?> tClass = beanDefinition.getBeanClass();
             //获取所有的字段， 包含父类的字段
             Field[] fields = ReflectUtil.getFields(tClass);
@@ -162,7 +165,7 @@ public class BeanScanUtil {
                     annotationHandler.processField(field, annotation, beanDefinition, contextUtil);
                 }
             }
-        });
+        }
     }
 
     /**
@@ -173,7 +176,10 @@ public class BeanScanUtil {
     public void scanMethod() {
         Map<Class<? extends Annotation>, AnnotationHandler> methodAnnoAndHandlerMap = annoUtil.getMethodAnnoAndHandlerMap();
 
-        for (BeanDefinition beanDefinition : contextUtil.context) {
+        Iterator<BeanDefinition> iterator = contextUtil.context.iterator();
+        while (iterator.hasNext()) {
+            BeanDefinition beanDefinition = iterator.next();
+
             if (beanDefinition.getBeanStatus() != BeanStatusEnum.Completed) {
                 throw new RuntimeException("容器中还存在实例化未完成的bean：{}" + beanDefinition.toString());
             }

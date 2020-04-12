@@ -1,17 +1,11 @@
 package xyz.xiezc.ioc;
 
-import cn.hutool.core.lang.Singleton;
 import cn.hutool.core.util.ClassUtil;
 import lombok.Data;
 import xyz.xiezc.ioc.common.BeanScanUtil;
 import xyz.xiezc.ioc.common.ContextUtil;
-import xyz.xiezc.ioc.definition.BeanDefinition;
-import xyz.xiezc.ioc.definition.BeanSignature;
-import xyz.xiezc.ioc.enums.BeanTypeEnum;
-import xyz.xiezc.ioc.test.TestC;
 
 import java.lang.annotation.Annotation;
-import java.util.Set;
 
 /**
  * 超级简单的依赖注入小框架
@@ -24,17 +18,6 @@ import java.util.Set;
  */
 @Data
 public final class Xioc {
-
-    public static void main(String[] args) {
-        Xioc xioc = Xioc.run(Xioc.class);
-        BeanSignature beanSignature = new BeanSignature();
-        beanSignature.setBeanClass(TestC.class);
-        beanSignature.setBeanTypeEnum(BeanTypeEnum.bean);
-        beanSignature.setBeanName("testc");
-        BeanDefinition beanDefinition = xioc.contextUtil.getComplatedBeanDefinitionBySignature(beanSignature);
-        TestC bean = (TestC) beanDefinition.getBean();
-        bean.print();
-    }
 
     /**
      * 装载依赖的容器. 当依赖全部注入完成的时候,这个集合会清空
