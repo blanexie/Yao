@@ -3,7 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <name>Yao</name>
-    <groupId>xyc.xiezc</groupId>
+    <groupId>xyz.xiezc</groupId>
     <artifactId>yao</artifactId>
     <packaging>pom</packaging>
     <version>0.0.1-SNAPSHOT</version>
@@ -23,10 +23,12 @@
         <maven.compiler.compilerVersion>${java.version}</maven.compiler.compilerVersion>
     </properties>
     <modules>
-        <module>Xioc</module>
+        <module>xioc</module>
         <module>starter</module>
         <module>example</module>
+        <module>xweb</module>
     </modules>
+
 
     <dependencyManagement>
         <dependencies>
@@ -41,7 +43,11 @@
                 <version>1.18.12</version>
                 <scope>provided</scope>
             </dependency>
-
+            <dependency>
+                <groupId>xyz.xiezc</groupId>
+                <artifactId>xioc</artifactId>
+                <version>0.0.1-SNAPSHOT</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <dependencies>

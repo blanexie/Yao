@@ -6,6 +6,8 @@ import xyz.xiezc.ioc.common.BeanScanUtil;
 import xyz.xiezc.ioc.common.ContextUtil;
 
 import java.lang.annotation.Annotation;
+import java.util.Observable;
+import java.util.Observer;
 
 /**
  * 超级简单的依赖注入小框架
@@ -61,6 +63,8 @@ public final class Xioc {
      */
     public static Xioc run(Class<?> clazz) {
 
+        Observer
+
         BeanScanUtil beanScanUtil = xioc.getBeanScanUtil();
         //加载配置
         beanScanUtil.loadPropertie();
@@ -82,6 +86,8 @@ public final class Xioc {
         beanScanUtil.initAndInjectBeans();
         //扫描容器中的bean, 处理方法
         beanScanUtil.scanMethod();
+
+
         return xioc;
     }
 

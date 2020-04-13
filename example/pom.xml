@@ -4,23 +4,27 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>yao</artifactId>
-        <groupId>xyc.xiezc</groupId>
+        <groupId>xyz.xiezc</groupId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>xyc.xiezc</groupId>
+    <groupId>xyz.xiezc</groupId>
     <artifactId>example</artifactId>
 
     <dependencies>
         <dependency>
-            <groupId>xyc.xiezc</groupId>
-            <artifactId>Xioc</artifactId>
+            <groupId>xyz.xiezc</groupId>
+            <artifactId>xioc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>xyz.xiezc</groupId>
+            <artifactId>starter</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>xyc.xiezc</groupId>
-            <artifactId>starter</artifactId>
+            <groupId>xyz.xiezc</groupId>
+            <artifactId>xweb</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
     </dependencies>

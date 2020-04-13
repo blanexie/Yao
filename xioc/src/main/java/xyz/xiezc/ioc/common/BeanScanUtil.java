@@ -142,7 +142,7 @@ public class BeanScanUtil {
             //检查每个字段的注解
             for (Field field : fields) {
                 Annotation[] annotations = AnnotationUtil.getAnnotations(field, true);
-                if (annotations == null) {
+                if (annotations == null || annotations.length == 0) {
                     continue;
                 }
                 List<AnnotationAndHandler> collect = CollUtil.newArrayList(annotations).stream()
@@ -191,7 +191,7 @@ public class BeanScanUtil {
             for (Method method : methods) {
 
                 Annotation[] annotations = AnnotationUtil.getAnnotations(method, true);
-                if (annotations == null) {
+                if (annotations == null || annotations.length == 0) {
                     continue;
                 }
                 List<AnnotationAndHandler> collect = CollUtil.newArrayList(annotations).stream()

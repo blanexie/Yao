@@ -14,10 +14,11 @@
 * 支持方法注入bean
 * 支持注入配置，配置文件使用Hutool的setting
 * 支持类似springboot的starter一样的导入包引入对应功能的方法
+> 需要导入的starter包必须在xyz.xiezc.ioc.starter包下放上一个@Configuration注解的类。 并且可以配合@BeanScan一起使用
 
 
 #### 后期支持的功能
-* 整合Servlet,使得支持web功能， 使用hutool的Servlet工具
+* 整合Servlet,使得支持web功能，  使用内嵌
 * 整合netty， 使用netty的web功能。 主要的web方向
 * 整合mybatis 使得支持数据
 * 整合mybatis后需要支持事务，参考spring的方式管理事务

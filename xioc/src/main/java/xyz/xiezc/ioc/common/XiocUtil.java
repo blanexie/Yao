@@ -169,6 +169,9 @@ public class XiocUtil {
         //获取这个bean的所有待注入的信息
         for (Field field : fields) {
             BeanSignature beanSignature1 = dealInjectFieldBean(field, beanSignature.getBeanClass());
+            if (beanSignature1 == null) {
+                continue;
+            }
             List<BeanSignature> injectBeans = beanDefinition.getInjectBeans();
             if (injectBeans == null) {
                 injectBeans = CollUtil.newArrayList();
@@ -195,13 +198,16 @@ public class XiocUtil {
         }
 
         Value value = AnnotationUtil.getAnnotation(field, Value.class);
-        String injectBeanName = value.value();
-        if (StrUtil.isBlank(injectBeanName)) {
-            injectBeanName = clazz.getTypeName() + "#" + field.getName();
+        if (value != null) {
+            String injectBeanName = value.value();
+            if (StrUtil.isBlank(injectBeanName)) {
+                injectBeanName = clazz.getTypeName() + "#" + field.getName();
+            }
+            BeanSignature beanSignature = createBeanSingature(field, injectBeanName);
+            beanSignature.setBeanTypeEnum(BeanTypeEnum.properties);
+            return beanSignature;
         }
-        BeanSignature beanSignature = createBeanSingature(field, injectBeanName);
-        beanSignature.setBeanTypeEnum(BeanTypeEnum.properties);
-        return beanSignature;
+        return null;
 
     }
 
