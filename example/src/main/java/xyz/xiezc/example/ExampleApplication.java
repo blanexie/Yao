@@ -1,17 +1,17 @@
-package xyz.xiezc.starter;
+package xyz.xiezc.example;
 
 
-import xyz.xiezc.example.TestExample;
 import xyz.xiezc.ioc.Xioc;
 import xyz.xiezc.ioc.definition.BeanDefinition;
 import xyz.xiezc.ioc.definition.BeanSignature;
 import xyz.xiezc.ioc.enums.BeanTypeEnum;
+import xyz.xiezc.ioc.test.StarterC;
 
-public class StarterApplication {
 
+public class ExampleApplication {
 
     public static void main(String[] args) {
-        Xioc xioc = Xioc.run(StarterApplication.class);
+        Xioc xioc = Xioc.run(ExampleApplication.class);
         BeanSignature beanSignature = new BeanSignature();
         beanSignature.setBeanClass(StarterC.class);
         beanSignature.setBeanTypeEnum(BeanTypeEnum.bean);
@@ -20,6 +20,7 @@ public class StarterApplication {
         BeanDefinition beanDefinition = xioc.getContextUtil().getComplatedBeanDefinitionBySignature(beanSignature);
         StarterC bean = beanDefinition.getBean();
         bean.print();
-
     }
+
+
 }

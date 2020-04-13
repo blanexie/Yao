@@ -9,8 +9,12 @@ import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.setting.Setting;
 import xyz.xiezc.ioc.AnnotationHandler;
-import xyz.xiezc.ioc.annotation.*;
-import xyz.xiezc.ioc.definition.*;
+import xyz.xiezc.ioc.annotation.Bean;
+import xyz.xiezc.ioc.annotation.Component;
+import xyz.xiezc.ioc.annotation.Configuration;
+import xyz.xiezc.ioc.annotation.Inject;
+import xyz.xiezc.ioc.definition.AnnotationAndHandler;
+import xyz.xiezc.ioc.definition.BeanDefinition;
 import xyz.xiezc.ioc.enums.BeanStatusEnum;
 
 import java.lang.annotation.Annotation;
@@ -18,6 +22,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.stream.Collectors;
 
 /**
@@ -79,10 +84,9 @@ public class BeanScanUtil {
      */
     public void scanClass() {
         Map<Class<? extends Annotation>, AnnotationHandler> classAnnoAndHandlerMap = annoUtil.classAnnoAndHandlerMap;
-        //扫描到类
-        Iterator<BeanDefinition> iterator = contextUtil.context.iterator();
-        while (iterator.hasNext()) {
-            BeanDefinition beanDefinition = iterator.next();
+
+        CopyOnWriteArraySet<BeanDefinition> copyOnWriteArraySet = new CopyOnWriteArraySet(contextUtil.context);
+        for (BeanDefinition beanDefinition : copyOnWriteArraySet) {
             Class cla = beanDefinition.getBeanClass();
 
             //获取这个类上所有的注解
@@ -129,9 +133,8 @@ public class BeanScanUtil {
 
         Map<Class<? extends Annotation>, AnnotationHandler> fieldAnnoAndHandlerMap = annoUtil.getFieldAnnoAndHandlerMap();
 
-        Iterator<BeanDefinition> iterator = contextUtil.context.iterator();
-        while (iterator.hasNext()) {
-            BeanDefinition beanDefinition = iterator.next();
+        CopyOnWriteArraySet<BeanDefinition> copyOnWriteArraySet = new CopyOnWriteArraySet(contextUtil.context);
+        for (BeanDefinition beanDefinition : copyOnWriteArraySet) {
 
             Class<?> tClass = beanDefinition.getBeanClass();
             //获取所有的字段， 包含父类的字段
@@ -176,9 +179,8 @@ public class BeanScanUtil {
     public void scanMethod() {
         Map<Class<? extends Annotation>, AnnotationHandler> methodAnnoAndHandlerMap = annoUtil.getMethodAnnoAndHandlerMap();
 
-        Iterator<BeanDefinition> iterator = contextUtil.context.iterator();
-        while (iterator.hasNext()) {
-            BeanDefinition beanDefinition = iterator.next();
+        CopyOnWriteArraySet<BeanDefinition> copyOnWriteArraySet = new CopyOnWriteArraySet(contextUtil.context);
+        for (BeanDefinition beanDefinition : copyOnWriteArraySet) {
 
             if (beanDefinition.getBeanStatus() != BeanStatusEnum.Completed) {
                 throw new RuntimeException("容器中还存在实例化未完成的bean：{}" + beanDefinition.toString());

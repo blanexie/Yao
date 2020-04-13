@@ -1,4 +1,4 @@
-package xyz.xiezc.starter;
+package xyz.xiezc.ioc.test;
 
 
 import xyz.xiezc.ioc.annotation.Component;
@@ -7,7 +7,7 @@ import xyz.xiezc.ioc.annotation.Component;
 public class StarterC {
 
 
-    public void print(){
+    public void print() {
         System.out.println("StarterC StarterCStarterCStarterC");
     }
 }
