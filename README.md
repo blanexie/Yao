@@ -13,9 +13,10 @@
 * 基本的扫描注入类，  
 * 支持方法注入bean
 * 支持注入配置，配置文件使用Hutool的setting
+* 支持类似springboot的starter一样的导入包引入对应功能的方法
+
 
 #### 后期支持的功能
-* 支持类似springboot的starter一样的导入包引入对应功能的方法
 * 整合Servlet,使得支持web功能， 使用hutool的Servlet工具
 * 整合netty， 使用netty的web功能。 主要的web方向
 * 整合mybatis 使得支持数据
