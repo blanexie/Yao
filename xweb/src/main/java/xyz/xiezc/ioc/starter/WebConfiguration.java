@@ -17,7 +17,9 @@ import java.util.Map;
 @BeanScan(basePackages = {"xyz.xiezc.web"})
 public class WebConfiguration {
 
-
+    /**
+     * 路径处理器
+     */
     public static final Map<String, MappingHandler> mappingHandlerMap = new HashMap<>();
 
 //

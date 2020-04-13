@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * 事件监听模式的包
@@ -13,6 +14,13 @@ public class EventListenerUtil {
 
     Map<Event, List<Listener>> listenerMap = new HashMap<>();
 
+    public void call(Event event){
+        List<Listener> listeners = listenerMap.get(event);
+        CopyOnWriteArrayList<Listener> copyOnWriteArrayList=new CopyOnWriteArrayList<>(listeners);
+        for (Listener listener : copyOnWriteArrayList) {
+            listener.execute(event);
+        }
+    }
 
     public void addListener(Event event, Listener listener) {
         List<Listener> listeners = listenerMap.get(event);
@@ -23,7 +31,6 @@ public class EventListenerUtil {
         listeners.add(listener);
     }
 
-
     public void removeListener(Event event, Listener listener) {
         List<Listener> listeners = listenerMap.get(event);
         if (listeners == null) {
@@ -33,7 +40,6 @@ public class EventListenerUtil {
     }
 
     public List<Listener> removeEvent (Event event) {
-
         return listenerMap.remove(event);
     }
 

@@ -4,6 +4,8 @@ import cn.hutool.core.util.ClassUtil;
 import lombok.Data;
 import xyz.xiezc.ioc.common.BeanScanUtil;
 import xyz.xiezc.ioc.common.ContextUtil;
+import xyz.xiezc.ioc.common.event.Event;
+import xyz.xiezc.ioc.common.event.EventListenerUtil;
 
 import java.lang.annotation.Annotation;
 import java.util.Observable;
@@ -26,6 +28,10 @@ public final class Xioc {
      */
     private final ContextUtil contextUtil = new ContextUtil();
 
+    /**
+     * 事件分发处理器
+     */
+    EventListenerUtil eventListenerUtil=new EventListenerUtil();
     /**
      * 扫描工具
      */
@@ -62,12 +68,12 @@ public final class Xioc {
      * @param clazz 传入的启动类, 以这个启动类所在目录为根目录开始扫描bean类
      */
     public static Xioc run(Class<?> clazz) {
-
-        Observer
-
+        //开始启动框架
+        xioc.eventListenerUtil.call(new Event("xioc-start"));
         BeanScanUtil beanScanUtil = xioc.getBeanScanUtil();
         //加载配置
         beanScanUtil.loadPropertie();
+        xioc.eventListenerUtil.call(new Event("xioc-start"));
         //加载注解信息
         beanScanUtil.loadAnnotation();
 

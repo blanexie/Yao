@@ -8,6 +8,10 @@ import java.util.Objects;
 @Data
 public class Event {
 
+    public Event(String name) {
+        this.name = name;
+    }
+
     /**
      * 事件名称
      */
