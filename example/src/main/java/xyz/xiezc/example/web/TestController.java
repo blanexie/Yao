@@ -9,12 +9,12 @@ public class TestController {
 
 
     @PostMapping("testPost")
-    public String testPost() {
-        return "hello word";
+    public String testPost(Integer per) {
+        return "hello word " + per;
     }
 
     @GetMapping("testGet")
-    public String testGet() {
-        return "hello word";
+    public String testGet(Integer per) {
+        return "hello word" + per;
     }
 }

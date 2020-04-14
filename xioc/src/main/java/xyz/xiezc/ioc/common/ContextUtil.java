@@ -1,5 +1,6 @@
 package xyz.xiezc.ioc.common;
 
+import cn.hutool.core.util.ClassUtil;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 import cn.hutool.setting.Setting;
@@ -56,23 +57,16 @@ public class ContextUtil {
      * @return
      */
     public BeanDefinition getComplatedBeanDefinitionBySignature(BeanSignature beanSignature) {
-        Optional<BeanDefinition> first = context.stream()
-                .filter(beanDefinition -> {
-                    Class<?> beanClass = beanDefinition.getBeanClass();
-                    if (beanSignature.getBeanClass() == beanClass) {
-                        return true;
-                    }
-                    return false;
-                })
-                .findFirst();
-        BeanDefinition beanDefinition = first.orElseThrow(() ->
-                new RuntimeException("容器中不存在对应的bean：" + beanSignature.toString())
-        );
+        BeanDefinition beanDefinition = getBeanDefinitionBySignature(beanSignature);
+        if (beanDefinition == null) {
+            new RuntimeException("容器中不存在对应的bean：" + beanSignature.toString());
+        }
         if (beanDefinition.getBeanStatus() == BeanStatusEnum.Completed) {
             return beanDefinition;
         }
         throw new RuntimeException("bean的依赖不足， bean: " + beanDefinition.toString());
     }
+
 
     /**
      * 从容器中获取对应的bean
@@ -87,11 +81,13 @@ public class ContextUtil {
                     if (beanSignature.getBeanClass() == beanClass) {
                         return true;
                     }
+                    if (ClassUtil.isAssignable(beanSignature.getBeanClass(), beanClass)) {
+                        return true;
+                    }
                     return false;
                 })
                 .findFirst();
         return first.orElse(null);
-
     }
 
 

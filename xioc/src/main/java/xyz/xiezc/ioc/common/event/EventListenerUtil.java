@@ -1,10 +1,13 @@
 package xyz.xiezc.ioc.common.event;
 
 
+import cn.hutool.core.thread.ThreadUtil;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -12,11 +15,20 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class EventListenerUtil {
 
-    Map<Event, List<Listener>> listenerMap = new HashMap<>();
+    Map<Event, List<Listener>> listenerMap = new ConcurrentHashMap<>();
 
-    public void call(Event event){
+    public void asyncCall(Event event) {
+        ThreadUtil.execute(() -> {
+            this.syncCall(event);
+        });
+    }
+
+    public void syncCall(Event event) {
         List<Listener> listeners = listenerMap.get(event);
-        CopyOnWriteArrayList<Listener> copyOnWriteArrayList=new CopyOnWriteArrayList<>(listeners);
+        if (listeners == null) {
+            return;
+        }
+        CopyOnWriteArrayList<Listener> copyOnWriteArrayList = new CopyOnWriteArrayList<>(listeners);
         for (Listener listener : copyOnWriteArrayList) {
             listener.execute(event);
         }
@@ -39,7 +51,7 @@ public class EventListenerUtil {
         listeners.remove(listener);
     }
 
-    public List<Listener> removeEvent (Event event) {
+    public List<Listener> removeEvent(Event event) {
         return listenerMap.remove(event);
     }
 

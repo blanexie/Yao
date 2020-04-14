@@ -6,6 +6,7 @@ import xyz.xiezc.ioc.definition.BeanDefinition;
 import xyz.xiezc.ioc.definition.BeanSignature;
 import xyz.xiezc.ioc.starter.WebConfiguration;
 import xyz.xiezc.web.annotation.PostMapping;
+import xyz.xiezc.web.common.DispatcherHandler;
 import xyz.xiezc.web.common.MappingHandler;
 
 import java.lang.reflect.Field;
@@ -48,7 +49,7 @@ public class PostMappingAnnotationHandler extends AnnotationHandler<PostMapping>
         mappingHandler.setPath(path);
         mappingHandler.setBeanDefinition(controller);
         mappingHandler.setMethod(method);
-        WebConfiguration.mappingHandlerMap.put(path, mappingHandler);
+        DispatcherHandler.mappingHandlerMap.put(path, mappingHandler);
     }
 
     @Override

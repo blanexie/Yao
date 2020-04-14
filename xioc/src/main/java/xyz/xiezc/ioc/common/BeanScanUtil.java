@@ -82,7 +82,7 @@ public class BeanScanUtil {
     /**
      * 扫描所有容器中的类的注解，并处理
      */
-    public void scanClass() {
+    public void scanBeanClass() {
         Map<Class<? extends Annotation>, AnnotationHandler> classAnnoAndHandlerMap = annoUtil.classAnnoAndHandlerMap;
 
         CopyOnWriteArraySet<BeanDefinition> copyOnWriteArraySet = new CopyOnWriteArraySet(contextUtil.context);
@@ -129,7 +129,7 @@ public class BeanScanUtil {
      *
      * @return
      */
-    public void scanField() {
+    public void scanBeanField() {
 
         Map<Class<? extends Annotation>, AnnotationHandler> fieldAnnoAndHandlerMap = annoUtil.getFieldAnnoAndHandlerMap();
 
@@ -181,15 +181,11 @@ public class BeanScanUtil {
 
         CopyOnWriteArraySet<BeanDefinition> copyOnWriteArraySet = new CopyOnWriteArraySet(contextUtil.context);
         for (BeanDefinition beanDefinition : copyOnWriteArraySet) {
-
-            if (beanDefinition.getBeanStatus() != BeanStatusEnum.Completed) {
-                throw new RuntimeException("容器中还存在实例化未完成的bean：{}" + beanDefinition.toString());
-            }
             Class<?> tClass = beanDefinition.getBeanClass();
-            Method[] methods = ReflectUtil.getMethods(tClass);
+
+            Method[] methods = tClass.getDeclaredMethods();
             //检查每个字段的注解
             for (Method method : methods) {
-
                 Annotation[] annotations = AnnotationUtil.getAnnotations(method, true);
                 if (annotations == null || annotations.length == 0) {
                     continue;
