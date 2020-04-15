@@ -2,33 +2,26 @@ package xyz.xiezc.web.common;
 
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.collection.ListUtil;
-import cn.hutool.core.convert.Convert;
-import cn.hutool.core.util.ClassUtil;
+import cn.hutool.core.exceptions.ExceptionUtil;
+import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.servlet.ServletUtil;
-import cn.hutool.json.JSONUtil;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
-import org.eclipse.jetty.util.MultiMap;
-import xyz.xiezc.ioc.AnnotationHandler;
 import xyz.xiezc.ioc.annotation.Component;
-import xyz.xiezc.ioc.annotation.Inject;
+import xyz.xiezc.ioc.definition.ParamDefinition;
 import xyz.xiezc.web.annotation.GetMapping;
 import xyz.xiezc.web.annotation.PostMapping;
+import xyz.xiezc.web.handler.HttpMessageConverter;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.lang.reflect.Array;
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
@@ -39,16 +32,18 @@ public class DispatcherHandler extends AbstractHandler {
      */
     public static final Map<String, MappingHandler> mappingHandlerMap = new HashMap<>();
 
+    /**
+     * 路径处理器
+     */
+    public Map<ContentType, HttpMessageConverter> httpMessageConverterMap = new HashMap<>();
+
 
     @Override
     public void handle(String target,
                        Request baseRequest,
                        HttpServletRequest request,
                        HttpServletResponse response
-    ) throws IOException, ServletException {
-        response.setContentType("application/json; charset=utf-8");
-        response.setStatus(HttpServletResponse.SC_OK);
-
+    ) throws IOException {
 
         String pathInfo = baseRequest.getPathInfo();
         MappingHandler mappingHandler = mappingHandlerMap.get(pathInfo);
@@ -57,18 +52,19 @@ public class DispatcherHandler extends AbstractHandler {
             return;
         }
 
-        Method method = mappingHandler.getMethod();
         //校验请求的psot 还是 get
-        String method1 = baseRequest.getMethod();
-        if (StrUtil.equalsIgnoreCase(method1, "get")) {
+        Method method = mappingHandler.getMethod();
+        if (StrUtil.equalsIgnoreCase(baseRequest.getMethod(), "get")) {
             GetMapping annotation = AnnotationUtil.getAnnotation(method, GetMapping.class);
             if (annotation == null) {
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 baseRequest.setHandled(true);
                 return;
             }
-        } else if (StrUtil.equalsIgnoreCase(method1, "post")) {
+        } else if (StrUtil.equalsIgnoreCase(baseRequest.getMethod(), "post")) {
             PostMapping annotation = AnnotationUtil.getAnnotation(method, PostMapping.class);
             if (annotation == null) {
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 baseRequest.setHandled(true);
                 return;
             }
@@ -77,49 +73,33 @@ public class DispatcherHandler extends AbstractHandler {
             return;
         }
 
-        Map<String, String> params = ServletUtil.getParamMap(baseRequest);
-        Parameter[] parameters = method.getParameters();
-        Object[] paramObjs = new Object[parameters.length];
-        for (int i = 0; i < parameters.length; i++) {
-            Parameter parameter = parameters[i];
-            parameter.getParameterizedType();
-            String name = parameter.getName();
-            String param = params.get(name);
-            Class<?> type = parameter.getType();
-
-            if (ClassUtil.isAssignable(type, Set.class) || ClassUtil.isAssignable(type, List.class)) {
-                String[] split = param.split(",");
-                Collection<String> strings = CollUtil.toCollection(CollUtil.newArrayList(split));
-                paramObjs[i] = strings;
-            }
-            if (type.isArray()) {
-                String[] split = param.split(",");
-                paramObjs[i] = split;
-            }
-
-            if (ClassUtil.isAssignable(type, Integer.class)) {
-                Integer integer = Convert.toInt(param);
-                paramObjs[i] = integer;
-            }
-            if (ClassUtil.isAssignable(type, String.class)) {
-                paramObjs[i] = param;
-            }
-            if (ClassUtil.isAssignable(type, Boolean.class)) {
-                paramObjs[i] = Convert.toBool(param);
-            }
-            if (ClassUtil.isAssignable(type, Character.class)) {
-                paramObjs[i] = Convert.toChar(param);
-            }
-            if (ClassUtil.isAssignable(type, Number.class)) {
-                paramObjs[i] = Convert.toNumber(param);
-            }
+        //获取调用方法的参数
+        String header = ServletUtil.getHeader(baseRequest, "Content-Type", CharsetUtil.CHARSET_UTF_8);
+        if (header.contains(";")) {
+            List<String> split = StrUtil.split(header, ';');
+            header = split.get(0);
         }
 
+
+        HttpMessageConverter httpMessageConverter = httpMessageConverterMap.get(ContentType.getByValue(header));
+        if (httpMessageConverter == null) {
+            ExceptionUtil.wrapAndThrow(new RuntimeException("contentType:" + header + "没有配置对应的HttpMessageConverter"));
+        }
+        httpMessageConverter.read(mappingHandler, baseRequest);
+
+        //反射调用方法
         Object bean = mappingHandler.getBeanDefinition().getBean();
-        Object invoke = ReflectUtil.invoke(bean, method, paramObjs);
-        PrintWriter out = response.getWriter();
-        out.println(JSONUtil.toJsonStr(invoke));
+        ParamDefinition[] paramDefinitions = mappingHandler.getParamDefinitions();
+        Object[] params=new Object[paramDefinitions.length];
+        for (int i = 0; i < paramDefinitions.length; i++) {
+            params[i]=paramDefinitions[i].getParam();
+        }
+        Object invoke = ReflectUtil.invoke(bean, method, params);
+        //回写数据
+        response.setStatus(HttpServletResponse.SC_OK);
+        httpMessageConverter.write(invoke, ContentType.JSON, response);
         baseRequest.setHandled(true);
+
 
     }
 }

@@ -8,26 +8,40 @@ import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.setting.Setting;
+import lombok.Data;
+import lombok.SneakyThrows;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.MethodVisitor;
 import xyz.xiezc.ioc.AnnotationHandler;
 import xyz.xiezc.ioc.annotation.Bean;
 import xyz.xiezc.ioc.annotation.Component;
 import xyz.xiezc.ioc.annotation.Configuration;
 import xyz.xiezc.ioc.annotation.Inject;
+import xyz.xiezc.ioc.common.event.Event;
+import xyz.xiezc.ioc.common.event.EventListenerUtil;
+import xyz.xiezc.ioc.common.event.Listener;
 import xyz.xiezc.ioc.definition.AnnotationAndHandler;
 import xyz.xiezc.ioc.definition.BeanDefinition;
+import xyz.xiezc.ioc.definition.BeanSignature;
 import xyz.xiezc.ioc.enums.BeanStatusEnum;
+import xyz.xiezc.ioc.enums.BeanTypeEnum;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.stream.Collectors;
 
 /**
  * bean 类扫描加载工具
  */
+
 public class BeanScanUtil {
 
     /**
@@ -39,10 +53,16 @@ public class BeanScanUtil {
      */
     AnnoUtil annoUtil;
 
+    /**
+     * 事件分发处理器
+     */
+    EventListenerUtil eventListenerUtil;
 
-    public BeanScanUtil(ContextUtil contextUtil) {
+
+    public BeanScanUtil(ContextUtil contextUtil, EventListenerUtil eventListenerUtil) {
         this.contextUtil = contextUtil;
         this.annoUtil = contextUtil.getAnnoUtil();
+        this.eventListenerUtil = eventListenerUtil;
     }
 
 
@@ -176,14 +196,14 @@ public class BeanScanUtil {
      *
      * @return
      */
+    @SneakyThrows
     public void scanMethod() {
         Map<Class<? extends Annotation>, AnnotationHandler> methodAnnoAndHandlerMap = annoUtil.getMethodAnnoAndHandlerMap();
 
         CopyOnWriteArraySet<BeanDefinition> copyOnWriteArraySet = new CopyOnWriteArraySet(contextUtil.context);
         for (BeanDefinition beanDefinition : copyOnWriteArraySet) {
             Class<?> tClass = beanDefinition.getBeanClass();
-
-            Method[] methods = tClass.getDeclaredMethods();
+            Method[] methods = ClassUtil.getDeclaredMethods(tClass);
             //检查每个字段的注解
             for (Method method : methods) {
                 Annotation[] annotations = AnnotationUtil.getAnnotations(method, true);
@@ -259,4 +279,25 @@ public class BeanScanUtil {
         contextUtil.setSetting(setting);
     }
 
+    /**
+     * 获取容器中的事件监听器， 这个方法是在。 初始化完成后执行
+     */
+    public void loadEventListener() {
+        BeanSignature beanSignature = new BeanSignature();
+        beanSignature.setBeanClass(Listener.class);
+        beanSignature.setBeanName("listener");
+        beanSignature.setBeanTypeEnum(BeanTypeEnum.bean);
+        List<BeanDefinition> beanDefinitions = contextUtil.getBeanDefinitions(beanSignature);
+        beanDefinitions.forEach(beanDefinition -> {
+            Listener bean;
+            if (beanDefinition.getBeanStatus() != BeanStatusEnum.Completed) {
+                bean = (Listener) XiocUtil.createBean(beanDefinition, contextUtil);
+            } else {
+                bean = beanDefinition.getBean();
+            }
+            Event event = bean.getEvent();
+            eventListenerUtil.addListener(event, bean);
+        });
+
+    }
 }

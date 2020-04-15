@@ -8,10 +8,13 @@ import lombok.Data;
 import xyz.xiezc.ioc.definition.BeanDefinition;
 import xyz.xiezc.ioc.definition.BeanSignature;
 import xyz.xiezc.ioc.enums.BeanStatusEnum;
+import xyz.xiezc.ioc.enums.BeanTypeEnum;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 容器，装载bean的容器
@@ -91,4 +94,39 @@ public class ContextUtil {
     }
 
 
+    /**
+     * 从容器中获取对应的bean
+     *
+     * @param beanSignature
+     * @return 容器中不存在返回null，
+     */
+    public List<BeanDefinition> getBeanDefinitions(BeanSignature beanSignature) {
+        List<BeanDefinition> collect = context.stream()
+                .filter(beanDefinition -> {
+                    Class<?> beanClass = beanDefinition.getBeanClass();
+                    if (beanSignature.getBeanClass() == beanClass) {
+                        return true;
+                    }
+                    if (ClassUtil.isAssignable(beanSignature.getBeanClass(), beanClass)) {
+                        return true;
+                    }
+                    return false;
+                }).collect(Collectors.toList());
+
+        return collect;
+    }
+
+    /**
+     * 从容器中获取对应的bean
+     *
+     * @param clazz
+     * @return 容器中不存在返回null，
+     */
+    public List<BeanDefinition> getBeanDefinitions(Class<?> clazz) {
+        BeanSignature beanSignature = new BeanSignature();
+        beanSignature.setBeanTypeEnum(BeanTypeEnum.bean);
+        beanSignature.setBeanClass(clazz);
+        beanSignature.setBeanName(clazz.getName());
+        return getBeanDefinitions(beanSignature);
+    }
 }

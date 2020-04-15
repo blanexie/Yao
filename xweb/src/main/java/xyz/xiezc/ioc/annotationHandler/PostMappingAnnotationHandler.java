@@ -1,10 +1,11 @@
 package xyz.xiezc.ioc.annotationHandler;
 
 import xyz.xiezc.ioc.AnnotationHandler;
+import xyz.xiezc.ioc.asm.AsmUtil;
 import xyz.xiezc.ioc.common.ContextUtil;
 import xyz.xiezc.ioc.definition.BeanDefinition;
 import xyz.xiezc.ioc.definition.BeanSignature;
-import xyz.xiezc.ioc.starter.WebConfiguration;
+import xyz.xiezc.ioc.definition.ParamDefinition;
 import xyz.xiezc.web.annotation.PostMapping;
 import xyz.xiezc.web.common.DispatcherHandler;
 import xyz.xiezc.web.common.MappingHandler;
@@ -45,10 +46,12 @@ public class PostMappingAnnotationHandler extends AnnotationHandler<PostMapping>
         }
         String path = beanName + value;
 
+        ParamDefinition[] paramDefinitions = AsmUtil.getMethodParamsAndAnnotaton(method);
         MappingHandler mappingHandler = new MappingHandler();
         mappingHandler.setPath(path);
         mappingHandler.setBeanDefinition(controller);
         mappingHandler.setMethod(method);
+        mappingHandler.setParamDefinitions(paramDefinitions);
         DispatcherHandler.mappingHandlerMap.put(path, mappingHandler);
     }
 

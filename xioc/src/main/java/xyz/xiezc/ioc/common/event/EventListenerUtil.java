@@ -1,6 +1,7 @@
 package xyz.xiezc.ioc.common.event;
 
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.thread.ThreadUtil;
 
 import java.util.ArrayList;
@@ -41,7 +42,13 @@ public class EventListenerUtil {
             listenerMap.put(event, listeners);
         }
         listeners.add(listener);
+        listeners.sort((a, b) -> {
+            int orderA = a.order();
+            int orderB = b.order();
+            return orderA > orderB ? 1 : -1;
+        });
     }
+
 
     public void removeListener(Event event, Listener listener) {
         List<Listener> listeners = listenerMap.get(event);

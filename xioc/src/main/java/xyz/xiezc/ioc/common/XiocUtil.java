@@ -110,6 +110,8 @@ public class XiocUtil {
             ReflectUtil.setFieldValue(bean, field, fieldValue);
         }
 
+
+
         //配置注入
         Value value = field.getAnnotation(Value.class);
         if (value != null) {

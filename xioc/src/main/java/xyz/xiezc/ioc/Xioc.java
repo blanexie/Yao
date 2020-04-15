@@ -1,16 +1,12 @@
 package xyz.xiezc.ioc;
 
 import cn.hutool.core.util.ClassUtil;
-import cn.hutool.core.util.ReflectUtil;
 import lombok.Data;
 import xyz.xiezc.ioc.common.BeanScanUtil;
 import xyz.xiezc.ioc.common.ContextUtil;
 import xyz.xiezc.ioc.common.event.Event;
 import xyz.xiezc.ioc.common.event.EventListenerUtil;
 import xyz.xiezc.ioc.common.event.Listener;
-import xyz.xiezc.ioc.definition.BeanDefinition;
-import xyz.xiezc.ioc.definition.BeanSignature;
-import xyz.xiezc.ioc.enums.BeanTypeEnum;
 
 import java.lang.annotation.Annotation;
 
@@ -38,7 +34,7 @@ public final class Xioc {
     /**
      * 扫描工具
      */
-    private final BeanScanUtil beanScanUtil = new BeanScanUtil(contextUtil);
+    private final BeanScanUtil beanScanUtil = new BeanScanUtil(contextUtil, eventListenerUtil);
 
     /**
      * 加载其他starter需要扫描的package路径
@@ -70,7 +66,7 @@ public final class Xioc {
      *
      * @param clazz 传入的启动类, 以这个启动类所在目录为根目录开始扫描bean类
      */
-    public static Xioc run(Class<?> clazz) {
+    public Xioc run(Class<?> clazz) {
         //开始启动框架
         xioc.eventListenerUtil.syncCall(new Event("xioc-start"));
         BeanScanUtil beanScanUtil = xioc.getBeanScanUtil();
@@ -102,23 +98,17 @@ public final class Xioc {
 
         //注入依赖和初始化
         beanScanUtil.initAndInjectBeans();
-        xioc.eventListenerUtil.syncCall(new Event("xioc-initAndInjectBeans"));
+        //加载容器中的事件bean
+        beanScanUtil.loadEventListener();
+        xioc.eventListenerUtil.syncCall(new Event("xioc-initAndInjectBeans-end"));
 
         return xioc;
     }
 
 
-    public Xioc web(Class<?> clazz) {
-        BeanSignature beanSignature = new BeanSignature();
-        beanSignature.setBeanClass(clazz);
-        beanSignature.setBeanTypeEnum(BeanTypeEnum.bean);
-        beanSignature.setBeanName("testc");
-        BeanDefinition beanDefinition = xioc.getContextUtil().getComplatedBeanDefinitionBySignature(beanSignature);
-        Object bean = beanDefinition.getBean();
-        Object server = ReflectUtil.invoke(bean, "createServer");
-        ReflectUtil.invoke(server, "start");
-        ReflectUtil.invoke(server, "join");
-        return xioc;
+    public void web(Class<?> clazz){
+        this.run(clazz);
+
     }
 
 

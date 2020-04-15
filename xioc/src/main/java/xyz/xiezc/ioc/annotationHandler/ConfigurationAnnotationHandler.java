@@ -20,7 +20,6 @@ import java.lang.reflect.Method;
  */
 public class ConfigurationAnnotationHandler extends AnnotationHandler<Configuration> {
 
-
     @Override
     public Class<Configuration> getAnnotationType() {
         return Configuration.class;

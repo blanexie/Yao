@@ -8,8 +8,7 @@ import xyz.xiezc.ioc.starter.WebConfiguration;
 public class ExampleApplication {
 
     public static void main(String[] args) {
-        Xioc xioc = Xioc.run(ExampleApplication.class).web(WebConfiguration.class);
-
+        Xioc xioc = Xioc.getSingleton().run(ExampleApplication.class);
         System.out.println();
     }
 

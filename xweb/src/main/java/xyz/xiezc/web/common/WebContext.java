@@ -7,7 +7,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpSession;
 
 @Data
-public class ReqContext {
+public class WebContext {
 
     ServletRequest request;
 
