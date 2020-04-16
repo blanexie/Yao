@@ -4,15 +4,12 @@ package xyz.xiezc.ioc.common;
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.exceptions.ExceptionUtil;
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.setting.Setting;
-import lombok.Data;
 import lombok.SneakyThrows;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.MethodVisitor;
 import xyz.xiezc.ioc.AnnotationHandler;
 import xyz.xiezc.ioc.annotation.Bean;
 import xyz.xiezc.ioc.annotation.Component;
@@ -27,6 +24,7 @@ import xyz.xiezc.ioc.definition.BeanSignature;
 import xyz.xiezc.ioc.enums.BeanStatusEnum;
 import xyz.xiezc.ioc.enums.BeanTypeEnum;
 
+import java.io.File;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -268,7 +266,13 @@ public class BeanScanUtil {
      */
     public void loadPropertie() {
         //读取classpath下的Application.setting，不使用变量
-        Setting setting = new Setting("application.setting");
+        File file = FileUtil.file("application.setting");
+        Setting setting;
+        if (file.exists()) {
+            setting = new Setting("application.setting");
+        } else {
+            setting = new Setting();
+        }
         String str = setting.getStr("other.setting.path");
         String[] split = StrUtil.split(str, ",");
         for (String s : split) {

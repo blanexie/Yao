@@ -74,11 +74,16 @@ public class DispatcherHandler extends AbstractHandler {
 
         //获取调用方法的参数
         String header = ServletUtil.getHeader(baseRequest, "Content-Type", CharsetUtil.CHARSET_UTF_8);
-        if (header.contains(";")) {
-            List<String> split = StrUtil.split(header, ';');
-            header = split.get(0);
+        ContentType contentType;
+        if (header == null && StrUtil.equalsIgnoreCase(baseRequest.getMethod(), "get")) {
+            contentType = ContentType.FORM_URLENCODED;
+        } else {
+            if (header.contains(";")) {
+                List<String> split = StrUtil.split(header, ';');
+                header = split.get(0);
+            }
+            contentType = ContentType.getByValue(header);
         }
-        ContentType contentType = ContentType.getByValue(header);
         HttpMessageConverter httpMessageConverter = httpMessageConverterMap.get(contentType);
         if (httpMessageConverter == null) {
             ExceptionUtil.wrapAndThrow(new RuntimeException("contentType:" + header + "; do not find HttpMessageConverter"));
