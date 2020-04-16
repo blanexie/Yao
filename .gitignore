@@ -11,6 +11,8 @@
 .gradle/
 build/
 
+venv
+
 #maven
 target/
 .mvn/
@@ -40,3 +42,5 @@ hs_err_pid*
 
 daily.properties
 /data/
+
+
