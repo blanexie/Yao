@@ -40,13 +40,13 @@ public interface HttpMessageConverter<T> {
     /**
      *
      */
-    void read(MappingHandler mappingHandler, HttpServletRequest inputStream)
+    void read(MappingHandler mappingHandler,ContentType contentType, HttpServletRequest request)
             throws IOException;
 
     /**
      *
      */
-    void write(T t, ContentType contentType, HttpServletResponse outputMessage)
+    void write(T t, ContentType contentType, HttpServletResponse response)
             throws IOException;
 
 }

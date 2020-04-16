@@ -1,17 +1,17 @@
 package xyz.xiezc.example.web;
 
+import lombok.Data;
 import xyz.xiezc.web.annotation.Controller;
 import xyz.xiezc.web.annotation.GetMapping;
 import xyz.xiezc.web.annotation.PostMapping;
-import xyz.xiezc.web.annotation.RequestBody;
 
-import java.util.List;
-
+@Data
 @Controller("/test")
 public class TestController {
 
+
     @PostMapping("testPost")
-    public String testPost(@RequestBody  List<Integer> per) {
+    public String testPost(int per) {
         return "hello word " + per;
     }
 

@@ -40,7 +40,7 @@ public class JsonHttpMessageConverter implements HttpMessageConverter<Object> {
 
 
     @Override
-    public void read(MappingHandler mappingHandler, HttpServletRequest request) throws IOException {
+    public void read(MappingHandler mappingHandler,ContentType contentType, HttpServletRequest request) throws IOException {
         ParamDefinition[] paramDefinitions = mappingHandler.getParamDefinitions();
         List<ParamDefinition> collect = CollUtil.newArrayList(paramDefinitions)
                 .stream()
@@ -89,6 +89,7 @@ public class JsonHttpMessageConverter implements HttpMessageConverter<Object> {
 
     @Override
     public void write(Object o, ContentType contentType, HttpServletResponse response) throws IOException {
+        response.setStatus(HttpServletResponse.SC_OK);
         String build = ContentType.build(contentType.getValue(), CharsetUtil.CHARSET_UTF_8);
         response.setContentType(build);
         byte[] bytes = JSONUtil.toJsonStr(o).getBytes(CharsetUtil.CHARSET_UTF_8);

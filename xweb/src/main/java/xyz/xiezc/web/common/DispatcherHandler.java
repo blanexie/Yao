@@ -1,8 +1,8 @@
 package xyz.xiezc.web.common;
 
 import cn.hutool.core.annotation.AnnotationUtil;
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.exceptions.ExceptionUtil;
+import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
@@ -22,7 +22,6 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Component
 public class DispatcherHandler extends AbstractHandler {
@@ -51,7 +50,6 @@ public class DispatcherHandler extends AbstractHandler {
             baseRequest.setHandled(true);
             return;
         }
-
         //校验请求的psot 还是 get
         Method method = mappingHandler.getMethod();
         if (StrUtil.equalsIgnoreCase(baseRequest.getMethod(), "get")) {
@@ -69,6 +67,7 @@ public class DispatcherHandler extends AbstractHandler {
                 return;
             }
         } else {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             baseRequest.setHandled(true);
             return;
         }
@@ -79,27 +78,26 @@ public class DispatcherHandler extends AbstractHandler {
             List<String> split = StrUtil.split(header, ';');
             header = split.get(0);
         }
-
-
-        HttpMessageConverter httpMessageConverter = httpMessageConverterMap.get(ContentType.getByValue(header));
+        ContentType contentType = ContentType.getByValue(header);
+        HttpMessageConverter httpMessageConverter = httpMessageConverterMap.get(contentType);
         if (httpMessageConverter == null) {
-            ExceptionUtil.wrapAndThrow(new RuntimeException("contentType:" + header + "没有配置对应的HttpMessageConverter"));
+            ExceptionUtil.wrapAndThrow(new RuntimeException("contentType:" + header + "; do not find HttpMessageConverter"));
         }
-        httpMessageConverter.read(mappingHandler, baseRequest);
+        WebContext.get().setRequest(request);
+        WebContext.get().setResponse(response);
+        httpMessageConverter.read(mappingHandler, contentType, baseRequest);
 
         //反射调用方法
         Object bean = mappingHandler.getBeanDefinition().getBean();
         ParamDefinition[] paramDefinitions = mappingHandler.getParamDefinitions();
-        Object[] params=new Object[paramDefinitions.length];
+        Object[] params = new Object[paramDefinitions.length];
         for (int i = 0; i < paramDefinitions.length; i++) {
-            params[i]=paramDefinitions[i].getParam();
+            params[i] = paramDefinitions[i].getParam();
         }
         Object invoke = ReflectUtil.invoke(bean, method, params);
         //回写数据
-        response.setStatus(HttpServletResponse.SC_OK);
         httpMessageConverter.write(invoke, ContentType.JSON, response);
+        WebContext.remove();
         baseRequest.setHandled(true);
-
-
     }
 }
