@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="xweb:war">
+    <output-path>$PROJECT_DIR$/xweb/target</output-path>
+    <properties id="maven-jee-properties">
+      <options>
+        <module>xweb</module>
+        <packaging>war</packaging>
+      </options>
+    </properties>
+    <root id="archive" name="xweb.war">
+      <element id="artifact" artifact-name="xweb:war exploded" />
+    </root>
+  </artifact>
+</component>

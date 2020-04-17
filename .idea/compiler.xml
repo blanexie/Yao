@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="xioc" />
+        <module name="example" />
+        <module name="starter" />
+        <module name="xweb" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="example" target="11" />
+      <module name="starter" target="11" />
+      <module name="xioc" target="11" />
+      <module name="xweb" target="11" />
+      <module name="yao" target="11" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

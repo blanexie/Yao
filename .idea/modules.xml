@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/example/example.iml" filepath="$PROJECT_DIR$/example/example.iml" />
+      <module fileurl="file://$PROJECT_DIR$/starter/starter.iml" filepath="$PROJECT_DIR$/starter/starter.iml" />
+      <module fileurl="file://$PROJECT_DIR$/xioc/xioc.iml" filepath="$PROJECT_DIR$/xioc/xioc.iml" />
+      <module fileurl="file://$PROJECT_DIR$/xweb/xweb.iml" filepath="$PROJECT_DIR$/xweb/xweb.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/yao.iml" filepath="$PROJECT_DIR$/.idea/yao.iml" />
+    </modules>
+  </component>
+</project>
