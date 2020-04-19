@@ -10,10 +10,7 @@ import xyz.xiezc.ioc.definition.BeanSignature;
 import xyz.xiezc.ioc.enums.BeanStatusEnum;
 import xyz.xiezc.ioc.enums.BeanTypeEnum;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -21,6 +18,7 @@ import java.util.stream.Collectors;
  */
 @Data
 public class ContextUtil {
+
     Log log = LogFactory.get(ContextUtil.class);
 
 
@@ -33,6 +31,16 @@ public class ContextUtil {
      * 容器
      */
     Set<BeanDefinition> context = new HashSet<>();
+
+    /**
+     * bean的name和class的映射关系
+     */
+    Map<String, Class<?>> nameAndClassMap = new HashMap<>();
+
+    /**
+     * bean的class与Beandefinition的映射关系
+     */
+    Map<Class<?>, BeanDefinition> classaAndBeanDefinitionMap = new HashMap<>();
 
     /**
      * 注解和注解处理器的映射关系

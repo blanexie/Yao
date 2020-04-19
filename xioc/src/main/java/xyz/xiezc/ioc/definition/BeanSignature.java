@@ -17,13 +17,11 @@ import java.util.Objects;
 public class BeanSignature {
 
 
-
     /**
      * bean ： 类上的注解，放入容器的bean
-     * properties ：方法上的注解，放入容器的bean
+     * properties ： 配置的注入
      */
     private BeanTypeEnum beanTypeEnum;
-
 
     /**
      * bean name

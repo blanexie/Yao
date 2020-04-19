@@ -18,7 +18,7 @@ import java.util.List;
  */
 @Setter
 @Getter
-public class BeanDefinition extends BeanSignature {
+public class BeanDefinition extends BeanSignature  {
 
     Log log = LogFactory.get(BeanDefinition.class);
 

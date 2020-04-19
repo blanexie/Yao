@@ -6,7 +6,7 @@ import lombok.Getter;
 public enum BeanStatusEnum {
 
     /**
-     * 原始的
+     * 初始状态
      */
     Original,
     /**
