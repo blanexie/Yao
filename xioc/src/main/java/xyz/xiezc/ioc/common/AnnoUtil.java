@@ -18,15 +18,10 @@ import java.util.Set;
 @Data
 public class AnnoUtil {
 
-
     public static Set<Class<? extends Annotation>> excludeAnnotation = new HashSet<>() {{
         add(Override.class);
         add(Deprecated.class);
     }};
-    /**
-     * 框架注解的路径
-     */
-    private String annoPath = "xyz.xiezc.ioc.annotationHandler";
 
     /**
      * 作用于类上面的注解

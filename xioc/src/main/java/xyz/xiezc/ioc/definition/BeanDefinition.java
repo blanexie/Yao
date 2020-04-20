@@ -76,7 +76,7 @@ public class BeanDefinition {
     /**
      * methodBean 的类型的bean调用的方法
      */
-    private MethodDefinition methodBeanInvoke;
+    private MethodDefinition InvokeMethodBean;
 
     /**
      * 具体的实例, 当beanScopeEnum为methodBean的时候，要注意下这个值是方法的返回值
@@ -90,8 +90,8 @@ public class BeanDefinition {
      * @return
      */
     public <T> T getBean() {
-        if(beanScopeEnum==BeanScopeEnum.factoryBean){
-            return ReflectUtil.invoke(bean,"getObject");
+        if (beanScopeEnum == BeanScopeEnum.factoryBean) {
+            return ReflectUtil.invoke(bean, "getObject");
         }
         return (T) bean;
     }

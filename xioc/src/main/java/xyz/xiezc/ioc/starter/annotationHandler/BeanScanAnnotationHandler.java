@@ -36,7 +36,7 @@ public class BeanScanAnnotationHandler extends AnnotationHandler<BeanScan> {
     public void processClass(BeanScan annotation, Class clazz, ContextUtil contextUtil) {
         //校验是否在@Configuration注解的bean内部
         if (AnnotationUtil.getAnnotation(clazz, Configuration.class) == null) {
-            ExceptionUtil.wrapAndThrow(new RuntimeException("BeanScan 必须在Configuration 注解的类上使用，error class:" + clazz.getName()));
+            ExceptionUtil.wrapAndThrow(new RuntimeException("@BeanScan必须在@Configuration注解的类上使用，error class:" + clazz.getName()));
         }
 
         Class<?>[] classes = annotation.basePackageClasses();

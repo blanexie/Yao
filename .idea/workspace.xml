@@ -2,47 +2,22 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="eb4483da-4f71-48f9-b035-099c27477286" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/annotation/Init.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/definition/FactoryBean.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/definition/FieldDefinition.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/definition/MethodDefinition.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/starter/annotationHandler/BeanAnnotationHandler.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/starter/annotationHandler/InitAnnotationHandler.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/starter/annotationHandler/InjectAnnotationHandler.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/starter/annotationHandler/ValueAnnotationHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__cn_hutool_hutool_all_5_3_0.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__cn_hutool_hutool_all_5_3_0.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__javax_servlet_javax_servlet_api_3_1_0.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__javax_servlet_javax_servlet_api_3_1_0.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_eclipse_jetty_jetty_http_9_4_28_v20200408.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_eclipse_jetty_jetty_http_9_4_28_v20200408.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_eclipse_jetty_jetty_io_9_4_28_v20200408.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_eclipse_jetty_jetty_io_9_4_28_v20200408.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_eclipse_jetty_jetty_server_9_4_28_v20200408.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_eclipse_jetty_jetty_server_9_4_28_v20200408.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_eclipse_jetty_jetty_util_9_4_28_v20200408.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_eclipse_jetty_jetty_util_9_4_28_v20200408.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_ow2_asm_asm_8_0_1.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_ow2_asm_asm_8_0_1.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_projectlombok_lombok_1_18_12.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_projectlombok_lombok_1_18_12.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/starter/src/main/java/xyz/xiezc/ioc/test/StarterA.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/starter/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/starter/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/starter/src/main/java/xyz/xiezc/ioc/starter/StarterApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/starter/src/main/java/xyz/xiezc/ioc/starter/StarterApplication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/AnnotationHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/AnnotationHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/starter/src/main/java/xyz/xiezc/ioc/test/StarterC.java" beforeDir="false" afterPath="$PROJECT_DIR$/starter/src/main/java/xyz/xiezc/ioc/test/StarterC.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/Xioc.java" beforeDir="false" afterPath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/Xioc.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/annotationHandler/BeanScanAnnotationHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/starter/annotationHandler/BeanScanAnnotationHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/annotationHandler/ComponentAnnotationHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/starter/annotationHandler/ComponentAnnotationHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/annotationHandler/ConfigurationAnnotationHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/starter/annotationHandler/ConfigurationAnnotationHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/asm/AsmUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/asm/AsmUtil.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/common/AnnoUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/common/AnnoUtil.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/common/BeanScanUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/common/BeanScanUtil.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/common/ContextUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/common/ContextUtil.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/common/XiocUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/common/XiocUtil.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/definition/BeanDefinition.java" beforeDir="false" afterPath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/definition/BeanDefinition.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/definition/BeanSignature.java" beforeDir="false" afterPath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/definition/BeanSignature.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/definition/ParamDefinition.java" beforeDir="false" afterPath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/definition/ParamDefinition.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/enums/BeanStatusEnum.java" beforeDir="false" afterPath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/enums/BeanStatusEnum.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/enums/BeanTypeEnum.java" beforeDir="false" afterPath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/enums/BeanScopeEnum.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/xweb/src/main/java/xyz/xiezc/ioc/annotationHandler/ControllerAnnotationHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/xweb/src/main/java/xyz/xiezc/ioc/starter/annotationHandler/ControllerAnnotationHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/xweb/src/main/java/xyz/xiezc/ioc/annotationHandler/GetMappingAnnotationHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/xweb/src/main/java/xyz/xiezc/ioc/starter/annotationHandler/GetMappingAnnotationHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/xweb/src/main/java/xyz/xiezc/ioc/annotationHandler/PostMappingAnnotationHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/xweb/src/main/java/xyz/xiezc/ioc/starter/annotationHandler/PostMappingAnnotationHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/starter/annotationHandler/BeanAnnotationHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/starter/annotationHandler/BeanAnnotationHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/starter/annotationHandler/BeanScanAnnotationHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/starter/annotationHandler/BeanScanAnnotationHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/starter/annotationHandler/ComponentAnnotationHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/starter/annotationHandler/ComponentAnnotationHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/starter/annotationHandler/ConfigurationAnnotationHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/starter/annotationHandler/ConfigurationAnnotationHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/starter/annotationHandler/InitAnnotationHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/starter/annotationHandler/InitAnnotationHandler.java" afterDir="false" />
     </list>
-    <ignored path="$PROJECT_DIR$/starter/target/" />
-    <ignored path="$PROJECT_DIR$/example/target/" />
-    <ignored path="$PROJECT_DIR$/target/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -52,115 +27,6 @@
   <component name="DefaultGradleProjectSettings">
     <option name="isMigrated" value="true" />
   </component>
-  <component name="FileEditorManager">
-    <leaf>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/common/BeanScanUtil.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="183">
-              <caret line="76" selection-start-line="76" selection-end-line="76" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/starter/annotationHandler/ComponentAnnotationHandler.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="149">
-              <caret line="31" selection-start-line="31" selection-end-line="31" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/starter/annotationHandler/BeanAnnotationHandler.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="258">
-              <caret line="28" column="60" selection-start-line="25" selection-start-column="7" selection-end-line="28" selection-end-column="60" />
-              <folding>
-                <element signature="imports" expanded="true" />
-                <element signature="e#443#444#0" expanded="true" />
-                <element signature="e#470#471#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/starter/annotationHandler/InitAnnotationHandler.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="214">
-              <caret line="20" selection-start-line="20" selection-end-line="20" />
-              <folding>
-                <element signature="imports" expanded="true" />
-                <element signature="e#443#444#0" expanded="true" />
-                <element signature="e#470#471#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/common/XiocUtil.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="5">
-              <caret line="304" column="38" lean-forward="true" selection-start-line="304" selection-start-column="38" selection-end-line="304" selection-end-column="38" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/common/AnnoUtil.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="202">
-              <caret line="25" column="7" lean-forward="true" selection-start-line="25" selection-start-column="7" selection-end-line="25" selection-end-column="7" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/starter/src/main/java/xyz/xiezc/ioc/test/StarterC.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="126">
-              <caret line="7" lean-forward="true" selection-start-line="7" selection-end-line="7" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/starter/pom.xml">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="295">
-              <caret line="21" selection-start-line="21" selection-end-line="21" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/starter/src/main/java/xyz/xiezc/ioc/starter/StarterApplication.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="135">
-              <caret line="9" column="10" selection-start-line="9" selection-start-column="1" selection-end-line="9" selection-end-column="10" />
-              <folding>
-                <element signature="imports" expanded="true" />
-                <element signature="e#229#230#0" expanded="true" />
-                <element signature="e#263#264#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/Xioc.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="183">
-              <caret line="80" selection-start-line="80" selection-end-line="80" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
-  </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
@@ -169,49 +35,8 @@
       </list>
     </option>
   </component>
-  <component name="FindInProjectRecents">
-    <findStrings>
-      <find>CombinationAnnotationElement</find>
-      <find>createBean</find>
-    </findStrings>
-  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
-  </component>
-  <component name="IdeDocumentHistory">
-    <option name="CHANGED_PATHS">
-      <list>
-        <option value="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/enums/BeanTypeEnum.java" />
-        <option value="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/definition/BeanSignature.java" />
-        <option value="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/enums/BeanScopeEnum.java" />
-        <option value="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/definition/FieldBeanDefinition.java" />
-        <option value="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/definition/MethodBeanDefinition.java" />
-        <option value="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/asm/AsmUtil.java" />
-        <option value="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/common/ContextUtil.java" />
-        <option value="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/annotationHandler/ConfigurationAnnotationHandler.java" />
-        <option value="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/AnnotationHandler.java" />
-        <option value="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/annotationHandler/ComponentAnnotationHandler.java" />
-        <option value="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/definition/MethodDefinition.java" />
-        <option value="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/enums/BeanStatusEnum.java" />
-        <option value="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/definition/BeanDefinition.java" />
-        <option value="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/definition/FactoryBean.java" />
-        <option value="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/Xioc.java" />
-        <option value="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/starter/annotationHandler/ConfigurationAnnotationHandler.java" />
-        <option value="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/starter/annotationHandler/BeanScanAnnotationHandler.java" />
-        <option value="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/definition/FieldDefinition.java" />
-        <option value="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/definition/ParamDefinition.java" />
-        <option value="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/starter/annotationHandler/InjectAnnotationHandler.java" />
-        <option value="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/starter/annotationHandler/ValueAnnotationHandler.java" />
-        <option value="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/starter/annotationHandler/BeanAnnotationHandler.java" />
-        <option value="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/annotation/Init.java" />
-        <option value="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/starter/annotationHandler/InitAnnotationHandler.java" />
-        <option value="$PROJECT_DIR$/starter/pom.xml" />
-        <option value="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/common/BeanScanUtil.java" />
-        <option value="$PROJECT_DIR$/starter/src/main/java/xyz/xiezc/ioc/starter/StarterApplication.java" />
-        <option value="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/common/AnnoUtil.java" />
-        <option value="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/common/XiocUtil.java" />
-      </list>
-    </option>
   </component>
   <component name="ProjectFrameBounds">
     <option name="y" value="23" />
@@ -220,219 +45,6 @@
   </component>
   <component name="ProjectId" id="1aUbC6eqvCU5Nfzs6T9fQHuZOee" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
-  <component name="ProjectView">
-    <navigator proportions="" version="1">
-      <foldersAlwaysOnTop value="true" />
-    </navigator>
-    <panes>
-      <pane id="Scope" />
-      <pane id="ProjectPane">
-        <subPane>
-          <expand>
-            <path>
-              <item name="yao" type="b2602c69:ProjectViewProjectNode" />
-              <item name="yao" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="yao" type="b2602c69:ProjectViewProjectNode" />
-              <item name="yao" type="462c0819:PsiDirectoryNode" />
-              <item name="starter" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="yao" type="b2602c69:ProjectViewProjectNode" />
-              <item name="yao" type="462c0819:PsiDirectoryNode" />
-              <item name="starter" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="yao" type="b2602c69:ProjectViewProjectNode" />
-              <item name="yao" type="462c0819:PsiDirectoryNode" />
-              <item name="starter" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="yao" type="b2602c69:ProjectViewProjectNode" />
-              <item name="yao" type="462c0819:PsiDirectoryNode" />
-              <item name="starter" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="yao" type="b2602c69:ProjectViewProjectNode" />
-              <item name="yao" type="462c0819:PsiDirectoryNode" />
-              <item name="starter" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="ioc" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="yao" type="b2602c69:ProjectViewProjectNode" />
-              <item name="yao" type="462c0819:PsiDirectoryNode" />
-              <item name="starter" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="ioc" type="462c0819:PsiDirectoryNode" />
-              <item name="starter" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="yao" type="b2602c69:ProjectViewProjectNode" />
-              <item name="yao" type="462c0819:PsiDirectoryNode" />
-              <item name="starter" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="ioc" type="462c0819:PsiDirectoryNode" />
-              <item name="test" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="yao" type="b2602c69:ProjectViewProjectNode" />
-              <item name="yao" type="462c0819:PsiDirectoryNode" />
-              <item name="xioc" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="yao" type="b2602c69:ProjectViewProjectNode" />
-              <item name="yao" type="462c0819:PsiDirectoryNode" />
-              <item name="xioc" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="yao" type="b2602c69:ProjectViewProjectNode" />
-              <item name="yao" type="462c0819:PsiDirectoryNode" />
-              <item name="xioc" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="yao" type="b2602c69:ProjectViewProjectNode" />
-              <item name="yao" type="462c0819:PsiDirectoryNode" />
-              <item name="xioc" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="yao" type="b2602c69:ProjectViewProjectNode" />
-              <item name="yao" type="462c0819:PsiDirectoryNode" />
-              <item name="xioc" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="ioc" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="yao" type="b2602c69:ProjectViewProjectNode" />
-              <item name="yao" type="462c0819:PsiDirectoryNode" />
-              <item name="xioc" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="ioc" type="462c0819:PsiDirectoryNode" />
-              <item name="annotation" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="yao" type="b2602c69:ProjectViewProjectNode" />
-              <item name="yao" type="462c0819:PsiDirectoryNode" />
-              <item name="xweb" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="yao" type="b2602c69:ProjectViewProjectNode" />
-              <item name="yao" type="462c0819:PsiDirectoryNode" />
-              <item name="xweb" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="yao" type="b2602c69:ProjectViewProjectNode" />
-              <item name="yao" type="462c0819:PsiDirectoryNode" />
-              <item name="xweb" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="yao" type="b2602c69:ProjectViewProjectNode" />
-              <item name="yao" type="462c0819:PsiDirectoryNode" />
-              <item name="xweb" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="yao" type="b2602c69:ProjectViewProjectNode" />
-              <item name="yao" type="462c0819:PsiDirectoryNode" />
-              <item name="xweb" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="xiezc" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="yao" type="b2602c69:ProjectViewProjectNode" />
-              <item name="yao" type="462c0819:PsiDirectoryNode" />
-              <item name="xweb" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="xiezc" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="yao" type="b2602c69:ProjectViewProjectNode" />
-              <item name="yao" type="462c0819:PsiDirectoryNode" />
-              <item name="xweb" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="xiezc" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="annotation" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="yao" type="b2602c69:ProjectViewProjectNode" />
-              <item name="yao" type="462c0819:PsiDirectoryNode" />
-              <item name="xweb" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="xiezc" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="common" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="yao" type="b2602c69:ProjectViewProjectNode" />
-              <item name="yao" type="462c0819:PsiDirectoryNode" />
-              <item name="xweb" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="xiezc" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="handler" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="yao" type="b2602c69:ProjectViewProjectNode" />
-              <item name="yao" type="462c0819:PsiDirectoryNode" />
-              <item name="xweb" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="xiezc" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="listener" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="yao" type="b2602c69:ProjectViewProjectNode" />
-              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
-            </path>
-          </expand>
-          <select />
-        </subPane>
-      </pane>
-      <pane id="PackagesPane" />
-    </panes>
-  </component>
   <component name="PropertiesComponent">
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
@@ -490,6 +102,16 @@
         <item itemvalue="Application.StarterApplication" />
       </list>
     </recent_temporary>
+  </component>
+  <component name="ServiceViewManager">
+    <option name="allServicesViewState">
+      <serviceView>
+        <treeState>
+          <expand />
+          <select />
+        </treeState>
+      </serviceView>
+    </option>
   </component>
   <component name="SvnConfiguration">
     <configuration />
@@ -549,50 +171,6 @@
     <option name="localTasksCounter" value="6" />
     <servers />
   </component>
-  <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="20210000" />
-  </component>
-  <component name="ToolWindowManager">
-    <frame x="0" y="23" width="1440" height="825" extended-state="6" />
-    <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.2532189" />
-      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info id="Designer" order="2" />
-      <window_info id="Image Layers" order="3" />
-      <window_info id="Capture Tool" order="4" />
-      <window_info id="UI Designer" order="5" />
-      <window_info id="Favorites" order="6" side_tool="true" />
-      <window_info id="Learn" order="7" />
-      <window_info id="Web" order="8" side_tool="true" />
-      <window_info anchor="bottom" id="Messages" weight="0.3287858" />
-      <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" weight="0.3287858" />
-      <window_info anchor="bottom" id="Run" order="2" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.39972714" />
-      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
-      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="bottom" id="Terminal" order="7" />
-      <window_info anchor="bottom" id="Docker" order="8" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
-      <window_info anchor="bottom" id="Java Enterprise" order="10" />
-      <window_info anchor="bottom" id="Database Changes" order="11" />
-      <window_info active="true" anchor="bottom" id="Version Control" order="12" visible="true" weight="0.9590723" />
-      <window_info anchor="bottom" id="Tail" order="13" />
-      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
-      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
-      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info anchor="right" id="Maven" order="3" />
-      <window_info anchor="right" id="Palette" order="4" />
-      <window_info anchor="right" id="Capture Analysis" order="5" />
-      <window_info anchor="right" id="Word Book" order="6" side_tool="true" />
-      <window_info anchor="right" id="Key Promoter X" order="7" />
-      <window_info anchor="right" id="SciView" order="8" />
-      <window_info anchor="right" id="Database" order="9" />
-      <window_info anchor="right" id="Palette&#9;" order="10" />
-      <window_info anchor="right" id="Theme Preview" order="11" />
-    </layout>
-  </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
   </component>
@@ -602,20 +180,7 @@
         <entry key="MAIN">
           <value>
             <State>
-              <option name="RECENTLY_FILTERED_USER_GROUPS">
-                <collection />
-              </option>
-              <option name="RECENTLY_FILTERED_BRANCH_GROUPS">
-                <collection />
-              </option>
-              <option name="COLUMN_ORDER">
-                <list>
-                  <option value="0" />
-                  <option value="1" />
-                  <option value="2" />
-                  <option value="3" />
-                </list>
-              </option>
+              <option name="COLUMN_ORDER" />
             </State>
           </value>
         </entry>
@@ -652,344 +217,86 @@
           </properties>
           <option name="timeStamp" value="1" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-method">
+          <url>file://$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/common/XiocUtil.java</url>
+          <line>222</line>
+          <properties class="xyz.xiezc.ioc.common.XiocUtil" method="dealBeanAnnotation">
+            <option name="EMULATED" value="true" />
+          </properties>
+          <option name="timeStamp" value="10" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-method">
+          <url>file://$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/AnnotationHandler.java</url>
+          <line>31</line>
+          <properties class="xyz.xiezc.ioc.AnnotationHandler" method="processClass">
+            <option name="EMULATED" value="true" />
+          </properties>
+          <option name="timeStamp" value="11" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-method">
+          <url>file://$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/AnnotationHandler.java</url>
+          <line>41</line>
+          <properties class="xyz.xiezc.ioc.AnnotationHandler" method="processMethod">
+            <option name="EMULATED" value="true" />
+          </properties>
+          <option name="timeStamp" value="12" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-method">
+          <url>file://$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/AnnotationHandler.java</url>
+          <line>51</line>
+          <properties class="xyz.xiezc.ioc.AnnotationHandler" method="processField">
+            <option name="EMULATED" value="true" />
+          </properties>
+          <option name="timeStamp" value="13" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-method">
+          <url>file://$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/common/XiocUtil.java</url>
+          <line>31</line>
+          <properties class="xyz.xiezc.ioc.common.XiocUtil" method="createBean">
+            <option name="EMULATED" value="true" />
+          </properties>
+          <option name="timeStamp" value="15" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-method">
+          <url>file://$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/common/XiocUtil.java</url>
+          <line>92</line>
+          <properties class="xyz.xiezc.ioc.common.XiocUtil" method="doCreateBean">
+            <option name="EMULATED" value="true" />
+          </properties>
+          <option name="timeStamp" value="16" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/Xioc.java</url>
+          <line>70</line>
+          <option name="timeStamp" value="5" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/Xioc.java</url>
+          <line>73</line>
+          <option name="timeStamp" value="6" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/Xioc.java</url>
+          <line>76</line>
+          <option name="timeStamp" value="7" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/Xioc.java</url>
+          <line>79</line>
+          <option name="timeStamp" value="8" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/Xioc.java</url>
+          <line>82</line>
+          <option name="timeStamp" value="9" />
+        </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/common/XiocUtil.java</url>
-          <line>304</line>
-          <properties />
-          <option name="timeStamp" value="3" />
+          <line>201</line>
+          <option name="timeStamp" value="14" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
-  </component>
-  <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/definition/BeanSignature.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="64">
-          <caret line="23" selection-start-line="23" selection-end-line="23" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/cn/hutool/hutool-all/5.3.0/hutool-all-5.3.0.jar!/cn/hutool/core/util/ClassUtil.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="128">
-          <caret line="356" column="26" selection-start-line="356" selection-start-column="26" selection-end-line="356" selection-end-column="26" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$USER_HOME$/jdk-11.0.3.jdk/Contents/Home/lib/src.zip!/jdk.jfr/jdk/jfr/AnnotationElement.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="128">
-          <caret line="69" column="19" selection-start-line="69" selection-start-column="19" selection-end-line="69" selection-end-column="19" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$USER_HOME$/jdk-11.0.3.jdk/Contents/Home/lib/src.zip!/java.base/java/lang/reflect/AnnotatedElement.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="121">
-          <caret line="253" column="17" selection-start-line="253" selection-start-column="17" selection-end-line="253" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$USER_HOME$/jdk-11.0.3.jdk/Contents/Home/lib/src.zip!/java.base/java/lang/FunctionalInterface.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="260">
-          <caret line="68" column="18" selection-start-line="68" selection-start-column="18" selection-end-line="68" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$USER_HOME$/jdk-11.0.3.jdk/Contents/Home/lib/src.zip!/java.base/java/lang/Deprecated.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="128">
-          <caret line="82" column="18" selection-start-line="82" selection-start-column="18" selection-end-line="82" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$USER_HOME$/jdk-11.0.3.jdk/Contents/Home/lib/src.zip!/java.base/java/lang/reflect/Parameter.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="140">
-          <caret line="41" column="19" selection-start-line="41" selection-start-column="19" selection-end-line="41" selection-end-column="19" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/asm/AsmUtil.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="88">
-          <caret line="23" column="7" lean-forward="true" selection-start-line="23" selection-start-column="7" selection-end-line="23" selection-end-column="7" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$USER_HOME$/jdk-11.0.3.jdk/Contents/Home/lib/src.zip!/java.base/java/util/Set.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="147">
-          <caret line="252" column="12" selection-start-line="252" selection-start-column="12" selection-end-line="252" selection-end-column="12" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/common/ContextUtil.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="73">
-          <caret line="30" lean-forward="true" selection-start-line="30" selection-end-line="30" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/enums/BeanScopeEnum.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="346">
-          <caret line="21" column="15" selection-start-line="21" selection-start-column="15" selection-end-line="21" selection-end-column="15" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/definition/MethodDefinition.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="297">
-          <caret line="33" selection-start-line="33" selection-end-line="33" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/enums/BeanStatusEnum.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="263">
-          <caret line="18" column="18" selection-start-line="18" selection-start-column="18" selection-end-line="18" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/definition/BeanDefinition.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="18">
-          <caret line="23" column="13" selection-start-line="23" selection-start-column="13" selection-end-line="23" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/cn/hutool/hutool-all/5.3.0/hutool-all-5.3.0-sources.jar!/cn/hutool/core/util/ClassUtil.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="201">
-          <caret line="934" lean-forward="true" selection-start-line="934" selection-end-line="934" />
-          <folding>
-            <element signature="e#22960#22961#0" expanded="true" />
-            <element signature="e#22999#23000#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$USER_HOME$/jdk-11.0.3.jdk/Contents/Home/lib/src.zip!/java.base/java/lang/Class.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="147">
-          <caret line="1135" column="18" selection-start-line="1135" selection-start-column="18" selection-end-line="1135" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/definition/FactoryBean.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="54">
-          <caret line="3" column="28" selection-start-line="3" selection-start-column="17" selection-end-line="3" selection-end-column="28" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$USER_HOME$/jdk-11.0.3.jdk/Contents/Home/lib/src.zip!/java.base/java/lang/reflect/Type.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="147">
-          <caret line="34" column="17" selection-start-line="34" selection-start-column="17" selection-end-line="34" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/cn/hutool/hutool-all/5.3.0/hutool-all-5.3.0-sources.jar!/cn/hutool/core/annotation/CombinationAnnotationElement.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="49" column="10" selection-start-line="49" selection-start-column="10" selection-end-line="49" selection-end-column="10" />
-          <folding>
-            <element signature="e#1377#1378#0" expanded="true" />
-            <element signature="e#1397#1398#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/cn/hutool/hutool-all/5.3.0/hutool-all-5.3.0-sources.jar!/cn/hutool/core/annotation/AnnotationUtil.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="223">
-          <caret line="60" column="55" selection-start-line="60" selection-start-column="55" selection-end-line="60" selection-end-column="55" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/starter/annotationHandler/ConfigurationAnnotationHandler.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="242">
-          <caret line="38" lean-forward="true" selection-start-line="38" selection-end-line="38" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/AnnotationHandler.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="114">
-          <caret line="18" column="22" selection-start-line="18" selection-start-column="22" selection-end-line="18" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/definition/ParamDefinition.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="198">
-          <caret line="19" column="16" lean-forward="true" selection-start-line="19" selection-start-column="16" selection-end-line="19" selection-end-column="16" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/definition/FieldDefinition.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-9">
-          <caret line="7" column="13" selection-start-line="7" selection-start-column="13" selection-end-line="7" selection-end-column="13" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/starter/annotationHandler/InjectAnnotationHandler.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="259">
-          <caret line="48" column="46" lean-forward="true" selection-start-line="44" selection-start-column="7" selection-end-line="48" selection-end-column="46" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#474#475#0" expanded="true" />
-            <element signature="e#513#514#0" expanded="true" />
-            <element signature="e#436#437#0" expanded="true" />
-            <element signature="e#463#464#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/starter/annotationHandler/ValueAnnotationHandler.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="122">
-          <caret line="25" lean-forward="true" selection-start-line="25" selection-end-line="25" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#447#448#0" expanded="true" />
-            <element signature="e#474#475#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/starter/annotationHandler/BeanScanAnnotationHandler.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="198">
-          <caret line="28" selection-start-line="28" selection-end-line="28" />
-          <folding>
-            <element signature="e#863#864#0" expanded="true" />
-            <element signature="e#902#903#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/annotation/BeanScan.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="147">
-          <caret line="17" column="18" selection-start-line="17" selection-start-column="18" selection-end-line="17" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/annotation/Init.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="108">
-          <caret line="6" selection-start-line="6" selection-end-line="6" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/annotation/Bean.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="90">
-          <caret line="8" column="35" selection-start-line="6" selection-end-line="8" selection-end-column="35" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/starter/annotationHandler/BeanAnnotationHandler.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="258">
-          <caret line="28" column="60" selection-start-line="25" selection-start-column="7" selection-end-line="28" selection-end-column="60" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#443#444#0" expanded="true" />
-            <element signature="e#470#471#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/starter/annotationHandler/InitAnnotationHandler.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="214">
-          <caret line="20" selection-start-line="20" selection-end-line="20" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#443#444#0" expanded="true" />
-            <element signature="e#470#471#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/starter/pom.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="295">
-          <caret line="21" selection-start-line="21" selection-end-line="21" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/starter/src/main/java/xyz/xiezc/ioc/test/StarterC.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="126">
-          <caret line="7" lean-forward="true" selection-start-line="7" selection-end-line="7" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/starter/src/main/java/xyz/xiezc/ioc/starter/StarterApplication.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="135">
-          <caret line="9" column="10" selection-start-line="9" selection-start-column="1" selection-end-line="9" selection-end-column="10" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#229#230#0" expanded="true" />
-            <element signature="e#263#264#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/Xioc.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="183">
-          <caret line="80" selection-start-line="80" selection-end-line="80" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/common/BeanScanUtil.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="183">
-          <caret line="76" selection-start-line="76" selection-end-line="76" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/starter/annotationHandler/ComponentAnnotationHandler.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="149">
-          <caret line="31" selection-start-line="31" selection-end-line="31" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/common/AnnoUtil.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="202">
-          <caret line="25" column="7" lean-forward="true" selection-start-line="25" selection-start-column="7" selection-end-line="25" selection-end-column="7" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/common/XiocUtil.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="5">
-          <caret line="304" column="38" lean-forward="true" selection-start-line="304" selection-start-column="38" selection-end-line="304" selection-end-column="38" />
-        </state>
-      </provider>
-    </entry>
   </component>
   <component name="masterDetails">
     <states>

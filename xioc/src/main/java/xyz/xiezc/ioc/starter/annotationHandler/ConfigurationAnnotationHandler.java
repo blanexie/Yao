@@ -1,6 +1,7 @@
 package xyz.xiezc.ioc.starter.annotationHandler;
 
 import cn.hutool.core.annotation.AnnotationUtil;
+import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import xyz.xiezc.ioc.AnnotationHandler;
@@ -8,13 +9,12 @@ import xyz.xiezc.ioc.annotation.Bean;
 import xyz.xiezc.ioc.annotation.Configuration;
 import xyz.xiezc.ioc.common.ContextUtil;
 import xyz.xiezc.ioc.common.XiocUtil;
-import xyz.xiezc.ioc.definition.BeanDefinition;
-import xyz.xiezc.ioc.definition.BeanSignature;
-import xyz.xiezc.ioc.definition.FieldDefinition;
-import xyz.xiezc.ioc.definition.MethodDefinition;
+import xyz.xiezc.ioc.definition.*;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 
 
 /**
@@ -30,7 +30,8 @@ public class ConfigurationAnnotationHandler extends AnnotationHandler<Configurat
     @Override
     public void processClass(Configuration annotation, Class clazz, ContextUtil contextUtil) {
         BeanDefinition beanDefinition = XiocUtil.dealBeanAnnotation(annotation, clazz, contextUtil);
-        contextUtil.addBeanDefinition(beanDefinition);
+        Class<?> beanClass = XiocUtil.getRealBeanClass(beanDefinition);
+        contextUtil.addBeanDefinition(beanDefinition.getBeanName(), beanClass, beanDefinition);
     }
 
 

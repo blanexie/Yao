@@ -49,13 +49,13 @@ public class ContextUtil {
      *
      * @param beanDefinition
      */
-    public void addBeanDefinition(BeanDefinition beanDefinition) {
+    public void addBeanDefinition(String beanName, Class<?> beanClass, BeanDefinition beanDefinition) {
         if (!beanDefinition.checkBean()) {
             log.error("请注入正确的bean到容器中");
             throw new RuntimeException("请注入正确的bean到容器中, bean: " + beanDefinition.toString());
         }
-        nameAndClassMap.put(beanDefinition.getBeanName(),beanDefinition.getBeanClass());
-        classaAndBeanDefinitionMap.put(beanDefinition.getBeanClass(),beanDefinition);
+        nameAndClassMap.put(beanName, beanClass);
+        classaAndBeanDefinitionMap.put(beanClass, beanDefinition);
     }
 
     public BeanDefinition getBeanDefinitions(String beanName) {

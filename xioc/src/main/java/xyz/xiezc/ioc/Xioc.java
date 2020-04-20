@@ -67,7 +67,6 @@ public final class Xioc {
      * @param clazz 传入的启动类, 以这个启动类所在目录为根目录开始扫描bean类
      */
     public Xioc run(Class<?> clazz) {
-
         //开始启动框架
         BeanScanUtil beanScanUtil = xioc.getBeanScanUtil();
 
@@ -83,7 +82,6 @@ public final class Xioc {
         //加载bean信息
         String packagePath = ClassUtil.getPackage(clazz);
         beanScanUtil.loadBeanDefinition(packagePath);
-
 
         //扫描容器中的bean， 处理所有在bean类上的注解
         beanScanUtil.scanBeanDefinitionClass();
