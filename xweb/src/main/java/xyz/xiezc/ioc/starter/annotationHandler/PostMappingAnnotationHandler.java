@@ -1,4 +1,4 @@
-package xyz.xiezc.ioc.annotationHandler;
+package xyz.xiezc.ioc.starter.annotationHandler;
 
 import xyz.xiezc.ioc.AnnotationHandler;
 import xyz.xiezc.ioc.asm.AsmUtil;

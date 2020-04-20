@@ -1,12 +1,10 @@
-package xyz.xiezc.ioc.annotationHandler;
+package xyz.xiezc.ioc.starter.annotationHandler;
 
 import xyz.xiezc.ioc.AnnotationHandler;
 import xyz.xiezc.ioc.common.ContextUtil;
 import xyz.xiezc.ioc.definition.BeanDefinition;
 import xyz.xiezc.ioc.definition.BeanSignature;
-import xyz.xiezc.ioc.starter.WebConfiguration;
 import xyz.xiezc.web.annotation.GetMapping;
-import xyz.xiezc.web.common.MappingHandler;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;

@@ -1,12 +1,15 @@
 package xyz.xiezc.ioc.definition;
 
+import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 import lombok.Getter;
 import lombok.Setter;
 import xyz.xiezc.ioc.enums.BeanStatusEnum;
+import xyz.xiezc.ioc.enums.BeanScopeEnum;
 
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
 import java.util.List;
 
@@ -18,37 +21,65 @@ import java.util.List;
  */
 @Setter
 @Getter
-public class BeanDefinition extends BeanSignature  {
+public class BeanDefinition {
 
     Log log = LogFactory.get(BeanDefinition.class);
 
     /**
-     * 是否是单例模式。 默认是单例的
+     * 这个bean上面的所有注解
+     */
+    AnnotatedElement annotatedElement;
+
+    /**
+     * 默认都是单例的
      */
     private boolean isSingleton = true;
 
     /**
-     *
+     * bean ： 类上的注解，放入容器的bean
+     * factoryBean,
+     * methodBean
+     * properties ： 配置的注入
+     */
+    private BeanScopeEnum beanScopeEnum;
+
+    /**
+     * 这个bean的状态
      */
     private BeanStatusEnum beanStatus = BeanStatusEnum.Original;
 
     /**
-     * 需要注入的字段， 这个字段不一定是一个配置， 有可能是一个配置
+     * bean paramName
      */
-    private List<BeanSignature> injectBeans;
+    private String beanName;
 
     /**
-     *
+     * bean的class
      */
-    private BeanDefinition parentBeanDefinition;
+    private Class<?> beanClass;
 
     /**
-     * 构造bean的方法
+     * 有自定义注解的字段
      */
-    private Method method;
+    private List<FieldDefinition> annotationFiledDefinitions;
 
     /**
-     * 具体的实例
+     * 有自定义注解的方法
+     */
+    private List<MethodDefinition> annotationMethodDefinitions;
+
+    /**
+     * 需要在初始化完成后进行调用的方法
+     */
+    private MethodDefinition initMethodDefinition;
+
+    /**
+     * methodBean 的类型的bean调用的方法
+     */
+    private MethodDefinition methodBeanInvoke;
+
+    /**
+     * 具体的实例, 当beanScopeEnum为methodBean的时候，要注意下这个值是方法的返回值
      */
     private Object bean;
 
@@ -59,12 +90,10 @@ public class BeanDefinition extends BeanSignature  {
      * @return
      */
     public <T> T getBean() {
+        if(beanScopeEnum==BeanScopeEnum.factoryBean){
+            return ReflectUtil.invoke(bean,"getObject");
+        }
         return (T) bean;
-    }
-
-    public void setBeanSignature(BeanSignature beanSignature) {
-        this.setBeanName(beanSignature.getBeanName());
-        this.setBeanClass(beanSignature.getBeanClass());
     }
 
     public boolean checkBean() {
@@ -76,8 +105,16 @@ public class BeanDefinition extends BeanSignature  {
             log.error("请设置正确的beanClass，  bean:{}", this.toString());
             return false;
         }
+
         return true;
     }
 
-
+    @Override
+    public String toString() {
+        return "BeanDefinition{" +
+                ", isSingleton=" + isSingleton +
+                ", beanName='" + beanName + '\'' +
+                ", beanClass=" + beanClass +
+                '}';
+    }
 }

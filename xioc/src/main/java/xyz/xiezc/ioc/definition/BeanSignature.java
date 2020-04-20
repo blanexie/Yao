@@ -2,7 +2,7 @@ package xyz.xiezc.ioc.definition;
 
 
 import lombok.Data;
-import xyz.xiezc.ioc.enums.BeanTypeEnum;
+import xyz.xiezc.ioc.enums.BeanScopeEnum;
 
 import java.util.Objects;
 
@@ -15,16 +15,20 @@ import java.util.Objects;
  */
 @Data
 public class BeanSignature {
-
-
     /**
      * bean ： 类上的注解，放入容器的bean
      * properties ： 配置的注入
      */
-    private BeanTypeEnum beanTypeEnum;
+    private BeanScopeEnum beanScopeEnum;
 
     /**
-     * bean name
+     * 是否是单例模式。 默认是单例的
+     */
+    private boolean isSingleton = true;
+
+
+    /**
+     * bean paramName
      */
     private String beanName;
 
@@ -33,25 +37,6 @@ public class BeanSignature {
      */
     private Class<?> beanClass;
 
-    @Override
-    public String toString() {
-        return "BeanSignature{" +
-                "beanName='" + beanName + '\'' +
-                ", beanClass=" + beanClass +
-                '}';
-    }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof BeanSignature)) return false;
-        BeanSignature that = (BeanSignature) o;
-        return getBeanName().equals(that.getBeanName()) &&
-                getBeanClass().equals(that.getBeanClass());
-    }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(getBeanName(), getBeanClass());
-    }
 }

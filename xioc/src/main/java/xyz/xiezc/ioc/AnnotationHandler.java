@@ -2,7 +2,9 @@ package xyz.xiezc.ioc;
 
 import xyz.xiezc.ioc.common.ContextUtil;
 import xyz.xiezc.ioc.definition.AnnotationOrder;
-import xyz.xiezc.ioc.definition.BeanSignature;
+import xyz.xiezc.ioc.definition.BeanDefinition;
+import xyz.xiezc.ioc.definition.FieldDefinition;
+import xyz.xiezc.ioc.definition.MethodDefinition;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -32,21 +34,21 @@ public abstract class AnnotationHandler<T extends Annotation> extends Annotation
     /**
      * 如果是方法注解，则会调用这个方法来处理
      *
-     * @param beanSignature 被注解的类
-     * @param method        被注解的方法
-     * @param annotation    这个类上的所有注解
-     * @param contextUtil   容器中已有的所有bean信息
+     * @param beanDefinition   被注解的类
+     * @param methodDefinition 被注解的方法
+     * @param annotation       这个类上的所有注解
+     * @param contextUtil      容器中已有的所有bean信息
      */
-    public abstract void processMethod(Method method, T annotation, BeanSignature beanSignature, ContextUtil contextUtil);
+    public abstract void processMethod(MethodDefinition methodDefinition, T annotation, BeanDefinition beanDefinition, ContextUtil contextUtil);
 
     /**
      * 如果是字段注解，则会调用这个方法来处理
      *
-     * @param beanSignature 被注解的类
-     * @param field         被注解的字段
-     * @param annotation    这个类上的所有注解
-     * @param contextUtil   容器中已有的所有bean信息
+     * @param beanDefinition  被注解的类
+     * @param fieldDefinition 被注解的字段
+     * @param annotation      这个类上的所有注解
+     * @param contextUtil     容器中已有的所有bean信息
      */
-    public abstract void processField(Field field, T annotation, BeanSignature beanSignature, ContextUtil contextUtil);
+    public abstract void processField(FieldDefinition fieldDefinition, T annotation, BeanDefinition beanDefinition, ContextUtil contextUtil);
 
 }

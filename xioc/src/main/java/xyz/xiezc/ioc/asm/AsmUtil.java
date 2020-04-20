@@ -1,12 +1,11 @@
 package xyz.xiezc.ioc.asm;
 
-import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.annotation.CombinationAnnotationElement;
 import cn.hutool.core.util.ClassUtil;
 import org.objectweb.asm.*;
 import xyz.xiezc.ioc.definition.ParamDefinition;
 
 import java.io.IOException;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
@@ -36,7 +35,7 @@ public class AsmUtil {
             @Override
             public MethodVisitor visitMethod(final int access, final String name, final String desc, final String signature, final String[] exceptions) {
                 final Type[] args = Type.getArgumentTypes(desc);
-                // The method name is the same and the number of parameters is the same
+                // The method paramName is the same and the number of parameters is the same
                 if (!name.equals(method.getName()) || !sameType(args, method.getParameterTypes())) {
                     return super.visitMethod(access, name, desc, signature, exceptions);
                 }
@@ -53,7 +52,7 @@ public class AsmUtil {
                         }
                         ParamDefinition paramDefinition = new ParamDefinition();
                         if (i >= 0 && i < paramNames.length) {
-                            paramDefinition.setName(name);
+                            paramDefinition.setParamName(name);
                             String className = Type.getType(desc).getClassName();
                             paramDefinition.setParamType(ClassUtil.loadClass(className));
                             paramNames[i] = paramDefinition;
@@ -71,8 +70,7 @@ public class AsmUtil {
 
         Parameter[] parameters = method.getParameters();
         for (int i = 0; i < parameters.length; i++) {
-            Annotation[] declaredAnnotations = parameters[i].getDeclaredAnnotations();
-            paramNames[i].setAnnotations(CollUtil.newArrayList(declaredAnnotations));
+            paramNames[i].setAnnotatedElement(new CombinationAnnotationElement(parameters[i]));
         }
 
         return paramNames;

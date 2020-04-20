@@ -8,7 +8,9 @@ import xyz.xiezc.ioc.AnnotationHandler;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 处理注解相关的工具类
@@ -16,6 +18,11 @@ import java.util.Map;
 @Data
 public class AnnoUtil {
 
+
+    public static Set<Class<? extends Annotation>> excludeAnnotation = new HashSet<>() {{
+        add(Override.class);
+        add(Deprecated.class);
+    }};
     /**
      * 框架注解的路径
      */

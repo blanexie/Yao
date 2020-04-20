@@ -18,21 +18,18 @@ import xyz.xiezc.ioc.annotation.Inject;
 import xyz.xiezc.ioc.common.event.Event;
 import xyz.xiezc.ioc.common.event.EventListenerUtil;
 import xyz.xiezc.ioc.common.event.Listener;
-import xyz.xiezc.ioc.definition.AnnotationAndHandler;
-import xyz.xiezc.ioc.definition.BeanDefinition;
-import xyz.xiezc.ioc.definition.BeanSignature;
+import xyz.xiezc.ioc.definition.*;
 import xyz.xiezc.ioc.enums.BeanStatusEnum;
-import xyz.xiezc.ioc.enums.BeanTypeEnum;
+import xyz.xiezc.ioc.enums.BeanScopeEnum;
 
 import java.io.File;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.stream.Collectors;
 
@@ -92,23 +89,25 @@ public class BeanScanUtil {
      * 开始开始初始化bean 并且 注入依赖
      */
     public void initAndInjectBeans() {
-        for (BeanDefinition beanDefinition : contextUtil.context) {
+        contextUtil.classaAndBeanDefinitionMap.forEach((clazz, beanDefinition) -> {
             XiocUtil.createBean(beanDefinition, contextUtil);
-        }
+        });
     }
 
     /**
      * 扫描所有容器中的类的注解，并处理
      */
-    public void scanBeanClass() {
+    public void scanBeanDefinitionClass() {
         Map<Class<? extends Annotation>, AnnotationHandler> classAnnoAndHandlerMap = annoUtil.classAnnoAndHandlerMap;
-
-        CopyOnWriteArraySet<BeanDefinition> copyOnWriteArraySet = new CopyOnWriteArraySet(contextUtil.context);
-        for (BeanDefinition beanDefinition : copyOnWriteArraySet) {
+        //遍历beanDefinition
+        Collection<BeanDefinition> values = contextUtil.classaAndBeanDefinitionMap.values();
+        CopyOnWriteArrayList<BeanDefinition> copyOnWriteArrayList = new CopyOnWriteArrayList<>(values);
+        for (BeanDefinition beanDefinition : copyOnWriteArrayList) {
             Class cla = beanDefinition.getBeanClass();
+            AnnotatedElement annotatedElement = beanDefinition.getAnnotatedElement();
 
             //获取这个类上所有的注解
-            Annotation[] annotations = AnnotationUtil.getAnnotations(cla, true);
+            Annotation[] annotations = AnnotationUtil.getAnnotations(annotatedElement, true);
             //获取注解和handler
             List<AnnotationAndHandler> collect = CollUtil.newArrayList(annotations)
                     .stream()
@@ -147,24 +146,23 @@ public class BeanScanUtil {
      *
      * @return
      */
-    public void scanBeanField() {
+    public void scanBeanDefinitionField() {
 
         Map<Class<? extends Annotation>, AnnotationHandler> fieldAnnoAndHandlerMap = annoUtil.getFieldAnnoAndHandlerMap();
+        //遍历beanDefinition
+        Collection<BeanDefinition> values = contextUtil.classaAndBeanDefinitionMap.values();
+        CopyOnWriteArrayList<BeanDefinition> copyOnWriteArrayList = new CopyOnWriteArrayList<>(values);
+        for (BeanDefinition beanDefinition : copyOnWriteArrayList) {
 
-        CopyOnWriteArraySet<BeanDefinition> copyOnWriteArraySet = new CopyOnWriteArraySet(contextUtil.context);
-        for (BeanDefinition beanDefinition : copyOnWriteArraySet) {
+            List<FieldDefinition> annotationFiledDefinitions = beanDefinition.getAnnotationFiledDefinitions();
 
-            Class<?> tClass = beanDefinition.getBeanClass();
-            //获取所有的字段， 包含父类的字段
-            Field[] fields = ReflectUtil.getFields(tClass);
             //检查每个字段的注解
-            for (Field field : fields) {
-                Annotation[] annotations = AnnotationUtil.getAnnotations(field, true);
-                if (annotations == null || annotations.length == 0) {
-                    continue;
-                }
-                List<AnnotationAndHandler> collect = CollUtil.newArrayList(annotations).stream()
-                        .filter(annotation -> annotation.annotationType() != Inject.class)
+            for (FieldDefinition fieldDefinition : annotationFiledDefinitions) {
+                AnnotatedElement annotatedElement = fieldDefinition.getAnnotatedElement();
+                Annotation[] annotations = AnnotationUtil.getAnnotations(annotatedElement, true);
+                //遍历注解，找到注解处理器
+                List<AnnotationAndHandler> collect = CollUtil.newArrayList(annotations)
+                        .stream()
                         .map(annotation -> {
                             AnnotationHandler annotationHandler = fieldAnnoAndHandlerMap.get(annotation.annotationType());
                             AnnotationAndHandler annotationAndHandler = new AnnotationAndHandler();
@@ -183,7 +181,7 @@ public class BeanScanUtil {
                 for (AnnotationAndHandler annotationAndHandler : collect) {
                     AnnotationHandler annotationHandler = annotationAndHandler.getAnnotationHandler();//processField()
                     Annotation annotation = annotationAndHandler.getAnnotation();
-                    annotationHandler.processField(field, annotation, beanDefinition, contextUtil);
+                    annotationHandler.processField(fieldDefinition, annotation, beanDefinition, contextUtil);
                 }
             }
         }
@@ -195,21 +193,21 @@ public class BeanScanUtil {
      * @return
      */
     @SneakyThrows
-    public void scanMethod() {
+    public void scanBeanDefinitionMethod() {
         Map<Class<? extends Annotation>, AnnotationHandler> methodAnnoAndHandlerMap = annoUtil.getMethodAnnoAndHandlerMap();
 
-        CopyOnWriteArraySet<BeanDefinition> copyOnWriteArraySet = new CopyOnWriteArraySet(contextUtil.context);
-        for (BeanDefinition beanDefinition : copyOnWriteArraySet) {
-            Class<?> tClass = beanDefinition.getBeanClass();
-            Method[] methods = ClassUtil.getDeclaredMethods(tClass);
+        Collection<BeanDefinition> values = contextUtil.classaAndBeanDefinitionMap.values();
+        CopyOnWriteArrayList<BeanDefinition> copyOnWriteArrayList = new CopyOnWriteArrayList<>(values);
+        for (BeanDefinition beanDefinition : copyOnWriteArrayList) {
+            List<MethodDefinition> annotationMethodDefinitions = beanDefinition.getAnnotationMethodDefinitions();
             //检查每个字段的注解
-            for (Method method : methods) {
-                Annotation[] annotations = AnnotationUtil.getAnnotations(method, true);
+            for (MethodDefinition methodDefinition : annotationMethodDefinitions) {
+                Annotation[] annotations = AnnotationUtil.getAnnotations(methodDefinition.getAnnotatedElement(), true);
                 if (annotations == null || annotations.length == 0) {
                     continue;
                 }
-                List<AnnotationAndHandler> collect = CollUtil.newArrayList(annotations).stream()
-                        .filter(annotation -> annotation.annotationType() != Bean.class)
+                List<AnnotationAndHandler> collect = CollUtil.newArrayList(annotations)
+                        .stream()
                         .map(annotation -> {
                             AnnotationHandler annotationHandler = methodAnnoAndHandlerMap.get(annotation.annotationType());
                             AnnotationAndHandler annotationAndHandler = new AnnotationAndHandler();
@@ -218,12 +216,17 @@ public class BeanScanUtil {
                             return annotationAndHandler;
                         })
                         .filter(annotationAndHandler -> annotationAndHandler.getAnnotationHandler() != null)
-                        // .sorted(Comparator.comparing(AnnotationAndHandler::getAnnotationHandler))
+                        .sorted((a, b) -> {
+                            int orderA = a.getAnnotationHandler().getOrder();
+                            int orderB = b.getAnnotationHandler().getOrder();
+                            return orderA > orderB ? 1 : -1;
+                        })
                         .collect(Collectors.toList());
+
                 for (AnnotationAndHandler annotationAndHandler : collect) {
-                    AnnotationHandler annotationHandler = annotationAndHandler.getAnnotationHandler();//processField()
+                    AnnotationHandler annotationHandler = annotationAndHandler.getAnnotationHandler();
                     Annotation annotation = annotationAndHandler.getAnnotation();
-                    annotationHandler.processMethod(method, annotation, beanDefinition, contextUtil);
+                    annotationHandler.processMethod(methodDefinition, annotation, beanDefinition, contextUtil);
                 }
             }
         }
@@ -235,12 +238,12 @@ public class BeanScanUtil {
      *
      * @return
      */
-    public void loadAnnotation() {
-        String annoPath = annoUtil.getAnnoPath();
+    public void loadAnnotationHandler(String annoPath) {
         //扫描出所有的注解处理器
-        Set<Class<?>> classes = ClassUtil.scanPackage(annoPath, clazz ->
-                AnnotationHandler.class.isAssignableFrom(clazz)
-        );
+        Set<Class<?>> classes = ClassUtil
+                .scanPackage(annoPath, clazz ->
+                        AnnotationHandler.class.isAssignableFrom(clazz)
+                );
         //反射生成所有的注解处理器
         Set<AnnotationHandler> annotationHandlerSet = new HashSet<>();
         for (Class<?> aClass : classes) {
@@ -287,11 +290,7 @@ public class BeanScanUtil {
      * 获取容器中的事件监听器， 这个方法是在。 初始化完成后执行
      */
     public void loadEventListener() {
-        BeanSignature beanSignature = new BeanSignature();
-        beanSignature.setBeanClass(Listener.class);
-        beanSignature.setBeanName("listener");
-        beanSignature.setBeanTypeEnum(BeanTypeEnum.bean);
-        List<BeanDefinition> beanDefinitions = contextUtil.getBeanDefinitions(beanSignature);
+        List<BeanDefinition> beanDefinitions = contextUtil.getBeanDefinitions(Listener.class);
         beanDefinitions.forEach(beanDefinition -> {
             Listener bean;
             if (beanDefinition.getBeanStatus() != BeanStatusEnum.Completed) {

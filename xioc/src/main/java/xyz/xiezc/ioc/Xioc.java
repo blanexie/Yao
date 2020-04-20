@@ -67,37 +67,36 @@ public final class Xioc {
      * @param clazz 传入的启动类, 以这个启动类所在目录为根目录开始扫描bean类
      */
     public Xioc run(Class<?> clazz) {
+
         //开始启动框架
-        xioc.eventListenerUtil.syncCall(new Event("xioc-start"));
         BeanScanUtil beanScanUtil = xioc.getBeanScanUtil();
+
         //加载配置
         beanScanUtil.loadPropertie();
-        xioc.eventListenerUtil.syncCall(new Event("xioc-loadPropertie"));
-        //加载注解信息
-        beanScanUtil.loadAnnotation();
-        xioc.eventListenerUtil.syncCall(new Event("xioc-loadAnnotation"));
+
+        //加载注解处理器信息
+        beanScanUtil.loadAnnotationHandler(xioc.starterPackage);
+
         //加载starter中的bean
         beanScanUtil.loadBeanDefinition(xioc.starterPackage);
-        xioc.eventListenerUtil.syncCall(new Event("xioc-starter-loadBeanDefinition"));
+
         //加载bean信息
         String packagePath = ClassUtil.getPackage(clazz);
         beanScanUtil.loadBeanDefinition(packagePath);
-        xioc.eventListenerUtil.syncCall(new Event("xioc-loadBeanDefinition"));
+
 
         //扫描容器中的bean， 处理所有在bean类上的注解
-        beanScanUtil.scanBeanClass();
-        xioc.eventListenerUtil.syncCall(new Event("xioc-scanBeanClass"));
+        beanScanUtil.scanBeanDefinitionClass();
 
         //扫描容器中的bean，处理bean上的字段的自定义注解
-        beanScanUtil.scanBeanField();
-        xioc.eventListenerUtil.syncCall(new Event("xioc-scanBeanField"));
+        beanScanUtil.scanBeanDefinitionField();
 
         //扫描容器中的bean, 处理方法
-        beanScanUtil.scanMethod();
-        xioc.eventListenerUtil.syncCall(new Event("xioc-scanMethod"));
+        beanScanUtil.scanBeanDefinitionMethod();
 
         //注入依赖和初始化
         beanScanUtil.initAndInjectBeans();
+
         //加载容器中的事件bean
         beanScanUtil.loadEventListener();
         xioc.eventListenerUtil.syncCall(new Event("xioc-initAndInjectBeans-end"));
@@ -106,7 +105,7 @@ public final class Xioc {
     }
 
 
-    public void web(Class<?> clazz){
+    public void web(Class<?> clazz) {
         this.run(clazz);
 
     }
