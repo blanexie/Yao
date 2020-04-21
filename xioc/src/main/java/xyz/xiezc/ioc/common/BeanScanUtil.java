@@ -147,15 +147,15 @@ public class BeanScanUtil {
      * @return
      */
     public void scanBeanDefinitionField() {
-
         Map<Class<? extends Annotation>, AnnotationHandler> fieldAnnoAndHandlerMap = annoUtil.getFieldAnnoAndHandlerMap();
         //遍历beanDefinition
         Collection<BeanDefinition> values = contextUtil.classaAndBeanDefinitionMap.values();
         CopyOnWriteArrayList<BeanDefinition> copyOnWriteArrayList = new CopyOnWriteArrayList<>(values);
         for (BeanDefinition beanDefinition : copyOnWriteArrayList) {
-
             List<FieldDefinition> annotationFiledDefinitions = beanDefinition.getAnnotationFiledDefinitions();
-
+            if (annotationFiledDefinitions == null) {
+                continue;
+            }
             //检查每个字段的注解
             for (FieldDefinition fieldDefinition : annotationFiledDefinitions) {
                 AnnotatedElement annotatedElement = fieldDefinition.getAnnotatedElement();
@@ -200,6 +200,9 @@ public class BeanScanUtil {
         CopyOnWriteArrayList<BeanDefinition> copyOnWriteArrayList = new CopyOnWriteArrayList<>(values);
         for (BeanDefinition beanDefinition : copyOnWriteArrayList) {
             List<MethodDefinition> annotationMethodDefinitions = beanDefinition.getAnnotationMethodDefinitions();
+            if (annotationMethodDefinitions == null) {
+                continue;
+            }
             //检查每个字段的注解
             for (MethodDefinition methodDefinition : annotationMethodDefinitions) {
                 Annotation[] annotations = AnnotationUtil.getAnnotations(methodDefinition.getAnnotatedElement(), true);
