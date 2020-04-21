@@ -11,26 +11,20 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.setting.Setting;
 import lombok.SneakyThrows;
 import xyz.xiezc.ioc.AnnotationHandler;
-import xyz.xiezc.ioc.annotation.Bean;
 import xyz.xiezc.ioc.annotation.Component;
 import xyz.xiezc.ioc.annotation.Configuration;
-import xyz.xiezc.ioc.annotation.Inject;
 import xyz.xiezc.ioc.common.event.Event;
 import xyz.xiezc.ioc.common.event.EventListenerUtil;
 import xyz.xiezc.ioc.common.event.Listener;
 import xyz.xiezc.ioc.definition.*;
 import xyz.xiezc.ioc.enums.BeanStatusEnum;
-import xyz.xiezc.ioc.enums.BeanScopeEnum;
 
 import java.io.File;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.stream.Collectors;
 
 /**
@@ -152,7 +146,7 @@ public class BeanScanUtil {
         Collection<BeanDefinition> values = contextUtil.classaAndBeanDefinitionMap.values();
         CopyOnWriteArrayList<BeanDefinition> copyOnWriteArrayList = new CopyOnWriteArrayList<>(values);
         for (BeanDefinition beanDefinition : copyOnWriteArrayList) {
-            List<FieldDefinition> annotationFiledDefinitions = beanDefinition.getAnnotationFiledDefinitions();
+            Set<FieldDefinition> annotationFiledDefinitions = beanDefinition.getAnnotationFiledDefinitions();
             if (annotationFiledDefinitions == null) {
                 continue;
             }
@@ -199,7 +193,7 @@ public class BeanScanUtil {
         Collection<BeanDefinition> values = contextUtil.classaAndBeanDefinitionMap.values();
         CopyOnWriteArrayList<BeanDefinition> copyOnWriteArrayList = new CopyOnWriteArrayList<>(values);
         for (BeanDefinition beanDefinition : copyOnWriteArrayList) {
-            List<MethodDefinition> annotationMethodDefinitions = beanDefinition.getAnnotationMethodDefinitions();
+            Set<MethodDefinition> annotationMethodDefinitions = beanDefinition.getAnnotationMethodDefinitions();
             if (annotationMethodDefinitions == null) {
                 continue;
             }

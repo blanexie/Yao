@@ -1,6 +1,5 @@
 package xyz.xiezc.ioc.common;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.log.Log;
@@ -8,9 +7,6 @@ import cn.hutool.log.LogFactory;
 import cn.hutool.setting.Setting;
 import lombok.Data;
 import xyz.xiezc.ioc.definition.BeanDefinition;
-import xyz.xiezc.ioc.definition.BeanSignature;
-import xyz.xiezc.ioc.enums.BeanStatusEnum;
-import xyz.xiezc.ioc.enums.BeanScopeEnum;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -58,26 +54,13 @@ public class ContextUtil {
         classaAndBeanDefinitionMap.put(beanClass, beanDefinition);
     }
 
-    public BeanDefinition getBeanDefinitions(String beanName) {
-        Class<?> aClass = nameAndClassMap.get(beanName);
-        if (aClass == null) {
-            return null;
-        }
-        BeanDefinition beanDefinition = classaAndBeanDefinitionMap.get(aClass);
-        return beanDefinition;
-    }
-
-
-    public List<BeanDefinition> getBeanDefinitions(Class<?> beanClass) {
-        Set<Class<?>> classes = classaAndBeanDefinitionMap.keySet();
-        List<BeanDefinition> collect = classes
-                .stream()
-                .filter(clazz -> ClassUtil.isAssignable(beanClass, clazz))
-                .map(classaAndBeanDefinitionMap::get)
-                .collect(Collectors.toList());
-        return collect;
-    }
-
+    /**
+     * 获取name和class 都一样的bean
+     *
+     * @param beanName
+     * @param beanClass
+     * @return
+     */
     public BeanDefinition getBeanDefinition(String beanName, Class<?> beanClass) {
         Class<?> aClass = nameAndClassMap.get(beanName);
         if (aClass == null) {
@@ -89,29 +72,116 @@ public class ContextUtil {
         return null;
     }
 
+    /**
+     * 根据name和class 获取可以注入的一个bean。
+     * 1. name 存在， class 一样 ：  注入
+     * 2. name 存在， class有子bean： 选择子bean中name一样的注入
+     * 3. name 存在， class没有，子bean也无： 报错
+     * 4. name 不存在， class 一样： 注入
+     * 5. name 不存在，  class有子bean ： 选择第一个子bean注入
+     * 6. name 不存在， class无子bean： 报错
+     *
+     * @param beanName
+     * @param beanClass
+     * @return
+     */
+    public BeanDefinition getInjectBeanDefinition(String beanName, Class<?> beanClass) {
+        Class<?> aClass = nameAndClassMap.get(beanName);
+        if (aClass == null) {
+            BeanDefinition beanDefinition = getBeanDefinition(beanClass);
+            if (beanDefinition != null) {
+                // 4. name 不存在， class 一样： 注入
+                return beanDefinition;
+            }
 
+            List<BeanDefinition> beanDefinitions = getBeanDefinitions(beanClass);
+            if (beanDefinitions == null || beanDefinitions.isEmpty()) {
+                // 6. name 不存在， class无子bean： 报错
+                throw new RuntimeException("根据beanName=" + beanName + "和 beanCLass=" + beanClass + "没有找到要注入的bean");
+            }
+            // 5. name 不存在，  class有子bean ： 选择第一个子bean注入
+            return beanDefinitions.get(0);
+        } else {
+            BeanDefinition beanDefinition = classaAndBeanDefinitionMap.get(beanClass);
+            if (beanDefinition != null) {
+                // 1. name存在， class 一样 ：  注入
+                return beanDefinition;
+            }
+            //寻找这个类 的所有 bean
+            List<BeanDefinition> beanDefinitions = getBeanDefinitions(aClass);
+            if (beanDefinitions == null || beanDefinitions.isEmpty()) {
+                // 3. name 存在， class没有，子bean也无： 报错
+                throw new RuntimeException("beanName:"
+                        + beanName
+                        + ", objClass:"
+                        + beanClass.getName()
+                        + "没有找到符合要求的bean");
+            }
+            //2. name 存在， class有子bean： 选择子bean中name一样的注入
+            return beanDefinitions.get(0);
+        }
+    }
+
+
+    /**
+     * 获取这个name一样的bean
+     *
+     * @param beanName
+     * @return
+     */
     public BeanDefinition getBeanDefinition(String beanName) {
         Class<?> aClass = nameAndClassMap.get(beanName);
         if (aClass == null) {
             return null;
         }
-        return getBeanDefinition(aClass);
+        BeanDefinition beanDefinition = classaAndBeanDefinitionMap.get(aClass);
+        return beanDefinition;
     }
 
+    /**
+     * 获取name一样，但是包含子bean的所有bean
+     *
+     * @param beanName
+     * @return
+     */
+    public List<BeanDefinition> getBeanDefinitions(String beanName) {
+        Class<?> aClass = nameAndClassMap.get(beanName);
+        if (aClass == null) {
+            return null;
+        }
+        return getBeanDefinitions(aClass);
+    }
+
+
+    /**
+     * 获取一样的class的bean
+     *
+     * @param beanClass
+     * @return
+     */
     public BeanDefinition getBeanDefinition(Class<?> beanClass) {
         //先获取最契合的
         BeanDefinition beanDefinition = classaAndBeanDefinitionMap.get(beanClass);
         if (beanDefinition != null) {
             return beanDefinition;
         }
-        //再获取其他契合的
-        List<BeanDefinition> beanDefinitions = this.getBeanDefinitions(beanClass);
-        if (beanDefinitions.size() != 1) {
-            //未找到抛出异常
-            ExceptionUtil.wrapAndThrow(new RuntimeException(beanClass.getName() + "类型获取的BeanDefinition不存在或者有两个及以上"));
-        }
-        return beanDefinitions.get(0);
+        return null;
     }
 
+    /**
+     * 选择这个class类的bean和这个类型的子bean
+     *
+     * @param beanClass
+     * @return
+     */
+    public List<BeanDefinition> getBeanDefinitions(Class<?> beanClass) {
+        Set<Class<?>> classes = classaAndBeanDefinitionMap.keySet();
+        List<BeanDefinition> collect = classes
+                .stream()
+                .filter(clazz -> ClassUtil.isAssignable(beanClass, clazz))
+                .map(classaAndBeanDefinitionMap::get)
+                .collect(Collectors.toList());
+        return collect;
+    }
 
 }

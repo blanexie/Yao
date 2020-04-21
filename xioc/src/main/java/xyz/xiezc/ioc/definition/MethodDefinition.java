@@ -4,6 +4,7 @@ import lombok.Data;
 
 import java.lang.reflect.AnnotatedElement;
 import java.util.Arrays;
+import java.util.Objects;
 
 
 @Data
@@ -35,10 +36,28 @@ public class MethodDefinition {
     @Override
     public String toString() {
         return "MethodDefinition{" +
-                ", beanDefinition=" + beanDefinition +
+                "beanDefinition=" + beanDefinition +
                 ", returnType=" + returnType +
                 ", methodName='" + methodName + '\'' +
                 ", paramDefinitions=" + Arrays.toString(paramDefinitions) +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof MethodDefinition)) return false;
+        MethodDefinition that = (MethodDefinition) o;
+        return Objects.equals(getBeanDefinition(), that.getBeanDefinition()) &&
+                Objects.equals(getReturnType(), that.getReturnType()) &&
+                Objects.equals(getMethodName(), that.getMethodName()) &&
+                Arrays.equals(getParamDefinitions(), that.getParamDefinitions());
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hash(getBeanDefinition(), getReturnType(), getMethodName());
+        result = 31 * result + Arrays.hashCode(getParamDefinitions());
+        return result;
     }
 }

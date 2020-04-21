@@ -10,12 +10,9 @@ import xyz.xiezc.ioc.annotation.BeanScan;
 import xyz.xiezc.ioc.annotation.Configuration;
 import xyz.xiezc.ioc.common.ContextUtil;
 import xyz.xiezc.ioc.definition.BeanDefinition;
-import xyz.xiezc.ioc.definition.BeanSignature;
 import xyz.xiezc.ioc.definition.FieldDefinition;
 import xyz.xiezc.ioc.definition.MethodDefinition;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.stream.Collectors;
 

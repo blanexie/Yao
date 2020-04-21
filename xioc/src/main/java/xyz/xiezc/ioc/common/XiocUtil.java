@@ -4,7 +4,6 @@ import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.annotation.CombinationAnnotationElement;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
@@ -18,6 +17,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class XiocUtil {
@@ -40,7 +40,7 @@ public class XiocUtil {
         }
 
         //检查所有需要注入字段的依赖是否都存在
-        List<FieldDefinition> annotationFiledDefinitions = beanDefinition.getAnnotationFiledDefinitions();
+        Set<FieldDefinition> annotationFiledDefinitions = beanDefinition.getAnnotationFiledDefinitions();
         checkFieldDefinitions(contextUtil, annotationFiledDefinitions);
         //检查methodBean的invoke方法的参数依赖是否存在
         MethodDefinition methodBeanInvoke = beanDefinition.getInvokeMethodBean();
@@ -141,7 +141,7 @@ public class XiocUtil {
             beanDefinition.setBeanStatus(BeanStatusEnum.HalfCooked);
         }
         //设置字段的属性值
-        List<FieldDefinition> annotationFiledDefinitions = beanDefinition.getAnnotationFiledDefinitions();
+        Set<FieldDefinition> annotationFiledDefinitions = beanDefinition.getAnnotationFiledDefinitions();
         annotationFiledDefinitions = CollectionUtil.emptyIfNull(annotationFiledDefinitions);
         for (FieldDefinition fieldDefinition : annotationFiledDefinitions) {
             Object obj = fieldDefinition.getObj();
@@ -160,7 +160,7 @@ public class XiocUtil {
      * @param contextUtil
      * @param annotationFiledDefinitions
      */
-    private static void checkFieldDefinitions(ContextUtil contextUtil, List<FieldDefinition> annotationFiledDefinitions) {
+    private static void checkFieldDefinitions(ContextUtil contextUtil, Set<FieldDefinition> annotationFiledDefinitions) {
         annotationFiledDefinitions = CollectionUtil.emptyIfNull(annotationFiledDefinitions);
         for (FieldDefinition annotationFiledDefinition : annotationFiledDefinitions) {
             if (annotationFiledDefinition.getObj() != null) {
@@ -179,13 +179,8 @@ public class XiocUtil {
 
             String beanName = annotationFiledDefinition.getBeanName();
             Class<?> fieldType = annotationFiledDefinition.getFieldType();
-            BeanDefinition beanDefinition = contextUtil.getBeanDefinition(beanName, fieldType);
-            if (beanDefinition == null) {
-                ExceptionUtil.wrapAndThrow(new RuntimeException("未找到注入的字段；" + annotationFiledDefinition));
-                break;
-            } else {
-                annotationFiledDefinition.setObj(beanDefinition);
-            }
+            BeanDefinition beanDefinition = contextUtil.getInjectBeanDefinition(beanName, fieldType);
+            annotationFiledDefinition.setObj(beanDefinition);
         }
     }
 
@@ -210,13 +205,8 @@ public class XiocUtil {
             }
             String beanName = paramDefinition.getBeanName();
             Class paramType = paramDefinition.getParamType();
-            BeanDefinition beanDefinition = contextUtil.getBeanDefinition(beanName, paramType);
-            if (beanDefinition == null) {
-                ExceptionUtil.wrapAndThrow(new RuntimeException("未找到方法的注入参数：" + paramDefinition));
-                break;
-            } else {
-                paramDefinition.setParam(beanDefinition);
-            }
+            BeanDefinition beanDefinition = contextUtil.getInjectBeanDefinition(beanName, paramType);
+            paramDefinition.setParam(beanDefinition);
         }
     }
 
@@ -239,7 +229,6 @@ public class XiocUtil {
         beanDefinition.setAnnotatedElement(annotatedElement);
         if (ClassUtil.isAssignable(FactoryBean.class, beanClass)) {
             beanDefinition.setBeanScopeEnum(BeanScopeEnum.factoryBean);
-
         } else {
             beanDefinition.setBeanScopeEnum(BeanScopeEnum.bean);
         }
@@ -252,9 +241,9 @@ public class XiocUtil {
             if (fieldDefinition == null) {
                 continue;
             }
-            List<FieldDefinition> injectFiledDefinitions = beanDefinition.getAnnotationFiledDefinitions();
+            Set<FieldDefinition> injectFiledDefinitions = beanDefinition.getAnnotationFiledDefinitions();
             if (injectFiledDefinitions == null) {
-                injectFiledDefinitions = CollUtil.newArrayList();
+                injectFiledDefinitions = CollUtil.newHashSet();
                 beanDefinition.setAnnotationFiledDefinitions(injectFiledDefinitions);
             }
             injectFiledDefinitions.add(fieldDefinition);
@@ -267,9 +256,9 @@ public class XiocUtil {
             if (methodDefinition == null) {
                 continue;
             }
-            List<MethodDefinition> methodDefinitions = beanDefinition.getAnnotationMethodDefinitions();
+            Set<MethodDefinition> methodDefinitions = beanDefinition.getAnnotationMethodDefinitions();
             if (methodDefinitions == null) {
-                methodDefinitions = CollUtil.newArrayList();
+                methodDefinitions = CollUtil.newHashSet();
                 beanDefinition.setAnnotationMethodDefinitions(methodDefinitions);
             }
             methodDefinitions.add(methodDefinition);

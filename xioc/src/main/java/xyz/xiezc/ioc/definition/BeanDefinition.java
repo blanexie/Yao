@@ -10,8 +10,9 @@ import xyz.xiezc.ioc.enums.BeanStatusEnum;
 import xyz.xiezc.ioc.enums.BeanScopeEnum;
 
 import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * 每个bean类的描述信息
@@ -61,12 +62,12 @@ public class BeanDefinition {
     /**
      * 有自定义注解的字段
      */
-    private List<FieldDefinition> annotationFiledDefinitions;
+    private Set<FieldDefinition> annotationFiledDefinitions;
 
     /**
      * 有自定义注解的方法
      */
-    private List<MethodDefinition> annotationMethodDefinitions;
+    private Set<MethodDefinition> annotationMethodDefinitions;
 
     /**
      * 需要在初始化完成后进行调用的方法
@@ -90,7 +91,7 @@ public class BeanDefinition {
      * @return
      */
     public <T> T getBean() {
-        if (beanScopeEnum == BeanScopeEnum.factoryBean) {
+        if (getBeanScopeEnum() == BeanScopeEnum.factoryBean) {
             return ReflectUtil.invoke(bean, "getObject");
         }
         return (T) bean;
@@ -112,9 +113,24 @@ public class BeanDefinition {
     @Override
     public String toString() {
         return "BeanDefinition{" +
-                ", isSingleton=" + isSingleton +
-                ", beanName='" + beanName + '\'' +
-                ", beanClass=" + beanClass +
+                " isSingleton=" + isSingleton +
+                ", beanName='" + getBeanName() + '\'' +
+                ", objClass=" + getBeanClass() +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof BeanDefinition)) return false;
+        BeanDefinition that = (BeanDefinition) o;
+        return getBeanScopeEnum() == that.getBeanScopeEnum() &&
+                Objects.equals(getBeanName(), that.getBeanName()) &&
+                Objects.equals(getBeanClass(), that.getBeanClass());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getBeanScopeEnum(), getBeanName(), getBeanClass());
     }
 }

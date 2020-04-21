@@ -98,16 +98,8 @@ public final class Xioc {
         //加载容器中的事件bean
         beanScanUtil.loadEventListener();
         xioc.eventListenerUtil.syncCall(new Event("xioc-initAndInjectBeans-end"));
-
         return xioc;
     }
-
-
-    public void web(Class<?> clazz) {
-        this.run(clazz);
-
-    }
-
 
     /**
      * 自动添加注解处理器， 可以使用这个特性自定义注解
@@ -119,7 +111,6 @@ public final class Xioc {
         xioc.eventListenerUtil.addListener(event, listener);
         return xioc;
     }
-
 
     /**
      * 自动添加注解处理器， 可以使用这个特性自定义注解

@@ -3,6 +3,7 @@ package xyz.xiezc.ioc.definition;
 import lombok.Data;
 
 import java.lang.reflect.AnnotatedElement;
+import java.util.Objects;
 
 @Data
 public class FieldDefinition {
@@ -20,7 +21,6 @@ public class FieldDefinition {
     String fieldName;
 
     /**
-     *
      * 如果这个字段有值， 说明这个字段是需要从容器中获取注入的
      * 如果这个字段是需要注入的字段，则这个就是需要注入beanName
      */
@@ -45,5 +45,20 @@ public class FieldDefinition {
                 ", fieldName='" + fieldName + '\'' +
                 ", beanName='" + beanName + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof FieldDefinition)) return false;
+        FieldDefinition that = (FieldDefinition) o;
+        return Objects.equals(getBeanDefinition(), that.getBeanDefinition()) &&
+                Objects.equals(getFieldType(), that.getFieldType()) &&
+                Objects.equals(getFieldName(), that.getFieldName());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getBeanDefinition(), getFieldType(), getFieldName());
     }
 }
