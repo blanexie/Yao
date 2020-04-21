@@ -1,18 +1,15 @@
 package xyz.xiezc.ioc.starter.annotationHandler;
 
-import cn.hutool.core.util.ClassUtil;
+import cn.hutool.core.annotation.AnnotationUtil;
+import cn.hutool.core.util.StrUtil;
 import xyz.xiezc.ioc.AnnotationHandler;
 import xyz.xiezc.ioc.annotation.Bean;
 import xyz.xiezc.ioc.common.ContextUtil;
 import xyz.xiezc.ioc.common.XiocUtil;
 import xyz.xiezc.ioc.definition.BeanDefinition;
-import xyz.xiezc.ioc.definition.FactoryBean;
 import xyz.xiezc.ioc.definition.FieldDefinition;
 import xyz.xiezc.ioc.definition.MethodDefinition;
 import xyz.xiezc.ioc.enums.BeanScopeEnum;
-
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 
 public class BeanAnnotationHandler extends AnnotationHandler<Bean> {
 
@@ -28,13 +25,19 @@ public class BeanAnnotationHandler extends AnnotationHandler<Bean> {
 
     @Override
     public void processMethod(MethodDefinition methodDefinition, Bean annotation, BeanDefinition beanDefinition, ContextUtil contextUtil) {
-        BeanDefinition beanDefinitionMethod = XiocUtil.dealBeanAnnotation(annotation, methodDefinition.getReturnType(), contextUtil);
+        Class beanClass = methodDefinition.getReturnType();
+        BeanDefinition beanDefinitionMethod = XiocUtil.dealBeanAnnotation(annotation, beanClass, contextUtil);
         beanDefinitionMethod.setBeanScopeEnum(BeanScopeEnum.methodBean);
         beanDefinitionMethod.setInvokeMethodBean(methodDefinition);
-        Class<?> beanClass = XiocUtil.getRealBeanClass(beanDefinition);
-        contextUtil.addBeanDefinition(beanDefinition.getBeanName(), beanClass, beanDefinition);
+        //MethodBean的特殊性，所以beanName 和class重新设置下
+        String beanName = annotation.value();
+        if (StrUtil.isBlank(beanName)) {
+            beanName = methodDefinition.getMethodName();
+        }
+        beanDefinitionMethod.setBeanName(beanName);
+        beanClass = XiocUtil.getRealBeanClass(beanDefinitionMethod);
+        contextUtil.addBeanDefinition(beanDefinition.getBeanName(), beanClass, beanDefinitionMethod);
     }
-
 
 
     @Override

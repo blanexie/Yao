@@ -77,7 +77,7 @@ public class BeanDefinition {
     /**
      * methodBean 的类型的bean调用的方法
      */
-    private MethodDefinition InvokeMethodBean;
+    private MethodDefinition invokeMethodBean;
 
     /**
      * 具体的实例, 当beanScopeEnum为methodBean的时候，要注意下这个值是方法的返回值

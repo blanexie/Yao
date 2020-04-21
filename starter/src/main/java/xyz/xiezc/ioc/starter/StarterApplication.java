@@ -7,6 +7,7 @@ import xyz.xiezc.ioc.annotation.BeanScan;
 import xyz.xiezc.ioc.annotation.Configuration;
 import xyz.xiezc.ioc.annotation.Inject;
 import xyz.xiezc.ioc.definition.BeanDefinition;
+import xyz.xiezc.ioc.test.StarterA;
 import xyz.xiezc.ioc.test.StarterC;
 
 import java.util.Map;
@@ -19,7 +20,8 @@ public class StarterApplication {
     StarterC starterC;
 
     @Bean
-    public StarterC ss(){
+    public StarterC ss(StarterA starterA) {
+        starterA.print();
         return new StarterC();
     }
 
@@ -28,8 +30,8 @@ public class StarterApplication {
 
         Map<Class<?>, BeanDefinition> classaAndBeanDefinitionMap = Xioc.getSingleton().getContextUtil().getClassaAndBeanDefinitionMap();
 
-        classaAndBeanDefinitionMap.forEach((clazz,beanDefinitiion)->{
-            System.out.println(clazz.getName()+" : "+ beanDefinitiion.toString());
+        classaAndBeanDefinitionMap.forEach((clazz, beanDefinitiion) -> {
+            System.out.println(clazz.getName() + " : " + beanDefinitiion.toString());
         });
 
     }

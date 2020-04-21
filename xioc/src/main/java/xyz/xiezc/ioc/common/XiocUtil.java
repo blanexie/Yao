@@ -4,6 +4,7 @@ import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.annotation.CombinationAnnotationElement;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
@@ -31,10 +32,7 @@ public class XiocUtil {
      */
     public static Object createBean(BeanDefinition beanDefinition, ContextUtil contextUtil) {
         BeanStatusEnum beanStatu = beanDefinition.getBeanStatus();
-        if (beanStatu == BeanStatusEnum.HalfCooked
-                || beanStatu == BeanStatusEnum.injectField
-                || beanStatu == BeanStatusEnum.Completed
-        ) {
+        if (beanStatu == BeanStatusEnum.Completed) {
             //已经初始化完成了
             return beanDefinition.getBean();
         }
@@ -51,15 +49,6 @@ public class XiocUtil {
         //初始化对应bean
         doCreateBean(beanDefinition, contextUtil);
 
-        //调用对应bean的init方法
-        MethodDefinition initMethodDefinition = beanDefinition.getInitMethodDefinition();
-        if (initMethodDefinition != null) {
-            Object bean = beanDefinition.getBean();
-            ReflectUtil.invoke(bean, initMethodDefinition.getMethodName());
-        }
-
-        //bean 所有对象设置完整
-        beanDefinition.setBeanStatus(BeanStatusEnum.Completed);
 
         return beanDefinition.getBean();
     }
@@ -91,20 +80,64 @@ public class XiocUtil {
     }
 
     private static void doCreateBean(BeanDefinition beanDefinition, ContextUtil contextUtil) {
-        //实例化普通bean
+        if (beanDefinition.getBeanStatus() == BeanStatusEnum.Original) {
+            //实例化普通bean
+            createInstance(beanDefinition, contextUtil);
+        }
+
+        if (beanDefinition.getBeanStatus() == BeanStatusEnum.HalfCooked) {
+            setInjectField(beanDefinition, contextUtil);
+        }
+
+        if (beanDefinition.getBeanStatus() == BeanStatusEnum.injectField) {
+            doInitMethod(beanDefinition);
+        }
+    }
+
+    private static void doInitMethod(BeanDefinition beanDefinition) {
+        //调用对应bean的init方法
+        MethodDefinition initMethodDefinition = beanDefinition.getInitMethodDefinition();
+        if (initMethodDefinition != null) {
+            Object bean = beanDefinition.getBean();
+            ReflectUtil.invoke(bean, initMethodDefinition.getMethodName());
+        }
+        //bean 所有对象设置完整
+        beanDefinition.setBeanStatus(BeanStatusEnum.Completed);
+    }
+
+    private static void setInjectField(BeanDefinition beanDefinition, ContextUtil contextUtil) {
+        //设置字段的属性值
+        Set<FieldDefinition> annotationFiledDefinitions = beanDefinition.getAnnotationFiledDefinitions();
+        annotationFiledDefinitions = CollectionUtil.emptyIfNull(annotationFiledDefinitions);
+        for (FieldDefinition fieldDefinition : annotationFiledDefinitions) {
+            Object obj = fieldDefinition.getObj();
+            if (obj instanceof BeanDefinition) {
+                BeanDefinition obj1 = (BeanDefinition) obj;
+                if (obj1.getBeanStatus() == BeanStatusEnum.Original) {
+                    obj = createBean(obj1, contextUtil);
+                } else {
+                    obj = obj1;
+                }
+            }
+            ReflectUtil.setFieldValue(beanDefinition.getBean(), fieldDefinition.getFieldName(), obj);
+        }
+        beanDefinition.setBeanStatus(BeanStatusEnum.injectField);
+    }
+
+    private static void createInstance(BeanDefinition beanDefinition, ContextUtil contextUtil) {
         if (beanDefinition.getBeanScopeEnum() == BeanScopeEnum.bean) {
             Class<?> beanClass = beanDefinition.getBeanClass();
             Object bean = ReflectUtil.newInstanceIfPossible(beanClass);
             beanDefinition.setBean(bean);
             beanDefinition.setBeanStatus(BeanStatusEnum.HalfCooked);
         }
-        //实例化 methodBean
+        //实例化 methodBean。 在实例化处理方法前需要先检查下容器中是否已经包含这个bean了， 如果已经包含， 就不要实例化了
         if (beanDefinition.getBeanScopeEnum() == BeanScopeEnum.methodBean) {
             MethodDefinition methodBeanInvoke = beanDefinition.getInvokeMethodBean();
             BeanDefinition beanDefinitionParent = methodBeanInvoke.getBeanDefinition();
             Object parent;
             BeanStatusEnum beanStatus = beanDefinitionParent.getBeanStatus();
-            if (beanStatus == BeanStatusEnum.Completed) {
+            if (beanStatus == BeanStatusEnum.injectField) {
                 parent = beanDefinitionParent.getBean();
             } else {
                 parent = createBean(beanDefinitionParent, contextUtil);
@@ -118,15 +151,28 @@ public class XiocUtil {
                 }
                 BeanDefinition beanDefinitionParam = contextUtil.getBeanDefinition(paramDefinition.getBeanName(), paramDefinition.getParamType());
                 beanStatus = beanDefinitionParent.getBeanStatus();
-                if (beanStatus == BeanStatusEnum.Completed) {
+                if (beanStatus == BeanStatusEnum.injectField) {
                     param = beanDefinitionParam.getBean();
                 } else {
                     param = createBean(beanDefinitionParam, contextUtil);
                 }
                 paramDefinition.setParam(param);
             }
-            List<Object> collect = CollUtil.newArrayList(paramDefinitions).stream()
-                    .map(ParamDefinition::getParam)
+
+            List<Object> collect = CollUtil.newArrayList(paramDefinitions)
+                    .stream()
+                    .map(paramDefinition -> {
+                        Object param = paramDefinition.getParam();
+                        if (param == null) {
+                            ExceptionUtil.wrapAndThrow(new RuntimeException("需要注入的参数容器中不存在： " + paramDefinition));
+                        }
+                        if (param instanceof BeanDefinition) {
+                            BeanDefinition beanDefinition1 = (BeanDefinition) param;
+                            Object bean = createBean(beanDefinition1, contextUtil);
+                            return bean;
+                        }
+                        return param;
+                    })
                     .collect(Collectors.toList());
             Object[] objects = collect.toArray();
             Object invoke = ReflectUtil.invoke(parent, methodBeanInvoke.getMethodName(), objects);
@@ -140,17 +186,6 @@ public class XiocUtil {
             beanDefinition.setBean(bean);
             beanDefinition.setBeanStatus(BeanStatusEnum.HalfCooked);
         }
-        //设置字段的属性值
-        Set<FieldDefinition> annotationFiledDefinitions = beanDefinition.getAnnotationFiledDefinitions();
-        annotationFiledDefinitions = CollectionUtil.emptyIfNull(annotationFiledDefinitions);
-        for (FieldDefinition fieldDefinition : annotationFiledDefinitions) {
-            Object obj = fieldDefinition.getObj();
-            if (obj instanceof BeanDefinition) {
-                obj = createBean((BeanDefinition) obj, contextUtil);
-            }
-            ReflectUtil.setFieldValue(beanDefinition.getBean(), fieldDefinition.getFieldName(), obj);
-        }
-        beanDefinition.setBeanStatus(BeanStatusEnum.injectField);
     }
 
 
