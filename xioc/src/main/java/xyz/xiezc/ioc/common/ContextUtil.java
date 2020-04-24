@@ -1,6 +1,5 @@
 package xyz.xiezc.ioc.common;
 
-import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
@@ -8,7 +7,10 @@ import cn.hutool.setting.Setting;
 import lombok.Data;
 import xyz.xiezc.ioc.definition.BeanDefinition;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -38,7 +40,7 @@ public class ContextUtil {
     /**
      * 注解和注解处理器的映射关系
      */
-    AnnoUtil annoUtil = new AnnoUtil();
+    AnnotationUtil annotationUtil = new AnnotationUtil();
 
     /**
      * 注入bean到容器中
@@ -176,8 +178,7 @@ public class ContextUtil {
      */
     public List<BeanDefinition> getBeanDefinitions(Class<?> beanClass) {
         Set<Class<?>> classes = classaAndBeanDefinitionMap.keySet();
-        List<BeanDefinition> collect = classes
-                .stream()
+        List<BeanDefinition> collect = classes.stream()
                 .filter(clazz -> ClassUtil.isAssignable(beanClass, clazz))
                 .map(classaAndBeanDefinitionMap::get)
                 .collect(Collectors.toList());

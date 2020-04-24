@@ -1,6 +1,5 @@
 package xyz.xiezc.ioc.starter.annotationHandler;
 
-import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.util.StrUtil;
 import xyz.xiezc.ioc.AnnotationHandler;
 import xyz.xiezc.ioc.annotation.Bean;
@@ -9,7 +8,7 @@ import xyz.xiezc.ioc.common.XiocUtil;
 import xyz.xiezc.ioc.definition.BeanDefinition;
 import xyz.xiezc.ioc.definition.FieldDefinition;
 import xyz.xiezc.ioc.definition.MethodDefinition;
-import xyz.xiezc.ioc.enums.BeanScopeEnum;
+import xyz.xiezc.ioc.enums.BeanTypeEnum;
 
 public class BeanAnnotationHandler extends AnnotationHandler<Bean> {
 
@@ -27,7 +26,7 @@ public class BeanAnnotationHandler extends AnnotationHandler<Bean> {
     public void processMethod(MethodDefinition methodDefinition, Bean annotation, BeanDefinition beanDefinition, ContextUtil contextUtil) {
         Class beanClass = methodDefinition.getReturnType();
         BeanDefinition beanDefinitionMethod = XiocUtil.dealBeanAnnotation(annotation, beanClass, contextUtil);
-        beanDefinitionMethod.setBeanScopeEnum(BeanScopeEnum.methodBean);
+        beanDefinitionMethod.setBeanTypeEnum(BeanTypeEnum.methodBean);
         beanDefinitionMethod.setInvokeMethodBean(methodDefinition);
         //MethodBean的特殊性，所以beanName 和class重新设置下
         String beanName = annotation.value();

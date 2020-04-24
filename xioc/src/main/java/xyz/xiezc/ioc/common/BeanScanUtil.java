@@ -1,7 +1,6 @@
 package xyz.xiezc.ioc.common;
 
 
-import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.io.FileUtil;
@@ -13,6 +12,10 @@ import lombok.SneakyThrows;
 import xyz.xiezc.ioc.AnnotationHandler;
 import xyz.xiezc.ioc.annotation.Component;
 import xyz.xiezc.ioc.annotation.Configuration;
+import xyz.xiezc.ioc.common.create.BeanCreateStrategy;
+import xyz.xiezc.ioc.common.create.BeanFactoryUtil;
+import xyz.xiezc.ioc.common.create.FactoryBeanCreateStrategy;
+import xyz.xiezc.ioc.common.create.MethodBeanCreateStrategy;
 import xyz.xiezc.ioc.common.event.Event;
 import xyz.xiezc.ioc.common.event.EventListenerUtil;
 import xyz.xiezc.ioc.common.event.Listener;
@@ -37,10 +40,14 @@ public class BeanScanUtil {
      * 容器
      */
     ContextUtil contextUtil;
+
+
+    BeanFactoryUtil beanFactoryUtil;
+
     /**
      * 注解工具类
      */
-    AnnoUtil annoUtil;
+    AnnotationUtil annotationUtil;
 
     /**
      * 事件分发处理器
@@ -50,10 +57,20 @@ public class BeanScanUtil {
 
     public BeanScanUtil(ContextUtil contextUtil, EventListenerUtil eventListenerUtil) {
         this.contextUtil = contextUtil;
-        this.annoUtil = contextUtil.getAnnoUtil();
+        this.annotationUtil = contextUtil.getAnnotationUtil();
         this.eventListenerUtil = eventListenerUtil;
     }
 
+    /**
+     * 加载bean初始化类
+     */
+    public void loadBeanCreateStategy() {
+        beanFactoryUtil = new BeanFactoryUtil();
+        beanFactoryUtil.setContextUtil(contextUtil);
+        beanFactoryUtil.addBeanFactoryStrategy(new MethodBeanCreateStrategy());
+        beanFactoryUtil.addBeanFactoryStrategy(new FactoryBeanCreateStrategy());
+        beanFactoryUtil.addBeanFactoryStrategy(new BeanCreateStrategy());
+    }
 
     /**
      * 加载所有的bean信息
@@ -65,15 +82,15 @@ public class BeanScanUtil {
         Set<Class<?>> classes = ClassUtil.scanPackage(packagePath);
         for (Class<?> aClass : classes) {
             //获取上面的component 注解
-            Component component = AnnotationUtil.getAnnotation(aClass, Component.class);
+            Component component = cn.hutool.core.annotation.AnnotationUtil.getAnnotation(aClass, Component.class);
             if (component != null) {
-                AnnotationHandler annotationHandler = annoUtil.getClassAnnoAndHandlerMap().get(Component.class);
+                AnnotationHandler annotationHandler = annotationUtil.getClassAnnoAndHandlerMap().get(Component.class);
                 annotationHandler.processClass(component, aClass, contextUtil);
             }
 
-            Configuration configuration = AnnotationUtil.getAnnotation(aClass, Configuration.class);
+            Configuration configuration = cn.hutool.core.annotation.AnnotationUtil.getAnnotation(aClass, Configuration.class);
             if (configuration != null) {
-                AnnotationHandler annotationHandler = annoUtil.getClassAnnoAndHandlerMap().get(Configuration.class);
+                AnnotationHandler annotationHandler = annotationUtil.getClassAnnoAndHandlerMap().get(Configuration.class);
                 annotationHandler.processClass(configuration, aClass, contextUtil);
             }
         }
@@ -84,7 +101,7 @@ public class BeanScanUtil {
      */
     public void initAndInjectBeans() {
         contextUtil.classaAndBeanDefinitionMap.forEach((clazz, beanDefinition) -> {
-            XiocUtil.createBean(beanDefinition, contextUtil);
+            beanFactoryUtil.createBean(beanDefinition);
         });
     }
 
@@ -92,7 +109,7 @@ public class BeanScanUtil {
      * 扫描所有容器中的类的注解，并处理
      */
     public void scanBeanDefinitionClass() {
-        Map<Class<? extends Annotation>, AnnotationHandler> classAnnoAndHandlerMap = annoUtil.classAnnoAndHandlerMap;
+        Map<Class<? extends Annotation>, AnnotationHandler> classAnnoAndHandlerMap = annotationUtil.classAnnoAndHandlerMap;
         //遍历beanDefinition
         Collection<BeanDefinition> values = contextUtil.classaAndBeanDefinitionMap.values();
         CopyOnWriteArrayList<BeanDefinition> copyOnWriteArrayList = new CopyOnWriteArrayList<>(values);
@@ -101,7 +118,7 @@ public class BeanScanUtil {
             AnnotatedElement annotatedElement = beanDefinition.getAnnotatedElement();
 
             //获取这个类上所有的注解
-            Annotation[] annotations = AnnotationUtil.getAnnotations(annotatedElement, true);
+            Annotation[] annotations = cn.hutool.core.annotation.AnnotationUtil.getAnnotations(annotatedElement, true);
             //获取注解和handler
             List<AnnotationAndHandler> collect = CollUtil.newArrayList(annotations)
                     .stream()
@@ -141,7 +158,7 @@ public class BeanScanUtil {
      * @return
      */
     public void scanBeanDefinitionField() {
-        Map<Class<? extends Annotation>, AnnotationHandler> fieldAnnoAndHandlerMap = annoUtil.getFieldAnnoAndHandlerMap();
+        Map<Class<? extends Annotation>, AnnotationHandler> fieldAnnoAndHandlerMap = annotationUtil.getFieldAnnoAndHandlerMap();
         //遍历beanDefinition
         Collection<BeanDefinition> values = contextUtil.classaAndBeanDefinitionMap.values();
         CopyOnWriteArrayList<BeanDefinition> copyOnWriteArrayList = new CopyOnWriteArrayList<>(values);
@@ -153,7 +170,7 @@ public class BeanScanUtil {
             //检查每个字段的注解
             for (FieldDefinition fieldDefinition : annotationFiledDefinitions) {
                 AnnotatedElement annotatedElement = fieldDefinition.getAnnotatedElement();
-                Annotation[] annotations = AnnotationUtil.getAnnotations(annotatedElement, true);
+                Annotation[] annotations = cn.hutool.core.annotation.AnnotationUtil.getAnnotations(annotatedElement, true);
                 //遍历注解，找到注解处理器
                 List<AnnotationAndHandler> collect = CollUtil.newArrayList(annotations)
                         .stream()
@@ -188,7 +205,7 @@ public class BeanScanUtil {
      */
     @SneakyThrows
     public void scanBeanDefinitionMethod() {
-        Map<Class<? extends Annotation>, AnnotationHandler> methodAnnoAndHandlerMap = annoUtil.getMethodAnnoAndHandlerMap();
+        Map<Class<? extends Annotation>, AnnotationHandler> methodAnnoAndHandlerMap = annotationUtil.getMethodAnnoAndHandlerMap();
 
         Collection<BeanDefinition> values = contextUtil.classaAndBeanDefinitionMap.values();
         CopyOnWriteArrayList<BeanDefinition> copyOnWriteArrayList = new CopyOnWriteArrayList<>(values);
@@ -199,7 +216,7 @@ public class BeanScanUtil {
             }
             //检查每个字段的注解
             for (MethodDefinition methodDefinition : annotationMethodDefinitions) {
-                Annotation[] annotations = AnnotationUtil.getAnnotations(methodDefinition.getAnnotatedElement(), true);
+                Annotation[] annotations = cn.hutool.core.annotation.AnnotationUtil.getAnnotations(methodDefinition.getAnnotatedElement(), true);
                 if (annotations == null || annotations.length == 0) {
                     continue;
                 }
@@ -257,7 +274,7 @@ public class BeanScanUtil {
         }
         //分类处理注解处理器
         annotationHandlerSet.forEach(annotationHandler -> {
-            annoUtil.addAnnotationHandler(annotationHandler);
+            annotationUtil.addAnnotationHandler(annotationHandler);
         });
     }
 
@@ -289,12 +306,8 @@ public class BeanScanUtil {
     public void loadEventListener() {
         List<BeanDefinition> beanDefinitions = contextUtil.getBeanDefinitions(Listener.class);
         beanDefinitions.forEach(beanDefinition -> {
-            Listener bean;
-            if (beanDefinition.getBeanStatus() != BeanStatusEnum.Completed) {
-                bean = (Listener) XiocUtil.createBean(beanDefinition, contextUtil);
-            } else {
-                bean = beanDefinition.getBean();
-            }
+            beanFactoryUtil.createBean(beanDefinition);
+            Listener bean = beanDefinition.getBean();
             Event event = bean.getEvent();
             eventListenerUtil.addListener(event, bean);
         });

@@ -1,7 +1,6 @@
 package xyz.xiezc.ioc.common;
 
 
-import cn.hutool.core.annotation.AnnotationUtil;
 import lombok.Data;
 import xyz.xiezc.ioc.AnnotationHandler;
 
@@ -16,7 +15,7 @@ import java.util.Set;
  * 处理注解相关的工具类
  */
 @Data
-public class AnnoUtil {
+public class AnnotationUtil {
 
     public static Set<Class<? extends Annotation>> excludeAnnotation = new HashSet<>() {{
         add(Override.class);
@@ -54,7 +53,7 @@ public class AnnoUtil {
     public void addAnnotationHandler(AnnotationHandler annotationHandler) {
         //获取对应的注解
         Class<? extends Annotation> annotation = annotationHandler.getAnnotationType();
-        ElementType[] value = AnnotationUtil.getTargetType(annotation);
+        ElementType[] value = cn.hutool.core.annotation.AnnotationUtil.getTargetType(annotation);
         for (ElementType elementType : value) {
             //作用于类上
             if (elementType == ElementType.TYPE) {

@@ -7,10 +7,9 @@ import cn.hutool.log.LogFactory;
 import lombok.Getter;
 import lombok.Setter;
 import xyz.xiezc.ioc.enums.BeanStatusEnum;
-import xyz.xiezc.ioc.enums.BeanScopeEnum;
+import xyz.xiezc.ioc.enums.BeanTypeEnum;
 
 import java.lang.reflect.AnnotatedElement;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -42,7 +41,7 @@ public class BeanDefinition {
      * methodBean
      * properties ： 配置的注入
      */
-    private BeanScopeEnum beanScopeEnum;
+    private BeanTypeEnum beanTypeEnum;
 
     /**
      * 这个bean的状态
@@ -71,11 +70,13 @@ public class BeanDefinition {
 
     /**
      * 需要在初始化完成后进行调用的方法
+     * @Init
      */
     private MethodDefinition initMethodDefinition;
 
     /**
      * methodBean 的类型的bean调用的方法
+     * @Bean
      */
     private MethodDefinition invokeMethodBean;
 
@@ -91,7 +92,7 @@ public class BeanDefinition {
      * @return
      */
     public <T> T getBean() {
-        if (getBeanScopeEnum() == BeanScopeEnum.factoryBean) {
+        if (getBeanTypeEnum() == BeanTypeEnum.factoryBean) {
             return ReflectUtil.invoke(bean, "getObject");
         }
         return (T) bean;
@@ -124,13 +125,13 @@ public class BeanDefinition {
         if (this == o) return true;
         if (!(o instanceof BeanDefinition)) return false;
         BeanDefinition that = (BeanDefinition) o;
-        return getBeanScopeEnum() == that.getBeanScopeEnum() &&
+        return getBeanTypeEnum() == that.getBeanTypeEnum() &&
                 Objects.equals(getBeanName(), that.getBeanName()) &&
                 Objects.equals(getBeanClass(), that.getBeanClass());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getBeanScopeEnum(), getBeanName(), getBeanClass());
+        return Objects.hash(getBeanTypeEnum(), getBeanName(), getBeanClass());
     }
 }

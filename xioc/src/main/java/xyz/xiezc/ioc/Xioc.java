@@ -82,6 +82,8 @@ public final class Xioc {
         //加载bean信息
         String packagePath = ClassUtil.getPackage(clazz);
         beanScanUtil.loadBeanDefinition(packagePath);
+        //加载BeanFactoryUtil
+        beanScanUtil.loadBeanCreateStategy();
 
         //扫描容器中的bean， 处理所有在bean类上的注解
         beanScanUtil.scanBeanDefinitionClass();
@@ -118,7 +120,7 @@ public final class Xioc {
      * @param annotationHandler
      */
     public Xioc addAnnoHandler(AnnotationHandler<? extends Annotation> annotationHandler) {
-        xioc.contextUtil.getAnnoUtil().addAnnotationHandler(annotationHandler);
+        xioc.contextUtil.getAnnotationUtil().addAnnotationHandler(annotationHandler);
         return xioc;
     }
 
