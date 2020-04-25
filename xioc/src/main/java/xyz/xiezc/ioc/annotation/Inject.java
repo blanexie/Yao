@@ -7,6 +7,12 @@ import java.lang.annotation.Target;
 
 /**
  * 注入依赖
+ * <p>
+ * name 一样， class 一样 ：  注入
+ * name 不一样， class 一样： 注入
+ * name 不一样，  class有子bean ： 选择第一个子bean注入
+ * name 一样， class有子bean： 选择子bean中name一样的注入
+ * name 不一样， class无子bean： 抱错
  *
  * @author wb-xzc291800
  * @date 2019/03/29 14:19
@@ -15,21 +21,9 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Inject {
 
-    String value() default "";
-
     /**
-     * 如果是往集合中注入元素, 必须指定集合的类型,
-     * 支持的集合有 Collection及其子类.
-     * <p>
-     * 不支持数组类型注入
-     * <p>
-     * 是按照类型注入, 且只是按照类型注入
-     *
      * @return
      */
-    Class<?> type() default void.class;
-
-
-
+    String value() default "";
 
 }

@@ -2,23 +2,18 @@ package xyz.xiezc.ioc.test;
 
 
 import xyz.xiezc.ioc.annotation.Component;
-import xyz.xiezc.ioc.definition.FactoryBean;
+import xyz.xiezc.ioc.annotation.Inject;
+import xyz.xiezc.ioc.starter.StarterApplication;
 
 @Component
-public class StarterC implements FactoryBean<StarterA> {
+public class StarterC {
 
+    @Inject
+    StarterApplication StarterAp;
 
     public void print() {
         System.out.println("StarterC StarterCStarterCStarterC");
     }
 
-    @Override
-    public StarterA getObject() throws Exception {
-        return new StarterA();
-    }
 
-    @Override
-    public Class<StarterA> getObjectType() {
-        return StarterA.class;
-    }
 }

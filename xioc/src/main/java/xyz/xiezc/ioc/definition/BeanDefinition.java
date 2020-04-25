@@ -7,11 +7,11 @@ import cn.hutool.log.LogFactory;
 import lombok.Getter;
 import lombok.Setter;
 import xyz.xiezc.ioc.enums.BeanStatusEnum;
-import xyz.xiezc.ioc.enums.BeanScopeEnum;
+import xyz.xiezc.ioc.enums.BeanTypeEnum;
 
 import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Method;
-import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * 每个bean类的描述信息
@@ -41,7 +41,7 @@ public class BeanDefinition {
      * methodBean
      * properties ： 配置的注入
      */
-    private BeanScopeEnum beanScopeEnum;
+    private BeanTypeEnum beanTypeEnum;
 
     /**
      * 这个bean的状态
@@ -61,22 +61,24 @@ public class BeanDefinition {
     /**
      * 有自定义注解的字段
      */
-    private List<FieldDefinition> annotationFiledDefinitions;
+    private Set<FieldDefinition> annotationFiledDefinitions;
 
     /**
      * 有自定义注解的方法
      */
-    private List<MethodDefinition> annotationMethodDefinitions;
+    private Set<MethodDefinition> annotationMethodDefinitions;
 
     /**
      * 需要在初始化完成后进行调用的方法
+     * @Init
      */
     private MethodDefinition initMethodDefinition;
 
     /**
      * methodBean 的类型的bean调用的方法
+     * @Bean
      */
-    private MethodDefinition InvokeMethodBean;
+    private MethodDefinition invokeMethodBean;
 
     /**
      * 具体的实例, 当beanScopeEnum为methodBean的时候，要注意下这个值是方法的返回值
@@ -90,7 +92,7 @@ public class BeanDefinition {
      * @return
      */
     public <T> T getBean() {
-        if (beanScopeEnum == BeanScopeEnum.factoryBean) {
+        if (getBeanTypeEnum() == BeanTypeEnum.factoryBean) {
             return ReflectUtil.invoke(bean, "getObject");
         }
         return (T) bean;
@@ -112,9 +114,24 @@ public class BeanDefinition {
     @Override
     public String toString() {
         return "BeanDefinition{" +
-                ", isSingleton=" + isSingleton +
-                ", beanName='" + beanName + '\'' +
-                ", beanClass=" + beanClass +
+                " isSingleton=" + isSingleton +
+                ", beanName='" + getBeanName() + '\'' +
+                ", objClass=" + getBeanClass() +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof BeanDefinition)) return false;
+        BeanDefinition that = (BeanDefinition) o;
+        return getBeanTypeEnum() == that.getBeanTypeEnum() &&
+                Objects.equals(getBeanName(), that.getBeanName()) &&
+                Objects.equals(getBeanClass(), that.getBeanClass());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getBeanTypeEnum(), getBeanName(), getBeanClass());
     }
 }

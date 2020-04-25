@@ -82,6 +82,8 @@ public final class Xioc {
         //加载bean信息
         String packagePath = ClassUtil.getPackage(clazz);
         beanScanUtil.loadBeanDefinition(packagePath);
+        //加载BeanFactoryUtil
+        beanScanUtil.loadBeanCreateStategy();
 
         //扫描容器中的bean， 处理所有在bean类上的注解
         beanScanUtil.scanBeanDefinitionClass();
@@ -98,16 +100,8 @@ public final class Xioc {
         //加载容器中的事件bean
         beanScanUtil.loadEventListener();
         xioc.eventListenerUtil.syncCall(new Event("xioc-initAndInjectBeans-end"));
-
         return xioc;
     }
-
-
-    public void web(Class<?> clazz) {
-        this.run(clazz);
-
-    }
-
 
     /**
      * 自动添加注解处理器， 可以使用这个特性自定义注解
@@ -120,14 +114,13 @@ public final class Xioc {
         return xioc;
     }
 
-
     /**
      * 自动添加注解处理器， 可以使用这个特性自定义注解
      *
      * @param annotationHandler
      */
     public Xioc addAnnoHandler(AnnotationHandler<? extends Annotation> annotationHandler) {
-        xioc.contextUtil.getAnnoUtil().addAnnotationHandler(annotationHandler);
+        xioc.contextUtil.getAnnotationUtil().addAnnotationHandler(annotationHandler);
         return xioc;
     }
 

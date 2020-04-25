@@ -1,6 +1,6 @@
 package xyz.xiezc.ioc.enums;
 
-public enum BeanScopeEnum {
+public enum BeanTypeEnum {
     /**
      * 普通的bean， 单例
      */

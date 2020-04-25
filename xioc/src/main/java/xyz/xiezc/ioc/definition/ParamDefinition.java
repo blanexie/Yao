@@ -5,6 +5,7 @@ import lombok.Data;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.util.List;
+import java.util.Objects;
 
 @Data
 public class ParamDefinition<T extends Annotation> {
@@ -45,5 +46,20 @@ public class ParamDefinition<T extends Annotation> {
                 ", BeanName='" + BeanName + '\'' +
                 ", paramType=" + paramType +
                 '}';
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ParamDefinition)) return false;
+        ParamDefinition<?> that = (ParamDefinition<?>) o;
+        return Objects.equals(getParamName(), that.getParamName()) &&
+                Objects.equals(getParamType(), that.getParamType());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getParamName(), getParamType());
     }
 }
