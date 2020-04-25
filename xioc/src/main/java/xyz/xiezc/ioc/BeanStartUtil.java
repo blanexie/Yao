@@ -1,31 +1,25 @@
-package xyz.xiezc.ioc.common;
+package xyz.xiezc.ioc;
 
 
+import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ClassUtil;
-import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.setting.Setting;
 import lombok.SneakyThrows;
-import xyz.xiezc.ioc.AnnotationHandler;
+import xyz.xiezc.ioc.annotation.AnnotationHandler;
 import xyz.xiezc.ioc.annotation.Component;
 import xyz.xiezc.ioc.annotation.Configuration;
-import xyz.xiezc.ioc.common.create.BeanCreateStrategy;
-import xyz.xiezc.ioc.common.create.BeanFactoryUtil;
-import xyz.xiezc.ioc.common.create.FactoryBeanCreateStrategy;
-import xyz.xiezc.ioc.common.create.MethodBeanCreateStrategy;
-import xyz.xiezc.ioc.common.event.Event;
+import xyz.xiezc.ioc.common.create.*;
+import xyz.xiezc.ioc.common.event.ApplicationEvent;
 import xyz.xiezc.ioc.common.event.EventListenerUtil;
-import xyz.xiezc.ioc.common.event.Listener;
+import xyz.xiezc.ioc.common.event.ApplicationListener;
 import xyz.xiezc.ioc.definition.*;
-import xyz.xiezc.ioc.enums.BeanStatusEnum;
 
 import java.io.File;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
@@ -34,20 +28,15 @@ import java.util.stream.Collectors;
  * bean 类扫描加载工具
  */
 
-public class BeanScanUtil {
+public class BeanStartUtil {
 
     /**
      * 容器
      */
-    ContextUtil contextUtil;
+    ApplicationContextUtil applicationContextUtil;
 
 
-    BeanFactoryUtil beanFactoryUtil;
-
-    /**
-     * 注解工具类
-     */
-    AnnotationUtil annotationUtil;
+    BeanCreateUtil beanCreateUtil;
 
     /**
      * 事件分发处理器
@@ -55,9 +44,8 @@ public class BeanScanUtil {
     EventListenerUtil eventListenerUtil;
 
 
-    public BeanScanUtil(ContextUtil contextUtil, EventListenerUtil eventListenerUtil) {
-        this.contextUtil = contextUtil;
-        this.annotationUtil = contextUtil.getAnnotationUtil();
+    public BeanStartUtil(ApplicationContextUtil applicationContextUtil, EventListenerUtil eventListenerUtil) {
+        this.applicationContextUtil = applicationContextUtil;
         this.eventListenerUtil = eventListenerUtil;
     }
 
@@ -65,12 +53,14 @@ public class BeanScanUtil {
      * 加载bean初始化类
      */
     public void loadBeanCreateStategy() {
-        beanFactoryUtil = new BeanFactoryUtil();
-        beanFactoryUtil.setContextUtil(contextUtil);
-        beanFactoryUtil.addBeanFactoryStrategy(new MethodBeanCreateStrategy());
-        beanFactoryUtil.addBeanFactoryStrategy(new FactoryBeanCreateStrategy());
-        beanFactoryUtil.addBeanFactoryStrategy(new BeanCreateStrategy());
+        List<BeanDefinition> beanDefinitions = applicationContextUtil.getBeanDefinitions(BeanCreateStrategy.class);
+        beanCreateUtil.setApplicationContextUtil(applicationContextUtil);
+        for (BeanDefinition beanDefinition : beanDefinitions) {
+            beanDefinition = beanCreateUtil.newInstance(beanDefinition);
+            beanCreateUtil.addBeanFactoryStrategy(beanDefinition.getBean());
+        }
     }
+
 
     /**
      * 加载所有的bean信息
@@ -84,14 +74,14 @@ public class BeanScanUtil {
             //获取上面的component 注解
             Component component = cn.hutool.core.annotation.AnnotationUtil.getAnnotation(aClass, Component.class);
             if (component != null) {
-                AnnotationHandler annotationHandler = annotationUtil.getClassAnnoAndHandlerMap().get(Component.class);
-                annotationHandler.processClass(component, aClass, contextUtil);
+                AnnotationHandler annotationHandler = applicationContextUtil.getClassAnnotationHandler(Component.class);
+                annotationHandler.processClass(component, aClass, applicationContextUtil);
             }
 
             Configuration configuration = cn.hutool.core.annotation.AnnotationUtil.getAnnotation(aClass, Configuration.class);
             if (configuration != null) {
-                AnnotationHandler annotationHandler = annotationUtil.getClassAnnoAndHandlerMap().get(Configuration.class);
-                annotationHandler.processClass(configuration, aClass, contextUtil);
+                AnnotationHandler annotationHandler = applicationContextUtil.getClassAnnotationHandler(Configuration.class);
+                annotationHandler.processClass(configuration, aClass, applicationContextUtil);
             }
         }
     }
@@ -100,8 +90,9 @@ public class BeanScanUtil {
      * 开始开始初始化bean 并且 注入依赖
      */
     public void initAndInjectBeans() {
-        contextUtil.classaAndBeanDefinitionMap.forEach((clazz, beanDefinition) -> {
-            beanFactoryUtil.createBean(beanDefinition);
+
+        applicationContextUtil.getAllBeanDefintion().forEach(beanDefinition -> {
+            beanCreateUtil.createBean(beanDefinition);
         });
     }
 
@@ -109,16 +100,15 @@ public class BeanScanUtil {
      * 扫描所有容器中的类的注解，并处理
      */
     public void scanBeanDefinitionClass() {
-        Map<Class<? extends Annotation>, AnnotationHandler> classAnnoAndHandlerMap = annotationUtil.classAnnoAndHandlerMap;
         //遍历beanDefinition
-        Collection<BeanDefinition> values = contextUtil.classaAndBeanDefinitionMap.values();
+        Collection<BeanDefinition> values = applicationContextUtil.getAllBeanDefintion();
         CopyOnWriteArrayList<BeanDefinition> copyOnWriteArrayList = new CopyOnWriteArrayList<>(values);
         for (BeanDefinition beanDefinition : copyOnWriteArrayList) {
             Class cla = beanDefinition.getBeanClass();
             AnnotatedElement annotatedElement = beanDefinition.getAnnotatedElement();
 
             //获取这个类上所有的注解
-            Annotation[] annotations = cn.hutool.core.annotation.AnnotationUtil.getAnnotations(annotatedElement, true);
+            Annotation[] annotations = AnnotationUtil.getAnnotations(annotatedElement, true);
             //获取注解和handler
             List<AnnotationAndHandler> collect = CollUtil.newArrayList(annotations)
                     .stream()
@@ -128,7 +118,7 @@ public class BeanScanUtil {
                         return !isBeanAnno;
                     })
                     .map(annotation -> {
-                        AnnotationHandler annotationHandler = classAnnoAndHandlerMap.get(annotation.annotationType());
+                        AnnotationHandler annotationHandler = applicationContextUtil.getClassAnnotationHandler(annotation.annotationType());
                         AnnotationAndHandler annotationAndHandler = new AnnotationAndHandler();
                         annotationAndHandler.setAnnotation(annotation);
                         annotationAndHandler.setAnnotationHandler(annotationHandler);
@@ -146,7 +136,7 @@ public class BeanScanUtil {
             for (AnnotationAndHandler annotationAndHandler : collect) {
                 AnnotationHandler annotationHandler = annotationAndHandler.getAnnotationHandler();
                 Annotation annotation = annotationAndHandler.getAnnotation();
-                annotationHandler.processClass(annotation, cla, contextUtil);
+                annotationHandler.processClass(annotation, cla, applicationContextUtil);
             }
         }
     }
@@ -158,9 +148,8 @@ public class BeanScanUtil {
      * @return
      */
     public void scanBeanDefinitionField() {
-        Map<Class<? extends Annotation>, AnnotationHandler> fieldAnnoAndHandlerMap = annotationUtil.getFieldAnnoAndHandlerMap();
         //遍历beanDefinition
-        Collection<BeanDefinition> values = contextUtil.classaAndBeanDefinitionMap.values();
+        Collection<BeanDefinition> values = applicationContextUtil.getAllBeanDefintion();
         CopyOnWriteArrayList<BeanDefinition> copyOnWriteArrayList = new CopyOnWriteArrayList<>(values);
         for (BeanDefinition beanDefinition : copyOnWriteArrayList) {
             Set<FieldDefinition> annotationFiledDefinitions = beanDefinition.getAnnotationFiledDefinitions();
@@ -175,7 +164,7 @@ public class BeanScanUtil {
                 List<AnnotationAndHandler> collect = CollUtil.newArrayList(annotations)
                         .stream()
                         .map(annotation -> {
-                            AnnotationHandler annotationHandler = fieldAnnoAndHandlerMap.get(annotation.annotationType());
+                            AnnotationHandler annotationHandler = applicationContextUtil.getFieldAnnotationHandler(annotation.annotationType());
                             AnnotationAndHandler annotationAndHandler = new AnnotationAndHandler();
                             annotationAndHandler.setAnnotation(annotation);
                             annotationAndHandler.setAnnotationHandler(annotationHandler);
@@ -192,7 +181,7 @@ public class BeanScanUtil {
                 for (AnnotationAndHandler annotationAndHandler : collect) {
                     AnnotationHandler annotationHandler = annotationAndHandler.getAnnotationHandler();//processField()
                     Annotation annotation = annotationAndHandler.getAnnotation();
-                    annotationHandler.processField(fieldDefinition, annotation, beanDefinition, contextUtil);
+                    annotationHandler.processField(fieldDefinition, annotation, beanDefinition, applicationContextUtil);
                 }
             }
         }
@@ -205,9 +194,8 @@ public class BeanScanUtil {
      */
     @SneakyThrows
     public void scanBeanDefinitionMethod() {
-        Map<Class<? extends Annotation>, AnnotationHandler> methodAnnoAndHandlerMap = annotationUtil.getMethodAnnoAndHandlerMap();
 
-        Collection<BeanDefinition> values = contextUtil.classaAndBeanDefinitionMap.values();
+        Collection<BeanDefinition> values = applicationContextUtil.getAllBeanDefintion();
         CopyOnWriteArrayList<BeanDefinition> copyOnWriteArrayList = new CopyOnWriteArrayList<>(values);
         for (BeanDefinition beanDefinition : copyOnWriteArrayList) {
             Set<MethodDefinition> annotationMethodDefinitions = beanDefinition.getAnnotationMethodDefinitions();
@@ -223,7 +211,7 @@ public class BeanScanUtil {
                 List<AnnotationAndHandler> collect = CollUtil.newArrayList(annotations)
                         .stream()
                         .map(annotation -> {
-                            AnnotationHandler annotationHandler = methodAnnoAndHandlerMap.get(annotation.annotationType());
+                            AnnotationHandler annotationHandler = applicationContextUtil.getMethodAnnotationHandler(annotation.annotationType());
                             AnnotationAndHandler annotationAndHandler = new AnnotationAndHandler();
                             annotationAndHandler.setAnnotation(annotation);
                             annotationAndHandler.setAnnotationHandler(annotationHandler);
@@ -240,7 +228,7 @@ public class BeanScanUtil {
                 for (AnnotationAndHandler annotationAndHandler : collect) {
                     AnnotationHandler annotationHandler = annotationAndHandler.getAnnotationHandler();
                     Annotation annotation = annotationAndHandler.getAnnotation();
-                    annotationHandler.processMethod(methodDefinition, annotation, beanDefinition, contextUtil);
+                    annotationHandler.processMethod(methodDefinition, annotation, beanDefinition, applicationContextUtil);
                 }
             }
         }
@@ -252,30 +240,13 @@ public class BeanScanUtil {
      *
      * @return
      */
-    public void loadAnnotationHandler(String annoPath) {
-        //扫描出所有的注解处理器
-        Set<Class<?>> classes = ClassUtil
-                .scanPackage(annoPath, clazz ->
-                        AnnotationHandler.class.isAssignableFrom(clazz)
-                );
-        //反射生成所有的注解处理器
-        Set<AnnotationHandler> annotationHandlerSet = new HashSet<>();
-        for (Class<?> aClass : classes) {
-            try {
-                AnnotationHandler annotationHandler = (AnnotationHandler) ReflectUtil.getConstructor(aClass).newInstance();
-                annotationHandlerSet.add(annotationHandler);
-            } catch (InstantiationException e) {
-                ExceptionUtil.wrapAndThrow(e);
-            } catch (IllegalAccessException e) {
-                ExceptionUtil.wrapAndThrow(e);
-            } catch (InvocationTargetException e) {
-                ExceptionUtil.wrapAndThrow(e);
-            }
+    public void loadAnnotationHandler() {
+        List<BeanDefinition> beanDefinitions = applicationContextUtil.getBeanDefinitions(AnnotationHandler.class);
+        for (BeanDefinition beanDefinition : beanDefinitions) {
+            beanCreateUtil.newInstance(beanDefinition);
+            applicationContextUtil.addAnnotationHandler(beanDefinition.getBean());
         }
-        //分类处理注解处理器
-        annotationHandlerSet.forEach(annotationHandler -> {
-            annotationUtil.addAnnotationHandler(annotationHandler);
-        });
+
     }
 
     /**
@@ -297,19 +268,19 @@ public class BeanScanUtil {
             setting.addSetting(setting1);
         }
         //配置文件的设置
-        contextUtil.setSetting(setting);
+        applicationContextUtil.addSetting(setting);
     }
 
     /**
      * 获取容器中的事件监听器， 这个方法是在。 初始化完成后执行
      */
     public void loadEventListener() {
-        List<BeanDefinition> beanDefinitions = contextUtil.getBeanDefinitions(Listener.class);
+        List<BeanDefinition> beanDefinitions = applicationContextUtil.getBeanDefinitions(ApplicationListener.class);
         beanDefinitions.forEach(beanDefinition -> {
-            beanFactoryUtil.createBean(beanDefinition);
-            Listener bean = beanDefinition.getBean();
-            Event event = bean.getEvent();
-            eventListenerUtil.addListener(event, bean);
+            beanCreateUtil.createBean(beanDefinition);
+            ApplicationListener bean = beanDefinition.getBean();
+            ApplicationEvent applicationEvent = bean.getEvent();
+            eventListenerUtil.addListener(applicationEvent, bean);
         });
 
     }

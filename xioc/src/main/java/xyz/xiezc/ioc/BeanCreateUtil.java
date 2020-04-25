@@ -1,11 +1,11 @@
-package xyz.xiezc.ioc.common.create;
+package xyz.xiezc.ioc;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.Getter;
 import lombok.Setter;
-import xyz.xiezc.ioc.common.ContextUtil;
+import xyz.xiezc.ioc.common.create.BeanCreateStrategy;
 import xyz.xiezc.ioc.definition.BeanDefinition;
 import xyz.xiezc.ioc.definition.FieldDefinition;
 import xyz.xiezc.ioc.definition.MethodDefinition;
@@ -13,28 +13,17 @@ import xyz.xiezc.ioc.definition.ParamDefinition;
 import xyz.xiezc.ioc.enums.BeanStatusEnum;
 import xyz.xiezc.ioc.enums.BeanTypeEnum;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
-public class BeanFactoryUtil {
+public class BeanCreateUtil {
 
     @Setter
     @Getter
-    ContextUtil contextUtil;
+    ApplicationContextUtil applicationContextUtil;
 
-    Map<BeanTypeEnum, BeanFactoryStrategy> beanCreateStrategyMap = new HashMap<>();
-
-    /**
-     * 初始化在中的bean缓存，用来判断循环依赖的
-     */
-    @Setter
-    @Getter
-    Map<String, BeanDefinition> preparingBeanMap = new HashMap<>();
-
-    public void addBeanFactoryStrategy(BeanFactoryStrategy strategy) {
-        strategy.setBeanFactoryUtil(this);
-        beanCreateStrategyMap.put(strategy.getBeanTypeEnum(), strategy);
+    public void addBeanFactoryStrategy(BeanCreateStrategy strategy) {
+        strategy.setBeanCreateUtil(this);
+        applicationContextUtil.putBeanCreateStrategy(strategy);
     }
 
     public BeanDefinition createBean(BeanDefinition beanDefinition) {
@@ -43,19 +32,16 @@ public class BeanFactoryUtil {
         ) {
             return beanDefinition;
         }
-        String beanName = beanDefinition.getBeanName();
-
-        if (preparingBeanMap.get(beanName) == null) {
+        //判断循环依赖， 同时把BeanDefinition 放路创建中的缓存map中
+        if (applicationContextUtil.isCircularDependenceBeanDefinition(beanDefinition)) {
             throw new RuntimeException("出现循环依赖，依赖的bean：" + beanDefinition.toString());
         }
-        //beanName 放入缓存中
-        preparingBeanMap.put(beanName, beanDefinition);
         //创建 bean
         BeanTypeEnum beanTypeEnum = beanDefinition.getBeanTypeEnum();
-        BeanFactoryStrategy beanFactoryStrategy = beanCreateStrategyMap.get(beanTypeEnum);
-        beanFactoryStrategy.createBean(beanDefinition);
+        BeanCreateStrategy beanCreateStrategy = applicationContextUtil.getBeanCreateStrategy(beanTypeEnum);
+        beanCreateStrategy.createBean(beanDefinition);
         //移除缓存
-        preparingBeanMap.remove(beanName);
+        applicationContextUtil.removeCreatingBeanDefinition(beanDefinition);
         return beanDefinition;
     }
 
@@ -83,9 +69,20 @@ public class BeanFactoryUtil {
 
             String beanName = annotationFiledDefinition.getBeanName();
             Class<?> fieldType = annotationFiledDefinition.getFieldType();
-            BeanDefinition beanDefinition = contextUtil.getInjectBeanDefinition(beanName, fieldType);
+            BeanDefinition beanDefinition = applicationContextUtil.getInjectBeanDefinition(beanName, fieldType);
             annotationFiledDefinition.setObj(beanDefinition);
         }
+    }
+
+    public BeanDefinition newInstance(BeanDefinition beanDefinition) {
+        //先创建类
+        if (beanDefinition.getBeanStatus() == BeanStatusEnum.HalfCooked) {
+            Class<?> beanClass = beanDefinition.getBeanClass();
+            Object bean = ReflectUtil.newInstanceIfPossible(beanClass);
+            beanDefinition.setBean(bean);
+            beanDefinition.setBeanStatus(BeanStatusEnum.HalfCooked);
+        }
+        return beanDefinition;
     }
 
     /**
@@ -108,7 +105,7 @@ public class BeanFactoryUtil {
             }
             String beanName = paramDefinition.getBeanName();
             Class paramType = paramDefinition.getParamType();
-            BeanDefinition beanDefinition = contextUtil.getInjectBeanDefinition(beanName, paramType);
+            BeanDefinition beanDefinition = applicationContextUtil.getInjectBeanDefinition(beanName, paramType);
             paramDefinition.setParam(beanDefinition);
         }
     }

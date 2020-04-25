@@ -1,13 +1,15 @@
-package xyz.xiezc.ioc.starter.annotationHandler;
+package xyz.xiezc.ioc.annotation.handler;
 
 import cn.hutool.core.util.StrUtil;
-import xyz.xiezc.ioc.AnnotationHandler;
+import xyz.xiezc.ioc.annotation.AnnotationHandler;
+import xyz.xiezc.ioc.annotation.Component;
 import xyz.xiezc.ioc.annotation.Value;
-import xyz.xiezc.ioc.common.ContextUtil;
+import xyz.xiezc.ioc.ApplicationContextUtil;
 import xyz.xiezc.ioc.definition.BeanDefinition;
 import xyz.xiezc.ioc.definition.FieldDefinition;
 import xyz.xiezc.ioc.definition.MethodDefinition;
 
+@Component
 public class ValueAnnotationHandler extends AnnotationHandler<Value> {
     @Override
     public Class<Value> getAnnotationType() {
@@ -15,17 +17,17 @@ public class ValueAnnotationHandler extends AnnotationHandler<Value> {
     }
 
     @Override
-    public void processClass(Value annotation, Class clazz, ContextUtil contextUtil) {
+    public void processClass(Value annotation, Class clazz, ApplicationContextUtil contextUtil) {
 
     }
 
     @Override
-    public void processMethod(MethodDefinition methodDefinition, Value annotation, BeanDefinition beanDefinition, ContextUtil contextUtil) {
+    public void processMethod(MethodDefinition methodDefinition, Value annotation, BeanDefinition beanDefinition, ApplicationContextUtil contextUtil) {
 
     }
 
     @Override
-    public void processField(FieldDefinition fieldDefinition, Value annotation, BeanDefinition beanDefinition, ContextUtil contextUtil) {
+    public void processField(FieldDefinition fieldDefinition, Value annotation, BeanDefinition beanDefinition, ApplicationContextUtil contextUtil) {
         String beanName = annotation.value();
         if (StrUtil.isBlank(beanName)) {
             beanName = fieldDefinition.getFieldName();

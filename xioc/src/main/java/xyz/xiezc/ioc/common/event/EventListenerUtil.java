@@ -1,11 +1,9 @@
 package xyz.xiezc.ioc.common.event;
 
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.thread.ThreadUtil;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -16,33 +14,33 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class EventListenerUtil {
 
-    Map<Event, List<Listener>> listenerMap = new ConcurrentHashMap<>();
+    Map<ApplicationEvent, List<ApplicationListener>> listenerMap = new ConcurrentHashMap<>();
 
-    public void asyncCall(Event event) {
+    public void asyncCall(ApplicationEvent applicationEvent) {
         ThreadUtil.execute(() -> {
-            this.syncCall(event);
+            this.syncCall(applicationEvent);
         });
     }
 
-    public void syncCall(Event event) {
-        List<Listener> listeners = listenerMap.get(event);
-        if (listeners == null) {
+    public void syncCall(ApplicationEvent applicationEvent) {
+        List<ApplicationListener> applicationListeners = listenerMap.get(applicationEvent);
+        if (applicationListeners == null) {
             return;
         }
-        CopyOnWriteArrayList<Listener> copyOnWriteArrayList = new CopyOnWriteArrayList<>(listeners);
-        for (Listener listener : copyOnWriteArrayList) {
-            listener.execute(event);
+        CopyOnWriteArrayList<ApplicationListener> copyOnWriteArrayList = new CopyOnWriteArrayList<>(applicationListeners);
+        for (ApplicationListener applicationListener : copyOnWriteArrayList) {
+            applicationListener.execute(applicationEvent);
         }
     }
 
-    public void addListener(Event event, Listener listener) {
-        List<Listener> listeners = listenerMap.get(event);
-        if (listeners == null) {
-            listeners = new ArrayList<>();
-            listenerMap.put(event, listeners);
+    public void addListener(ApplicationEvent applicationEvent, ApplicationListener applicationListener) {
+        List<ApplicationListener> applicationListeners = listenerMap.get(applicationEvent);
+        if (applicationListeners == null) {
+            applicationListeners = new ArrayList<>();
+            listenerMap.put(applicationEvent, applicationListeners);
         }
-        listeners.add(listener);
-        listeners.sort((a, b) -> {
+        applicationListeners.add(applicationListener);
+        applicationListeners.sort((a, b) -> {
             int orderA = a.order();
             int orderB = b.order();
             return orderA > orderB ? 1 : -1;
@@ -50,16 +48,16 @@ public class EventListenerUtil {
     }
 
 
-    public void removeListener(Event event, Listener listener) {
-        List<Listener> listeners = listenerMap.get(event);
-        if (listeners == null) {
+    public void removeListener(ApplicationEvent applicationEvent, ApplicationListener applicationListener) {
+        List<ApplicationListener> applicationListeners = listenerMap.get(applicationEvent);
+        if (applicationListeners == null) {
             return;
         }
-        listeners.remove(listener);
+        applicationListeners.remove(applicationListener);
     }
 
-    public List<Listener> removeEvent(Event event) {
-        return listenerMap.remove(event);
+    public List<ApplicationListener> removeEvent(ApplicationEvent applicationEvent) {
+        return listenerMap.remove(applicationEvent);
     }
 
 }

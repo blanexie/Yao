@@ -1,15 +1,16 @@
-package xyz.xiezc.ioc.starter.annotationHandler;
+package xyz.xiezc.ioc.annotation.handler;
 
 import cn.hutool.core.util.StrUtil;
-import xyz.xiezc.ioc.AnnotationHandler;
+import xyz.xiezc.ioc.annotation.AnnotationHandler;
+import xyz.xiezc.ioc.annotation.Component;
 import xyz.xiezc.ioc.annotation.Inject;
-import xyz.xiezc.ioc.common.ContextUtil;
+import xyz.xiezc.ioc.ApplicationContextUtil;
 import xyz.xiezc.ioc.definition.BeanDefinition;
 import xyz.xiezc.ioc.definition.FieldDefinition;
 import xyz.xiezc.ioc.definition.MethodDefinition;
 
-import java.lang.annotation.Annotation;
 
+@Component
 public class InjectAnnotationHandler extends AnnotationHandler<Inject> {
 
     @Override
@@ -23,12 +24,12 @@ public class InjectAnnotationHandler extends AnnotationHandler<Inject> {
     }
 
     @Override
-    public void processClass(Inject annotation, Class clazz, ContextUtil contextUtil) {
+    public void processClass(Inject annotation, Class clazz, ApplicationContextUtil contextUtil) {
 
     }
 
     @Override
-    public void processMethod(MethodDefinition methodDefinition, Inject annotation, BeanDefinition beanDefinition, ContextUtil contextUtil) {
+    public void processMethod(MethodDefinition methodDefinition, Inject annotation, BeanDefinition beanDefinition, ApplicationContextUtil contextUtil) {
 
     }
 
@@ -41,7 +42,7 @@ public class InjectAnnotationHandler extends AnnotationHandler<Inject> {
      * @param contextUtil     容器中已有的所有bean信息
      */
     @Override
-    public void processField(FieldDefinition fieldDefinition, Inject annotation, BeanDefinition beanDefinition, ContextUtil contextUtil) {
+    public void processField(FieldDefinition fieldDefinition, Inject annotation, BeanDefinition beanDefinition, ApplicationContextUtil contextUtil) {
         String beanName = annotation.value();
         if (StrUtil.isBlank(beanName)) {
             beanName = fieldDefinition.getFieldName();

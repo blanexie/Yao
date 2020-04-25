@@ -1,18 +1,12 @@
-package xyz.xiezc.ioc.starter.annotationHandler;
+package xyz.xiezc.ioc.annotation.handler;
 
 
-import cn.hutool.core.util.ClassUtil;
-import xyz.xiezc.ioc.AnnotationHandler;
+import xyz.xiezc.ioc.annotation.AnnotationHandler;
 import xyz.xiezc.ioc.annotation.Component;
-import xyz.xiezc.ioc.common.ContextUtil;
-import xyz.xiezc.ioc.common.XiocUtil;
+import xyz.xiezc.ioc.ApplicationContextUtil;
 import xyz.xiezc.ioc.definition.*;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-
+@Component
 public class ComponentAnnotationHandler extends AnnotationHandler<Component> {
 
     @Override
@@ -28,9 +22,9 @@ public class ComponentAnnotationHandler extends AnnotationHandler<Component> {
      * @param contextUtil 容器中已有的所有bean信息
      */
     @Override
-    public void processClass(Component annotation, Class clazz, ContextUtil contextUtil) {
-        BeanDefinition beanDefinition = XiocUtil.dealBeanAnnotation(annotation, clazz, contextUtil);
-        Class<?> beanClass = XiocUtil.getRealBeanClass(beanDefinition);
+    public void processClass(Component annotation, Class clazz, ApplicationContextUtil contextUtil) {
+        BeanDefinition beanDefinition =dealBeanAnnotation(annotation, clazz, contextUtil);
+        Class<?> beanClass =getRealBeanClass(beanDefinition);
         contextUtil.addBeanDefinition(beanDefinition.getBeanName(), beanClass, beanDefinition);
     }
 
@@ -44,12 +38,12 @@ public class ComponentAnnotationHandler extends AnnotationHandler<Component> {
      * @param contextUtil      容器中已有的所有bean信息
      */
     @Override
-    public void processMethod(MethodDefinition methodDefinition, Component annotation, BeanDefinition beanSignature, ContextUtil contextUtil) {
+    public void processMethod(MethodDefinition methodDefinition, Component annotation, BeanDefinition beanSignature, ApplicationContextUtil contextUtil) {
 
     }
 
     @Override
-    public void processField(FieldDefinition fieldDefinition, Component annotation, BeanDefinition beanSignature, ContextUtil contextUtil) {
+    public void processField(FieldDefinition fieldDefinition, Component annotation, BeanDefinition beanSignature, ApplicationContextUtil contextUtil) {
 
     }
 

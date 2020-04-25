@@ -1,7 +1,7 @@
 package xyz.xiezc.ioc.definition;
 
 import lombok.Data;
-import xyz.xiezc.ioc.AnnotationHandler;
+import xyz.xiezc.ioc.annotation.AnnotationHandler;
 
 import java.lang.annotation.Annotation;
 

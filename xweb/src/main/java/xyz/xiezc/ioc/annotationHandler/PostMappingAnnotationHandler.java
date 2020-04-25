@@ -1,8 +1,8 @@
-package xyz.xiezc.ioc.starter.annotationHandler;
+package xyz.xiezc.ioc.annotationHandler;
 
-import xyz.xiezc.ioc.AnnotationHandler;
+import xyz.xiezc.ioc.annotation.AnnotationHandler;
 import xyz.xiezc.ioc.asm.AsmUtil;
-import xyz.xiezc.ioc.common.ContextUtil;
+import xyz.xiezc.ioc.ApplicationContextUtil;
 import xyz.xiezc.ioc.definition.BeanDefinition;
 import xyz.xiezc.ioc.definition.BeanSignature;
 import xyz.xiezc.ioc.definition.ParamDefinition;
@@ -21,17 +21,17 @@ public class PostMappingAnnotationHandler extends AnnotationHandler<PostMapping>
     }
 
     @Override
-    public void processClass(PostMapping annotation, Class clazz, ContextUtil contextUtil) {
+    public void processClass(PostMapping annotation, Class clazz, ApplicationContextUtil contextUtil) {
 
     }
 
     @Override
-    public void processMethod(Method method, PostMapping annotation, BeanSignature beanSignature, ContextUtil contextUtil) {
+    public void processMethod(Method method, PostMapping annotation, BeanSignature beanSignature, ApplicationContextUtil contextUtil) {
         //获取controller
         dealMappingMethod(method, beanSignature, contextUtil, annotation.value());
     }
 
-    static void dealMappingMethod(Method method, BeanSignature beanSignature, ContextUtil contextUtil, String value) {
+    static void dealMappingMethod(Method method, BeanSignature beanSignature, ApplicationContextUtil contextUtil, String value) {
         BeanDefinition controller = contextUtil.getBeanDefinitionBySignature(beanSignature);
         if (controller == null) {
             throw new RuntimeException("请在Controller中使用PostMapping注解， method：" + method.getName());
@@ -56,7 +56,7 @@ public class PostMappingAnnotationHandler extends AnnotationHandler<PostMapping>
     }
 
     @Override
-    public void processField(Field field, PostMapping annotation, BeanSignature beanSignature, ContextUtil contextUtil) {
+    public void processField(Field field, PostMapping annotation, BeanSignature beanSignature, ApplicationContextUtil contextUtil) {
 
     }
 }
