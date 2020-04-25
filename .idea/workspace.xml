@@ -38,11 +38,6 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectFrameBounds">
-    <option name="y" value="23" />
-    <option name="width" value="1440" />
-    <option name="height" value="825" />
-  </component>
   <component name="ProjectId" id="1aUbC6eqvCU5Nfzs6T9fQHuZOee" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="PropertiesComponent">
@@ -132,6 +127,8 @@
       <workItem from="1587299325974" duration="1773000" />
       <workItem from="1587346636842" duration="2307000" />
       <workItem from="1587367507648" duration="17903000" />
+      <workItem from="1587567657832" duration="16000" />
+      <workItem from="1587658041606" duration="12000" />
     </task>
     <task id="LOCAL-00001" summary="1">
       <created>1586795275086</created>
