@@ -62,7 +62,6 @@ public final class Xioc {
      */
     public Xioc run(Class<?> clazz) {
         //开始启动框架
-        BeanLoadUtil beanLoadUtil = xioc.getBeanLoadUtil();
         applicationContextUtil.publisherEvent(new ApplicationEvent(EventNameConstant.XiocStart));
         //加载配置
         beanLoadUtil.loadPropertie();

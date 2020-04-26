@@ -20,11 +20,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="eb4483da-4f71-48f9-b035-099c27477286" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/ApplicationContextUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/ApplicationContextUtil.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/BeanLoadUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/BeanLoadUtil.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/Xioc.java" beforeDir="false" afterPath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/Xioc.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/common/context/impl/AnnotationContextUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/common/context/impl/AnnotationContextUtil.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/enums/EventNameConstant.java" beforeDir="false" afterPath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/enums/EventNameConstant.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__xyz_xiezc_Xioc_0_0_1_SNAPSHOT.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__xyz_xiezc_Xioc_0_0_1_SNAPSHOT.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -75,6 +72,18 @@
     <key name="CreateClassDialog.RecentsKey">
       <recent name="xyz.xiezc.ioc.common.context.impl" />
     </key>
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
   </component>
   <component name="RunManager" selected="Application.StarterApplication">
     <configuration name="ExampleApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
@@ -230,7 +239,9 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
           </value>
         </entry>
       </map>
@@ -249,7 +260,6 @@
         </entry>
       </map>
     </option>
-    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="idea" />
@@ -348,7 +358,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/starter/src/main/java/xyz/xiezc/ioc/starter/StarterApplication.java</url>
-          <line>21</line>
+          <line>17</line>
           <option name="timeStamp" value="43" />
         </line-breakpoint>
       </breakpoints>
