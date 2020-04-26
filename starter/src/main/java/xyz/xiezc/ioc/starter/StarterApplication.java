@@ -19,21 +19,12 @@ public class StarterApplication {
     @Inject
     StarterC starterC;
 
-    @Bean
-    public StarterC ss(StarterA starterA) {
-        starterA.print();
-        return new StarterC();
-    }
-
     public static void main(String[] args) {
         Xioc.getSingleton().run(StarterApplication.class);
 
-        Map<Class<?>, BeanDefinition> classaAndBeanDefinitionMap = Xioc.getSingleton().getContextUtil().getClassaAndBeanDefinitionMap();
+        BeanDefinition beanDefinition = Xioc.getSingleton().getContextUtil().getBeanDefinition(StarterA.class);
 
-        classaAndBeanDefinitionMap.forEach((clazz, beanDefinitiion) -> {
-            System.out.println(clazz.getName() + " : " + beanDefinitiion.toString());
-        });
-
+        System.out.println(beanDefinition.toString());
     }
 
 }

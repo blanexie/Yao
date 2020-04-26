@@ -1,5 +1,6 @@
 package xyz.xiezc.ioc.common.event;
 
+import cn.hutool.core.lang.Dict;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -7,7 +8,7 @@ import lombok.ToString;
 @Setter
 @Getter
 @ToString
-public abstract class ApplicationEvent {
+public class ApplicationEvent {
 
     public ApplicationEvent(String eventName) {
         this.eventName = eventName;
@@ -20,5 +21,9 @@ public abstract class ApplicationEvent {
     public final long getTimestamp() {
         return this.timestamp;
     }
+
+
+    private Dict dict;
+
 
 }

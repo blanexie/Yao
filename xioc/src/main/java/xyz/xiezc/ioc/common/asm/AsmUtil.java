@@ -1,4 +1,4 @@
-package xyz.xiezc.ioc.asm;
+package xyz.xiezc.ioc.common.asm;
 
 import cn.hutool.core.annotation.CombinationAnnotationElement;
 import cn.hutool.core.util.ClassUtil;

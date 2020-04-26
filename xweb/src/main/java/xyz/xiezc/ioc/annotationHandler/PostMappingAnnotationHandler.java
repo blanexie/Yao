@@ -1,7 +1,7 @@
 package xyz.xiezc.ioc.annotationHandler;
 
 import xyz.xiezc.ioc.annotation.AnnotationHandler;
-import xyz.xiezc.ioc.asm.AsmUtil;
+import xyz.xiezc.ioc.common.asm.AsmUtil;
 import xyz.xiezc.ioc.ApplicationContextUtil;
 import xyz.xiezc.ioc.definition.BeanDefinition;
 import xyz.xiezc.ioc.definition.BeanSignature;

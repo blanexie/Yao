@@ -7,39 +7,56 @@ import xyz.xiezc.ioc.common.context.EventPublisherContext;
 import xyz.xiezc.ioc.common.event.ApplicationEvent;
 import xyz.xiezc.ioc.common.event.ApplicationListener;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 
+/**
+ * 事件监听处理的相关逻辑，
+ */
 public class EventPublisherContextUtil implements EventPublisherContext {
 
-    Map<String, List<ApplicationListener>> listenerMap = new HashMap();
+    Map<String, List<ApplicationListener>> listenersMap = MapUtil.newHashMap();
+
 
     @Override
-    public void addApplicationListener(ApplicationListener<?> listener) {
-        List<ApplicationListener> applicationListeners = listenerMap.get(listener.getEventName());
-        applicationListeners = CollUtil.defaultIfEmpty(applicationListeners, new ArrayList<>());
+    public void addApplicationListener(String eventName, ApplicationListener listener) {
+        List<ApplicationListener> applicationListeners = listenersMap.get(eventName);
+        if (CollUtil.isEmpty(applicationListeners)) {
+            applicationListeners = CollUtil.newArrayList();
+        }
+
         applicationListeners.add(listener);
-        listenerMap.put(listener.getEventName(), applicationListeners);
+        applicationListeners = applicationListeners.stream()
+                .sorted((a, b) -> {
+                    int orderA = a.order();
+                    int orderB = b.order();
+                    return orderA - orderB > 0 ? 1 : -1;
+                }).collect(Collectors.toList());
+        listenersMap.put(eventName, applicationListeners);
     }
 
     @Override
-    public void removeApplicationListener(ApplicationListener<?> listener) {
-        List<ApplicationListener> applicationListeners = listenerMap.get(listener.getEventName());
-        applicationListeners.remove(listener);
+    public void removeApplicationListener(String eventName) {
+        List<ApplicationListener> applicationListeners = listenersMap.get(eventName);
+        applicationListeners.remove(eventName);
+        listenersMap.put(eventName, applicationListeners);
     }
 
     @Override
     public void removeAllListeners() {
-        listenerMap.clear();
+        listenersMap.clear();
     }
 
     @Override
-    public void multicastEvent(ApplicationEvent event) {
-        List<ApplicationListener> applicationListeners = listenerMap.get(event.getEventName());
-        applicationListeners.forEach(applicationListener -> {
+    public void publisherEvent(ApplicationEvent event) {
+        List<ApplicationListener> applicationListeners = listenersMap.get(event);
+        if (CollUtil.isEmpty(applicationListeners)) {
+            return;
+        }
+        CopyOnWriteArrayList<ApplicationListener> applicationListeners1 = new CopyOnWriteArrayList<>(applicationListeners);
+        for (ApplicationListener applicationListener : applicationListeners1) {
             applicationListener.execute(event);
-        });
+        }
     }
 }

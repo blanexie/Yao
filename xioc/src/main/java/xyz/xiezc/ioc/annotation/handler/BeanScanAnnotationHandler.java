@@ -47,7 +47,7 @@ public class BeanScanAnnotationHandler extends AnnotationHandler<BeanScan> {
             packages.add(string);
         }
         for (String aPackage : packages) {
-            Xioc.getSingleton().getBeanStartUtil().loadBeanDefinition(aPackage);
+            Xioc.getSingleton().getBeanLoadUtil().loadBeanDefinition(aPackage);
         }
     }
 

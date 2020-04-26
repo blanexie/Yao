@@ -18,10 +18,10 @@ import java.util.Set;
 @Data
 public class AnnotationContextUtil implements AnnotationContext {
 
-//    public static Set<Class<? extends Annotation>> excludeAnnotation = new HashSet<>() {{
-//        add(Override.class);
-//        add(Deprecated.class);
-//    }};
+    public static Set<Class<? extends Annotation>> excludeAnnotation = new HashSet<>() {{
+        add(Override.class);
+        add(Deprecated.class);
+    }};
 
     /**
      * 作用于类上面的注解
@@ -79,6 +79,16 @@ public class AnnotationContextUtil implements AnnotationContext {
                 this.annoAndHandlerMap.put(annotation, annotationHandler);
             }
         }
+    }
+
+    @Override
+    public void addNotHandleAnnotation(Class<? extends Annotation> clazz) {
+        excludeAnnotation.add(clazz);
+    }
+
+    @Override
+    public boolean isNotHandleAnnotation(Class<? extends Annotation> clazz) {
+        return excludeAnnotation.contains(clazz);
     }
 
     @Override

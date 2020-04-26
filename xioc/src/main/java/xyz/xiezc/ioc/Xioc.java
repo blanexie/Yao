@@ -2,12 +2,7 @@ package xyz.xiezc.ioc;
 
 import cn.hutool.core.util.ClassUtil;
 import lombok.Data;
-import xyz.xiezc.ioc.annotation.AnnotationHandler;
 import xyz.xiezc.ioc.common.event.ApplicationEvent;
-import xyz.xiezc.ioc.common.event.EventListenerUtil;
-import xyz.xiezc.ioc.common.event.ApplicationListener;
-
-import java.lang.annotation.Annotation;
 
 /**
  * 超级简单的依赖注入小框架
@@ -27,13 +22,10 @@ public final class Xioc {
     private final ApplicationContextUtil contextUtil = new ApplicationContextUtil();
 
     /**
-     * 事件分发处理器
-     */
-    EventListenerUtil eventListenerUtil = new EventListenerUtil();
-    /**
      * 扫描工具
      */
-    private final BeanStartUtil beanStartUtil = new BeanStartUtil(contextUtil, eventListenerUtil);
+    private final BeanLoadUtil beanLoadUtil = new BeanLoadUtil(contextUtil);
+
 
     /**
      * 加载其他starter需要扫描的package路径
@@ -67,63 +59,37 @@ public final class Xioc {
      */
     public Xioc run(Class<?> clazz) {
         //开始启动框架
-        BeanStartUtil beanStartUtil = xioc.getBeanStartUtil();
-
-        //加载配置
-        beanStartUtil.loadPropertie();
+        BeanLoadUtil beanLoadUtil = xioc.getBeanLoadUtil();
 
         //加载框架中的bean
-        beanStartUtil.loadBeanDefinition(ClassUtil.getPackage(Xioc.class));
-
+        beanLoadUtil.loadBeanDefinition(ClassUtil.getPackage(Xioc.class));
         //加载starter中的bean
-        beanStartUtil.loadBeanDefinition(xioc.starterPackage);
-
+        beanLoadUtil.loadBeanDefinition(xioc.starterPackage);
         //加载bean信息， 加载用户传入的地址的bean
         String packagePath = ClassUtil.getPackage(clazz);
-        beanStartUtil.loadBeanDefinition(packagePath);
+        beanLoadUtil.loadBeanDefinition(packagePath);
 
         //加载BeanFactoryUtil,并简单初始化bean创建器
-        beanStartUtil.loadBeanCreateStategy();
+        beanLoadUtil.loadBeanCreateStategy();
         //加载注解处理器， 并简单初始化bean
-        beanStartUtil.loadAnnotationHandler();
+        beanLoadUtil.loadAnnotationHandler();
+        //加载容器中的事件处理相关的bean
+        beanLoadUtil.loadEventListener();
+
+        //加载配置
+        beanLoadUtil.loadPropertie();
 
         //扫描容器中的bean， 处理所有在bean类上的注解
-        beanStartUtil.scanBeanDefinitionClass();
-
+        beanLoadUtil.scanBeanDefinitionClass();
         //扫描容器中的bean，处理bean上的字段的自定义注解
-        beanStartUtil.scanBeanDefinitionField();
-
+        beanLoadUtil.scanBeanDefinitionField();
         //扫描容器中的bean, 处理方法
-        beanStartUtil.scanBeanDefinitionMethod();
-
+        beanLoadUtil.scanBeanDefinitionMethod();
         //注入依赖和初始化
-        beanStartUtil.initAndInjectBeans();
-
-        //加载容器中的事件bean
-        beanStartUtil.loadEventListener();
-        xioc.eventListenerUtil.syncCall(new ApplicationEvent("xioc-initAndInjectBeans-end"));
+        beanLoadUtil.initAndInjectBeans();
+        contextUtil.publisherEvent(new ApplicationEvent("initAndInjectBeans"));
         return xioc;
     }
 
-    /**
-     * 自动添加注解处理器， 可以使用这个特性自定义注解
-     *
-     * @param applicationEvent
-     * @param applicationListener
-     */
-    public Xioc addEventListener(ApplicationEvent applicationEvent, ApplicationListener applicationListener) {
-        xioc.eventListenerUtil.addListener(applicationEvent, applicationListener);
-        return xioc;
-    }
-
-    /**
-     * 自动添加注解处理器， 可以使用这个特性自定义注解
-     *
-     * @param annotationHandler
-     */
-    public Xioc addAnnoHandler(AnnotationHandler<? extends Annotation> annotationHandler) {
-        xioc.contextUtil.getAnnotationUtil().addAnnotationHandler(annotationHandler);
-        return xioc;
-    }
 
 }

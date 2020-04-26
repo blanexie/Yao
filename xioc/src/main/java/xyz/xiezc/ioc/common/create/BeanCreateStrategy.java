@@ -1,6 +1,6 @@
 package xyz.xiezc.ioc.common.create;
 
-import xyz.xiezc.ioc.BeanCreateUtil;
+import xyz.xiezc.ioc.ApplicationContextUtil;
 import xyz.xiezc.ioc.definition.BeanDefinition;
 import xyz.xiezc.ioc.enums.BeanTypeEnum;
 
@@ -13,6 +13,5 @@ public interface BeanCreateStrategy {
 
     BeanTypeEnum getBeanTypeEnum();
 
-    void setBeanCreateUtil(BeanCreateUtil beanCreateUtil);
-
+    void setApplicationContext(ApplicationContextUtil applicationContext);
 }

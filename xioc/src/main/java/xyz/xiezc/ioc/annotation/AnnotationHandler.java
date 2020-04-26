@@ -7,16 +7,14 @@ import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import xyz.xiezc.ioc.ApplicationContextUtil;
-import xyz.xiezc.ioc.asm.AsmUtil;
+import xyz.xiezc.ioc.common.asm.AsmUtil;
 import xyz.xiezc.ioc.common.context.AnnotationContext;
-import xyz.xiezc.ioc.common.context.impl.AnnotationContextUtil;
 import xyz.xiezc.ioc.definition.*;
 import xyz.xiezc.ioc.enums.BeanTypeEnum;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -88,7 +86,7 @@ public abstract class AnnotationHandler<T extends Annotation> extends Annotation
 
     public BeanDefinition dealBeanAnnotation(Annotation annotation, Class clazz, ApplicationContextUtil applicationContextUtil) {
         Class<?> beanClass = clazz;
-        String beanName =AnnotationUtil.getAnnotationValue(clazz, annotation.annotationType(), "value");
+        String beanName = AnnotationUtil.getAnnotationValue(clazz, annotation.annotationType(), "value");
         if (StrUtil.isBlank(beanName)) {
             beanName = clazz.getTypeName();
         }
