@@ -1,6 +1,8 @@
 package xyz.xiezc.ioc.common.context.impl;
 
 
+import cn.hutool.aop.ProxyUtil;
+import cn.hutool.core.annotation.AnnotationUtil;
 import lombok.Data;
 import xyz.xiezc.ioc.annotation.AnnotationHandler;
 import xyz.xiezc.ioc.common.context.AnnotationContext;
@@ -54,8 +56,9 @@ public class AnnotationContextUtil implements AnnotationContext {
     @Override
     public <T extends Annotation> void addAnnotationHandler(AnnotationHandler<T> annotationHandler) {
         //获取对应的注解
+
         Class<? extends Annotation> annotation = annotationHandler.getAnnotationType();
-        ElementType[] value = cn.hutool.core.annotation.AnnotationUtil.getTargetType(annotation);
+        ElementType[] value = AnnotationUtil.getTargetType(annotation);
         for (ElementType elementType : value) {
             //作用于类上
             if (elementType == ElementType.TYPE) {

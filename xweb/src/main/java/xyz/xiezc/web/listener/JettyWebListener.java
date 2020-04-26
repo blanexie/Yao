@@ -50,7 +50,7 @@ public class JettyWebListener implements ApplicationListener {
     public void execute(ApplicationEvent applicationEvent) {
 
         //加载对应的HttpMessageConverter
-        List<BeanDefinition> beanDefinitions = Xioc.getSingleton().getContextUtil().getBeanDefinitions(HttpMessageConverter.class);
+        List<BeanDefinition> beanDefinitions = Xioc.getSingleton().getApplicationContextUtil().getBeanDefinitions(HttpMessageConverter.class);
         beanDefinitions.stream().map(beanDefinition ->
                 (HttpMessageConverter) beanDefinition.getBean()
         ).forEach(httpMessageConverter -> {

@@ -3,6 +3,7 @@ package xyz.xiezc.ioc;
 import cn.hutool.core.util.ClassUtil;
 import lombok.Data;
 import xyz.xiezc.ioc.common.event.ApplicationEvent;
+import xyz.xiezc.ioc.enums.EventNameConstant;
 
 /**
  * 超级简单的依赖注入小框架
@@ -19,13 +20,12 @@ public final class Xioc {
     /**
      * 装载依赖的容器. 当依赖全部注入完成的时候,这个集合会清空
      */
-    private final ApplicationContextUtil contextUtil = new ApplicationContextUtil();
+    private final ApplicationContextUtil applicationContextUtil = new ApplicationContextUtil();
 
     /**
      * 扫描工具
      */
-    private final BeanLoadUtil beanLoadUtil = new BeanLoadUtil(contextUtil);
-
+    private final BeanLoadUtil beanLoadUtil = new BeanLoadUtil(applicationContextUtil);
 
     /**
      * 加载其他starter需要扫描的package路径
@@ -60,6 +60,8 @@ public final class Xioc {
     public Xioc run(Class<?> clazz) {
         //开始启动框架
         BeanLoadUtil beanLoadUtil = xioc.getBeanLoadUtil();
+        //加载配置
+        beanLoadUtil.loadPropertie();
 
         //加载框架中的bean
         beanLoadUtil.loadBeanDefinition(ClassUtil.getPackage(Xioc.class));
@@ -76,9 +78,6 @@ public final class Xioc {
         //加载容器中的事件处理相关的bean
         beanLoadUtil.loadEventListener();
 
-        //加载配置
-        beanLoadUtil.loadPropertie();
-
         //扫描容器中的bean， 处理所有在bean类上的注解
         beanLoadUtil.scanBeanDefinitionClass();
         //扫描容器中的bean，处理bean上的字段的自定义注解
@@ -87,7 +86,7 @@ public final class Xioc {
         beanLoadUtil.scanBeanDefinitionMethod();
         //注入依赖和初始化
         beanLoadUtil.initAndInjectBeans();
-        contextUtil.publisherEvent(new ApplicationEvent("initAndInjectBeans"));
+        applicationContextUtil.publisherEvent(new ApplicationEvent(EventNameConstant.initAndInjectBeans));
         return xioc;
     }
 

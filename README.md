@@ -26,6 +26,7 @@
 
 
 #### 后期支持的功能
+* 支持AOP切面的功能
 * 整合Servlet, 使得支持web功能，  使用内嵌Jetty
 * 整合netty， 使用netty的web功能。 主要的web方向
 * 整合mybatis 使得支持数据

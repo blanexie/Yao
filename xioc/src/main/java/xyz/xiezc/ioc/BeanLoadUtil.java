@@ -73,28 +73,35 @@ public class BeanLoadUtil {
         //扫描到类
         Set<Class<?>> classes = ClassUtil.scanPackage(packagePath);
         for (Class<?> aClass : classes) {
-            //获取上面的component 注解
-            Component component = AnnotationUtil.getAnnotation(aClass, Component.class);
-            if (component != null) {
-                AnnotationHandler annotationHandler = applicationContextUtil.getClassAnnotationHandler(Component.class);
-                if (annotationHandler == null) {
-                    Class<? extends AnnotationHandler> annotatonHandler = Component.annotatonHandler;
-                    annotationHandler = ReflectUtil.newInstanceIfPossible(annotatonHandler);
-                    applicationContextUtil.addAnnotationHandler(annotationHandler);
-                }
-                annotationHandler.processClass(component, aClass, applicationContextUtil);
-            }
+            this.loadBeanDefinition(aClass);
+        }
+    }
 
-            Configuration configuration = AnnotationUtil.getAnnotation(aClass, Configuration.class);
-            if (configuration != null) {
-                AnnotationHandler annotationHandler = applicationContextUtil.getClassAnnotationHandler(Configuration.class);
-                if (annotationHandler == null) {
-                    Class<? extends AnnotationHandler> annotatonHandler = Configuration.annotatonHandler;
-                    annotationHandler = ReflectUtil.newInstanceIfPossible(annotatonHandler);
-                    applicationContextUtil.addAnnotationHandler(annotationHandler);
-                }
-                annotationHandler.processClass(configuration, aClass, applicationContextUtil);
+    /**
+     * 加载某个具体的类BeanDefinition到容器中， 前提是这个类必须被@Component 和 Configuration注解
+     */
+    public void loadBeanDefinition(Class clazz) {
+        //获取上面的component 注解
+        Component component = AnnotationUtil.getAnnotation(clazz, Component.class);
+        if (component != null) {
+            AnnotationHandler annotationHandler = applicationContextUtil.getClassAnnotationHandler(Component.class);
+            if (annotationHandler == null) {
+                Class<? extends AnnotationHandler> annotatonHandler = Component.annotatonHandler;
+                annotationHandler = ReflectUtil.newInstanceIfPossible(annotatonHandler);
+                applicationContextUtil.addAnnotationHandler(annotationHandler);
             }
+            annotationHandler.processClass(component, clazz, applicationContextUtil);
+        }
+
+        Configuration configuration = AnnotationUtil.getAnnotation(clazz, Configuration.class);
+        if (configuration != null) {
+            AnnotationHandler annotationHandler = applicationContextUtil.getClassAnnotationHandler(Configuration.class);
+            if (annotationHandler == null) {
+                Class<? extends AnnotationHandler> annotatonHandler = Configuration.annotatonHandler;
+                annotationHandler = ReflectUtil.newInstanceIfPossible(annotatonHandler);
+                applicationContextUtil.addAnnotationHandler(annotationHandler);
+            }
+            annotationHandler.processClass(configuration, clazz, applicationContextUtil);
         }
     }
 
