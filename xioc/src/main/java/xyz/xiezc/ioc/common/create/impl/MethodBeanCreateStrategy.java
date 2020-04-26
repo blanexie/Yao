@@ -1,11 +1,13 @@
-package xyz.xiezc.ioc.common.create;
+package xyz.xiezc.ioc.common.create.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 import lombok.Data;
-import xyz.xiezc.ioc.common.ContextUtil;
+import xyz.xiezc.ioc.ApplicationContextUtil;
+import xyz.xiezc.ioc.common.create.BeanCreateStrategy;
+import xyz.xiezc.ioc.BeanCreateUtil;
 import xyz.xiezc.ioc.definition.BeanDefinition;
 import xyz.xiezc.ioc.definition.FieldDefinition;
 import xyz.xiezc.ioc.definition.MethodDefinition;
@@ -17,11 +19,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Data
-public class MethodBeanCreateStrategy implements BeanFactoryStrategy {
+public class MethodBeanCreateStrategy implements BeanCreateStrategy {
 
-    Log log = LogFactory.get(BeanCreateStrategy.class);
+    Log log = LogFactory.get(SimpleBeanCreateStategy.class);
 
-    BeanFactoryUtil beanFactoryUtil;
+    BeanCreateUtil beanCreateUtil;
 
     @Override
     public void createBean(BeanDefinition beanDefinition) {
@@ -31,24 +33,24 @@ public class MethodBeanCreateStrategy implements BeanFactoryStrategy {
             return;
         }
 
-        ContextUtil contextUtil = beanFactoryUtil.getContextUtil();
+        ApplicationContextUtil contextUtil = beanCreateUtil.getApplicationContextUtil();
 
         //检查所有需要注入字段的依赖是否都存在
         Set<FieldDefinition> annotationFiledDefinitions = beanDefinition.getAnnotationFiledDefinitions();
-        beanFactoryUtil.checkFieldDefinitions(annotationFiledDefinitions);
+        beanCreateUtil.checkFieldDefinitions(annotationFiledDefinitions);
         //检查@Init注解的方法的参数是否都是空的， bean的init方法的参数必须是空的
         MethodDefinition initMethodDefinition = beanDefinition.getInitMethodDefinition();
-        beanFactoryUtil.checkInitMethod(initMethodDefinition);
+        beanCreateUtil.checkInitMethod(initMethodDefinition);
         //检查@Bean注解的方法的参数是否在容器中都存在
         MethodDefinition invokeMethodBean = beanDefinition.getInvokeMethodBean();
-        beanFactoryUtil.checkMethodParam(invokeMethodBean);
+        beanCreateUtil.checkMethodParam(invokeMethodBean);
 
         //开始初始化
         if (beanDefinition.getBeanStatus() == BeanStatusEnum.Original) {
             //获取方法的调用方
             BeanDefinition beanDefinitionParent = invokeMethodBean.getBeanDefinition();
             //先初始化
-            beanDefinitionParent = beanFactoryUtil.createBean(beanDefinitionParent);
+            beanDefinitionParent = beanCreateUtil.createBean(beanDefinitionParent);
             Object bean = beanDefinitionParent.getBean();
             //获取参数
             ParamDefinition[] paramDefinitions = invokeMethodBean.getParamDefinitions();
@@ -59,7 +61,7 @@ public class MethodBeanCreateStrategy implements BeanFactoryStrategy {
                 }
                 if (param instanceof BeanDefinition) {
                     BeanDefinition beanDefinitionParam = contextUtil.getBeanDefinition(paramDefinition.getBeanName(), paramDefinition.getParamType());
-                    beanDefinitionParam = beanFactoryUtil.createBean(beanDefinitionParam);
+                    beanDefinitionParam = beanCreateUtil.createBean(beanDefinitionParam);
                     param = beanDefinitionParam.getBean();
                 }
                 paramDefinition.setParam(param);
@@ -77,13 +79,13 @@ public class MethodBeanCreateStrategy implements BeanFactoryStrategy {
         //注入字段
         if (beanDefinition.getBeanStatus() == BeanStatusEnum.HalfCooked) {
             //设置字段的属性值
-            beanFactoryUtil.injectFieldValue(beanDefinition);
+            beanCreateUtil.injectFieldValue(beanDefinition);
             beanDefinition.setBeanStatus(BeanStatusEnum.injectField);
         }
 
         //调用init方法
         if (beanDefinition.getBeanStatus() == BeanStatusEnum.injectField) {
-            beanFactoryUtil.doInitMethod(beanDefinition);
+            beanCreateUtil.doInitMethod(beanDefinition);
             //bean 所有对象设置完整
             beanDefinition.setBeanStatus(BeanStatusEnum.Completed);
         }

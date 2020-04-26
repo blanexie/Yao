@@ -1,14 +1,15 @@
-package xyz.xiezc.ioc.starter.annotationHandler;
+package xyz.xiezc.ioc.annotation.handler;
 
 import cn.hutool.core.exceptions.ExceptionUtil;
-import xyz.xiezc.ioc.AnnotationHandler;
+import xyz.xiezc.ioc.annotation.AnnotationHandler;
+import xyz.xiezc.ioc.annotation.Component;
 import xyz.xiezc.ioc.annotation.Init;
-import xyz.xiezc.ioc.common.ContextUtil;
+import xyz.xiezc.ioc.ApplicationContextUtil;
 import xyz.xiezc.ioc.definition.BeanDefinition;
 import xyz.xiezc.ioc.definition.FieldDefinition;
 import xyz.xiezc.ioc.definition.MethodDefinition;
 import xyz.xiezc.ioc.definition.ParamDefinition;
-
+@Component
 public class InitAnnotationHandler extends AnnotationHandler<Init> {
 
     @Override
@@ -17,12 +18,12 @@ public class InitAnnotationHandler extends AnnotationHandler<Init> {
     }
 
     @Override
-    public void processClass(Init annotation, Class clazz, ContextUtil contextUtil) {
+    public void processClass(Init annotation, Class clazz, ApplicationContextUtil contextUtil) {
 
     }
 
     @Override
-    public void processMethod(MethodDefinition methodDefinition, Init annotation, BeanDefinition beanDefinition, ContextUtil contextUtil) {
+    public void processMethod(MethodDefinition methodDefinition, Init annotation, BeanDefinition beanDefinition, ApplicationContextUtil contextUtil) {
         ParamDefinition[] paramDefinitions = methodDefinition.getParamDefinitions();
         if (paramDefinitions != null && paramDefinitions.length != 0) {
             ExceptionUtil.wrapAndThrow(new RuntimeException("bean的init方法只能无参，"+methodDefinition));
@@ -31,7 +32,7 @@ public class InitAnnotationHandler extends AnnotationHandler<Init> {
     }
 
     @Override
-    public void processField(FieldDefinition fieldDefinition, Init annotation, BeanDefinition beanDefinition, ContextUtil contextUtil) {
+    public void processField(FieldDefinition fieldDefinition, Init annotation, BeanDefinition beanDefinition, ApplicationContextUtil contextUtil) {
 
     }
 }

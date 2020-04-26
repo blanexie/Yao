@@ -1,15 +1,16 @@
-package xyz.xiezc.ioc.starter.annotationHandler;
+package xyz.xiezc.ioc.annotation.handler;
 
 import cn.hutool.core.util.StrUtil;
-import xyz.xiezc.ioc.AnnotationHandler;
+import xyz.xiezc.ioc.annotation.AnnotationHandler;
 import xyz.xiezc.ioc.annotation.Bean;
-import xyz.xiezc.ioc.common.ContextUtil;
-import xyz.xiezc.ioc.common.XiocUtil;
+import xyz.xiezc.ioc.annotation.Component;
+import xyz.xiezc.ioc.ApplicationContextUtil;
 import xyz.xiezc.ioc.definition.BeanDefinition;
 import xyz.xiezc.ioc.definition.FieldDefinition;
 import xyz.xiezc.ioc.definition.MethodDefinition;
 import xyz.xiezc.ioc.enums.BeanTypeEnum;
 
+@Component
 public class BeanAnnotationHandler extends AnnotationHandler<Bean> {
 
     @Override
@@ -18,14 +19,14 @@ public class BeanAnnotationHandler extends AnnotationHandler<Bean> {
     }
 
     @Override
-    public void processClass(Bean annotation, Class clazz, ContextUtil contextUtil) {
+    public void processClass(Bean annotation, Class clazz, ApplicationContextUtil contextUtil) {
 
     }
 
     @Override
-    public void processMethod(MethodDefinition methodDefinition, Bean annotation, BeanDefinition beanDefinition, ContextUtil contextUtil) {
+    public void processMethod(MethodDefinition methodDefinition, Bean annotation, BeanDefinition beanDefinition, ApplicationContextUtil contextUtil) {
         Class beanClass = methodDefinition.getReturnType();
-        BeanDefinition beanDefinitionMethod = XiocUtil.dealBeanAnnotation(annotation, beanClass, contextUtil);
+        BeanDefinition beanDefinitionMethod = dealBeanAnnotation(annotation, beanClass, contextUtil);
         beanDefinitionMethod.setBeanTypeEnum(BeanTypeEnum.methodBean);
         beanDefinitionMethod.setInvokeMethodBean(methodDefinition);
         //MethodBean的特殊性，所以beanName 和class重新设置下
@@ -34,13 +35,13 @@ public class BeanAnnotationHandler extends AnnotationHandler<Bean> {
             beanName = methodDefinition.getMethodName();
         }
         beanDefinitionMethod.setBeanName(beanName);
-        beanClass = XiocUtil.getRealBeanClass(beanDefinitionMethod);
+        beanClass = getRealBeanClass(beanDefinitionMethod);
         contextUtil.addBeanDefinition(beanDefinition.getBeanName(), beanClass, beanDefinitionMethod);
     }
 
 
     @Override
-    public void processField(FieldDefinition fieldDefinition, Bean annotation, BeanDefinition beanDefinition, ContextUtil contextUtil) {
+    public void processField(FieldDefinition fieldDefinition, Bean annotation, BeanDefinition beanDefinition, ApplicationContextUtil contextUtil) {
 
     }
 }

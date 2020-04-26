@@ -1,5 +1,7 @@
 package xyz.xiezc.ioc.annotation;
 
+import xyz.xiezc.ioc.annotation.handler.BeanAnnotationHandler;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -15,5 +17,10 @@ public @interface Bean {
      * @return
      */
     String value() default "";
+
+    /**
+     * 注解处理器
+     */
+    Class<? extends AnnotationHandler> annotationHandler= BeanAnnotationHandler.class;
 
 }

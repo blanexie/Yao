@@ -1,12 +1,15 @@
-package xyz.xiezc.ioc.common;
+package xyz.xiezc.ioc.annotation;
 
+import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.annotation.CombinationAnnotationElement;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
-import xyz.xiezc.ioc.AnnotationHandler;
+import xyz.xiezc.ioc.ApplicationContextUtil;
 import xyz.xiezc.ioc.asm.AsmUtil;
+import xyz.xiezc.ioc.common.context.AnnotationContext;
+import xyz.xiezc.ioc.common.context.impl.AnnotationContextUtil;
 import xyz.xiezc.ioc.definition.*;
 import xyz.xiezc.ioc.enums.BeanTypeEnum;
 
@@ -17,7 +20,45 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class XiocUtil {
+/**
+ * 注解处理器， 每一个注解都应该对应一个处理器。
+ *
+ * @author wb-xzc291800
+ * @date 2019/04/04 15:01
+ */
+public abstract class AnnotationHandler<T extends Annotation> extends AnnotationOrder {
+
+
+    public abstract Class<T> getAnnotationType();
+
+    /**
+     * 如果是在类注解， 则会调用这个方法处理
+     *
+     * @param clazz       被注解类的基本信息
+     * @param annotation  这个类上的所有注解
+     * @param contextUtil 容器
+     */
+    public abstract void processClass(T annotation, Class clazz, ApplicationContextUtil contextUtil);
+
+    /**
+     * 如果是方法注解，则会调用这个方法来处理
+     *
+     * @param beanDefinition   被注解的类
+     * @param methodDefinition 被注解的方法
+     * @param annotation       这个类上的所有注解
+     * @param contextUtil      容器中已有的所有bean信息
+     */
+    public abstract void processMethod(MethodDefinition methodDefinition, T annotation, BeanDefinition beanDefinition, ApplicationContextUtil contextUtil);
+
+    /**
+     * 如果是字段注解，则会调用这个方法来处理
+     *
+     * @param beanDefinition  被注解的类
+     * @param fieldDefinition 被注解的字段
+     * @param annotation      这个类上的所有注解
+     * @param contextUtil     容器中已有的所有bean信息
+     */
+    public abstract void processField(FieldDefinition fieldDefinition, T annotation, BeanDefinition beanDefinition, ApplicationContextUtil contextUtil);
 
     /**
      * 获取BeanDefinition的真实类型， 因为有些Bean是通过FactoryBean创建的
@@ -25,7 +66,7 @@ public class XiocUtil {
      * @param beanDefinition
      * @return
      */
-    public static Class<?> getRealBeanClass(BeanDefinition beanDefinition) {
+    protected Class<?> getRealBeanClass(BeanDefinition beanDefinition) {
         Class<?> beanClass = beanDefinition.getBeanClass();
         //对应的beanClass需要重新设置
         Type[] genericInterfaces = beanClass.getGenericInterfaces();
@@ -45,14 +86,14 @@ public class XiocUtil {
     }
 
 
-    public static BeanDefinition dealBeanAnnotation(Annotation annotation, Class clazz, ContextUtil contextUtil) {
+    public BeanDefinition dealBeanAnnotation(Annotation annotation, Class clazz, ApplicationContextUtil applicationContextUtil) {
         Class<?> beanClass = clazz;
-        String beanName = cn.hutool.core.annotation.AnnotationUtil.getAnnotationValue(clazz, annotation.annotationType(), "value");
+        String beanName =AnnotationUtil.getAnnotationValue(clazz, annotation.annotationType(), "value");
         if (StrUtil.isBlank(beanName)) {
             beanName = clazz.getTypeName();
         }
         //获取容器中是否存在这个bean
-        BeanDefinition beanDefinition = contextUtil.getBeanDefinition(beanName, beanClass);
+        BeanDefinition beanDefinition = applicationContextUtil.getBeanDefinition(beanName, beanClass);
         //如果容器中不存在 这个bean。 就要放入
         if (beanDefinition == null) {
             beanDefinition = new BeanDefinition();
@@ -72,7 +113,7 @@ public class XiocUtil {
         Field[] fields = ReflectUtil.getFields(beanClass);
         //获取这个bean的所有待注入的信息
         for (Field field : fields) {
-            FieldDefinition fieldDefinition = dealFieldDefinition(field, beanDefinition, contextUtil.getAnnotationUtil());
+            FieldDefinition fieldDefinition = dealFieldDefinition(field, beanDefinition, applicationContextUtil);
             if (fieldDefinition == null) {
                 continue;
             }
@@ -87,7 +128,7 @@ public class XiocUtil {
         //获取这个bean中的所有方法
         Method[] methods = ReflectUtil.getMethods(beanClass);
         for (Method method : methods) {
-            MethodDefinition methodDefinition = dealMethodDefinition(method, beanDefinition, contextUtil.getAnnotationUtil());
+            MethodDefinition methodDefinition = dealMethodDefinition(method, beanDefinition, applicationContextUtil);
             if (methodDefinition == null) {
                 continue;
             }
@@ -103,18 +144,15 @@ public class XiocUtil {
     }
 
 
-    private static FieldDefinition dealFieldDefinition(Field field, BeanDefinition beanDefinition, AnnotationUtil annotationUtil) {
+    private static FieldDefinition dealFieldDefinition(Field field, BeanDefinition beanDefinition, AnnotationContext annotationContext) {
         //获取字段上的所有注解
-        Annotation[] annotations = cn.hutool.core.annotation.AnnotationUtil.getAnnotations(field, true);
+        Annotation[] annotations = AnnotationUtil.getAnnotations(field, true);
         //校验排除一些注解
-        Map<Class<? extends Annotation>, AnnotationHandler> fieldAnnoAndHandlerMap =
-                annotationUtil.getFieldAnnoAndHandlerMap();
         List<Annotation> collect = CollUtil.newArrayList(annotations)
                 .stream()
-                .filter(annotation -> !AnnotationUtil.excludeAnnotation.contains(annotation.annotationType()))
-                .filter(annotation -> fieldAnnoAndHandlerMap.get(annotation.annotationType()) != null)
+                .filter(annotation -> !annotationContext.isNotHandleAnnotation(annotation.annotationType()))
+                .filter(annotation -> annotationContext.getFieldAnnotationHandler(annotation.annotationType()) != null)
                 .collect(Collectors.toList());
-
 
         if (CollUtil.isNotEmpty(collect)) {
             FieldDefinition fieldDefinition = new FieldDefinition();
@@ -128,15 +166,14 @@ public class XiocUtil {
     }
 
 
-    private static MethodDefinition dealMethodDefinition(Method method, BeanDefinition beanDefinition, AnnotationUtil annotationUtil) {
+    private MethodDefinition dealMethodDefinition(Method method, BeanDefinition beanDefinition, AnnotationContext annotationContext) {
         //获取字段上的所有注解
         Annotation[] annotations = cn.hutool.core.annotation.AnnotationUtil.getAnnotations(method, true);
         //校验排除一些注解
-        Map<Class<? extends Annotation>, AnnotationHandler> methodAnnoAndHandlerMap = annotationUtil.getMethodAnnoAndHandlerMap();
         List<Annotation> collect = CollUtil.newArrayList(annotations)
                 .stream()
-                .filter(annotation -> !AnnotationUtil.excludeAnnotation.contains(annotation.annotationType()))
-                .filter(annotation -> methodAnnoAndHandlerMap.get(annotation.annotationType()) != null)
+                .filter(annotation -> !annotationContext.isNotHandleAnnotation(annotation.annotationType()))
+                .filter(annotation -> annotationContext.getMethodAnnotationHandler(annotation.annotationType()) != null)
                 .collect(Collectors.toList());
 
         if (CollUtil.isNotEmpty(collect)) {
@@ -152,6 +189,5 @@ public class XiocUtil {
         return null;
 
     }
-
 
 }

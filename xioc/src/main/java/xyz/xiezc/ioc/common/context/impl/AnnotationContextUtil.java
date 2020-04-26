@@ -1,8 +1,9 @@
-package xyz.xiezc.ioc.common;
+package xyz.xiezc.ioc.common.context.impl;
 
 
 import lombok.Data;
-import xyz.xiezc.ioc.AnnotationHandler;
+import xyz.xiezc.ioc.annotation.AnnotationHandler;
+import xyz.xiezc.ioc.common.context.AnnotationContext;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
@@ -15,12 +16,12 @@ import java.util.Set;
  * 处理注解相关的工具类
  */
 @Data
-public class AnnotationUtil {
+public class AnnotationContextUtil implements AnnotationContext {
 
-    public static Set<Class<? extends Annotation>> excludeAnnotation = new HashSet<>() {{
-        add(Override.class);
-        add(Deprecated.class);
-    }};
+//    public static Set<Class<? extends Annotation>> excludeAnnotation = new HashSet<>() {{
+//        add(Override.class);
+//        add(Deprecated.class);
+//    }};
 
     /**
      * 作用于类上面的注解
@@ -50,7 +51,8 @@ public class AnnotationUtil {
      *
      * @param annotationHandler
      */
-    public void addAnnotationHandler(AnnotationHandler annotationHandler) {
+    @Override
+    public <T extends Annotation> void addAnnotationHandler(AnnotationHandler<T> annotationHandler) {
         //获取对应的注解
         Class<? extends Annotation> annotation = annotationHandler.getAnnotationType();
         ElementType[] value = cn.hutool.core.annotation.AnnotationUtil.getTargetType(annotation);
@@ -77,5 +79,30 @@ public class AnnotationUtil {
                 this.annoAndHandlerMap.put(annotation, annotationHandler);
             }
         }
+    }
+
+    @Override
+    public <T extends Annotation> AnnotationHandler<T> getClassAnnotationHandler(Class<T> clazz) {
+        return classAnnoAndHandlerMap.get(clazz);
+    }
+
+    @Override
+    public <T extends Annotation> AnnotationHandler<T> getMethodAnnotationHandler(Class<T> clazz) {
+        return methodAnnoAndHandlerMap.get(clazz);
+    }
+
+    @Override
+    public <T extends Annotation> AnnotationHandler<T> getFieldAnnotationHandler(Class<T> clazz) {
+        return fieldAnnoAndHandlerMap.get(clazz);
+    }
+
+    @Override
+    public <T extends Annotation> AnnotationHandler<T> getAnnotationAnnotationHandler(Class<T> clazz) {
+        return annoAndHandlerMap.get(clazz);
+    }
+
+    @Override
+    public <T extends Annotation> AnnotationHandler<T> getParameterAnnotationHandler(Class<T> clazz) {
+        return parameterAnnoAndHandlerMap.get(clazz);
     }
 }

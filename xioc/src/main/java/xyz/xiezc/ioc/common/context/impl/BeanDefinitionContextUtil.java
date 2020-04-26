@@ -1,31 +1,18 @@
-package xyz.xiezc.ioc.common;
+package xyz.xiezc.ioc.common.context.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
-import cn.hutool.setting.Setting;
-import lombok.Data;
+import xyz.xiezc.ioc.common.context.BeanDefinitionContext;
 import xyz.xiezc.ioc.definition.BeanDefinition;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- * 容器，装载bean的容器
- */
-@Data
-public class ContextUtil {
+public class BeanDefinitionContextUtil implements BeanDefinitionContext {
 
-    Log log = LogFactory.get(ContextUtil.class);
-
-
-    /**
-     * 所有的配置文件加载进入
-     */
-    Setting setting;
+    Log log = LogFactory.get(BeanDefinitionContextUtil.class);
 
     /**
      * bean的name和class的映射关系
@@ -37,16 +24,18 @@ public class ContextUtil {
      */
     Map<Class<?>, BeanDefinition> classaAndBeanDefinitionMap = new HashMap<>();
 
-    /**
-     * 注解和注解处理器的映射关系
-     */
-    AnnotationUtil annotationUtil = new AnnotationUtil();
+    @Override
+    public List<BeanDefinition> getAllBeanDefintion() {
+        Collection<BeanDefinition> values = classaAndBeanDefinitionMap.values();
+        return CollectionUtil.newArrayList(values);
+    }
 
     /**
      * 注入bean到容器中
      *
      * @param beanDefinition
      */
+    @Override
     public void addBeanDefinition(String beanName, Class<?> beanClass, BeanDefinition beanDefinition) {
         if (!beanDefinition.checkBean()) {
             log.error("请注入正确的bean到容器中");
@@ -63,6 +52,7 @@ public class ContextUtil {
      * @param beanClass
      * @return
      */
+    @Override
     public BeanDefinition getBeanDefinition(String beanName, Class<?> beanClass) {
         Class<?> aClass = nameAndClassMap.get(beanName);
         if (aClass == null) {
@@ -87,6 +77,7 @@ public class ContextUtil {
      * @param beanClass
      * @return
      */
+    @Override
     public BeanDefinition getInjectBeanDefinition(String beanName, Class<?> beanClass) {
         Class<?> aClass = nameAndClassMap.get(beanName);
         if (aClass == null) {
@@ -131,6 +122,7 @@ public class ContextUtil {
      * @param beanName
      * @return
      */
+    @Override
     public BeanDefinition getBeanDefinition(String beanName) {
         Class<?> aClass = nameAndClassMap.get(beanName);
         if (aClass == null) {
@@ -146,6 +138,7 @@ public class ContextUtil {
      * @param beanName
      * @return
      */
+    @Override
     public List<BeanDefinition> getBeanDefinitions(String beanName) {
         Class<?> aClass = nameAndClassMap.get(beanName);
         if (aClass == null) {
@@ -161,6 +154,7 @@ public class ContextUtil {
      * @param beanClass
      * @return
      */
+    @Override
     public BeanDefinition getBeanDefinition(Class<?> beanClass) {
         //先获取最契合的
         BeanDefinition beanDefinition = classaAndBeanDefinitionMap.get(beanClass);
@@ -176,6 +170,7 @@ public class ContextUtil {
      * @param beanClass
      * @return
      */
+    @Override
     public List<BeanDefinition> getBeanDefinitions(Class<?> beanClass) {
         Set<Class<?>> classes = classaAndBeanDefinitionMap.keySet();
         List<BeanDefinition> collect = classes.stream()
@@ -184,5 +179,4 @@ public class ContextUtil {
                 .collect(Collectors.toList());
         return collect;
     }
-
 }

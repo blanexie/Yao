@@ -1,5 +1,7 @@
 package xyz.xiezc.ioc.annotation;
 
+import xyz.xiezc.ioc.annotation.handler.InjectAnnotationHandler;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -26,4 +28,6 @@ public @interface Inject {
      */
     String value() default "";
 
+
+    Class<? extends AnnotationHandler> annotatonHandler = InjectAnnotationHandler.class;
 }

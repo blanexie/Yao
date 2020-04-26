@@ -12,8 +12,8 @@ import xyz.xiezc.ioc.Xioc;
 import xyz.xiezc.ioc.annotation.Component;
 import xyz.xiezc.ioc.annotation.Inject;
 import xyz.xiezc.ioc.annotation.Value;
-import xyz.xiezc.ioc.common.event.Event;
-import xyz.xiezc.ioc.common.event.Listener;
+import xyz.xiezc.ioc.common.event.ApplicationEvent;
+import xyz.xiezc.ioc.common.event.ApplicationListener;
 import xyz.xiezc.ioc.definition.BeanDefinition;
 import xyz.xiezc.web.common.ContentType;
 import xyz.xiezc.web.common.DispatcherHandler;
@@ -24,7 +24,7 @@ import java.nio.file.Paths;
 import java.util.List;
 
 @Component
-public class JettyWebListener implements Listener {
+public class JettyWebListener implements ApplicationListener {
 
 
     @Value("server.static.path")
@@ -43,11 +43,11 @@ public class JettyWebListener implements Listener {
     /**
      * 启动Jetty服务器
      *
-     * @param event
+     * @param applicationEvent
      */
     @SneakyThrows
     @Override
-    public void execute(Event event) {
+    public void execute(ApplicationEvent applicationEvent) {
 
         //加载对应的HttpMessageConverter
         List<BeanDefinition> beanDefinitions = Xioc.getSingleton().getContextUtil().getBeanDefinitions(HttpMessageConverter.class);
@@ -93,8 +93,8 @@ public class JettyWebListener implements Listener {
 
 
     @Override
-    public Event getEvent() {
-        return new Event("xioc-initAndInjectBeans-end");
+    public ApplicationEvent getEvent() {
+        return new ApplicationEvent("xioc-initAndInjectBeans-end");
     }
 
 }
