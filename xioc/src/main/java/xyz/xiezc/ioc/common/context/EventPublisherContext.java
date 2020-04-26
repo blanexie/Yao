@@ -7,19 +7,21 @@ import xyz.xiezc.ioc.common.event.ApplicationListener;
  * 事件监听器接口 管理类
  */
 public interface EventPublisherContext {
+
+
     /**
      * Add a listener to be notified of all events.
      *
      * @param listener the listener to add
      */
-    void addApplicationListener(ApplicationListener<?> listener);
+    void addApplicationListener(String eventName,ApplicationListener  listener);
 
     /**
      * Remove a listener from the notification list.
      *
-     * @param listener the listener to remove
+     * @param eventName the listener to remove
      */
-    void removeApplicationListener(ApplicationListener<?> listener);
+    void removeApplicationListener(String eventName);
 
     /**
      * Remove all listeners registered with this multicaster.
@@ -34,5 +36,5 @@ public interface EventPublisherContext {
      *
      * @param event the event to multicast
      */
-    <T extends ApplicationEvent> void multicastEvent(T event);
+     void publisherEvent(ApplicationEvent event);
 }

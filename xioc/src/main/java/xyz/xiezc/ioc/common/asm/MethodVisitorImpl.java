@@ -1,4 +1,4 @@
-package xyz.xiezc.ioc.asm;
+package xyz.xiezc.ioc.common.asm;
 
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;

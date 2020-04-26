@@ -5,22 +5,32 @@ import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ClassUtil;
+import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.log.Log;
+import cn.hutool.log.LogFactory;
 import cn.hutool.setting.Setting;
 import lombok.SneakyThrows;
 import xyz.xiezc.ioc.annotation.AnnotationHandler;
 import xyz.xiezc.ioc.annotation.Component;
 import xyz.xiezc.ioc.annotation.Configuration;
-import xyz.xiezc.ioc.common.create.*;
+import xyz.xiezc.ioc.annotation.EventListener;
+import xyz.xiezc.ioc.common.create.BeanCreateStrategy;
 import xyz.xiezc.ioc.common.event.ApplicationEvent;
-import xyz.xiezc.ioc.common.event.EventListenerUtil;
 import xyz.xiezc.ioc.common.event.ApplicationListener;
-import xyz.xiezc.ioc.definition.*;
+import xyz.xiezc.ioc.common.exception.CircularDependenceException;
+import xyz.xiezc.ioc.definition.AnnotationAndHandler;
+import xyz.xiezc.ioc.definition.BeanDefinition;
+import xyz.xiezc.ioc.definition.FieldDefinition;
+import xyz.xiezc.ioc.definition.MethodDefinition;
+import xyz.xiezc.ioc.enums.EventNameConstant;
 
 import java.io.File;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
@@ -28,7 +38,9 @@ import java.util.stream.Collectors;
  * bean 类扫描加载工具
  */
 
-public class BeanStartUtil {
+public class BeanLoadUtil {
+
+    Log log = LogFactory.get(BeanLoadUtil.class);
 
     /**
      * 容器
@@ -36,17 +48,8 @@ public class BeanStartUtil {
     ApplicationContextUtil applicationContextUtil;
 
 
-    BeanCreateUtil beanCreateUtil;
-
-    /**
-     * 事件分发处理器
-     */
-    EventListenerUtil eventListenerUtil;
-
-
-    public BeanStartUtil(ApplicationContextUtil applicationContextUtil, EventListenerUtil eventListenerUtil) {
+    public BeanLoadUtil(ApplicationContextUtil applicationContextUtil) {
         this.applicationContextUtil = applicationContextUtil;
-        this.eventListenerUtil = eventListenerUtil;
     }
 
     /**
@@ -54,11 +57,14 @@ public class BeanStartUtil {
      */
     public void loadBeanCreateStategy() {
         List<BeanDefinition> beanDefinitions = applicationContextUtil.getBeanDefinitions(BeanCreateStrategy.class);
-        beanCreateUtil.setApplicationContextUtil(applicationContextUtil);
         for (BeanDefinition beanDefinition : beanDefinitions) {
-            beanDefinition = beanCreateUtil.newInstance(beanDefinition);
-            beanCreateUtil.addBeanFactoryStrategy(beanDefinition.getBean());
+            beanDefinition = applicationContextUtil.newInstance(beanDefinition);
+            BeanCreateStrategy bean = beanDefinition.getBean();
+            bean.setApplicationContext(applicationContextUtil);
+            applicationContextUtil.putBeanCreateStrategy(bean);
         }
+        applicationContextUtil.publisherEvent(new ApplicationEvent(EventNameConstant.loadBeanCreateStategy));
+
     }
 
 
@@ -71,18 +77,36 @@ public class BeanStartUtil {
         //扫描到类
         Set<Class<?>> classes = ClassUtil.scanPackage(packagePath);
         for (Class<?> aClass : classes) {
-            //获取上面的component 注解
-            Component component = cn.hutool.core.annotation.AnnotationUtil.getAnnotation(aClass, Component.class);
-            if (component != null) {
-                AnnotationHandler annotationHandler = applicationContextUtil.getClassAnnotationHandler(Component.class);
-                annotationHandler.processClass(component, aClass, applicationContextUtil);
-            }
+            this.loadBeanDefinition(aClass);
+        }
 
-            Configuration configuration = cn.hutool.core.annotation.AnnotationUtil.getAnnotation(aClass, Configuration.class);
-            if (configuration != null) {
-                AnnotationHandler annotationHandler = applicationContextUtil.getClassAnnotationHandler(Configuration.class);
-                annotationHandler.processClass(configuration, aClass, applicationContextUtil);
+    }
+
+    /**
+     * 加载某个具体的类BeanDefinition到容器中， 前提是这个类必须被@Component 和 Configuration注解
+     */
+    public void loadBeanDefinition(Class clazz) {
+        //获取上面的component 注解
+        Component component = AnnotationUtil.getAnnotation(clazz, Component.class);
+        if (component != null) {
+            AnnotationHandler annotationHandler = applicationContextUtil.getClassAnnotationHandler(Component.class);
+            if (annotationHandler == null) {
+                Class<? extends AnnotationHandler> annotatonHandler = Component.annotatonHandler;
+                annotationHandler = ReflectUtil.newInstanceIfPossible(annotatonHandler);
+                applicationContextUtil.addAnnotationHandler(annotationHandler);
             }
+            annotationHandler.processClass(component, clazz, applicationContextUtil);
+        }
+
+        Configuration configuration = AnnotationUtil.getAnnotation(clazz, Configuration.class);
+        if (configuration != null) {
+            AnnotationHandler annotationHandler = applicationContextUtil.getClassAnnotationHandler(Configuration.class);
+            if (annotationHandler == null) {
+                Class<? extends AnnotationHandler> annotatonHandler = Configuration.annotatonHandler;
+                annotationHandler = ReflectUtil.newInstanceIfPossible(annotatonHandler);
+                applicationContextUtil.addAnnotationHandler(annotationHandler);
+            }
+            annotationHandler.processClass(configuration, clazz, applicationContextUtil);
         }
     }
 
@@ -90,10 +114,17 @@ public class BeanStartUtil {
      * 开始开始初始化bean 并且 注入依赖
      */
     public void initAndInjectBeans() {
-
         applicationContextUtil.getAllBeanDefintion().forEach(beanDefinition -> {
-            beanCreateUtil.createBean(beanDefinition);
+            try {
+                applicationContextUtil.createBean(beanDefinition);
+            } catch (CircularDependenceException e1) {
+                log.error("初始化" + beanDefinition.toString() + "的时候出现循环依赖");
+                log.error(e1);
+                throw e1;
+            }
         });
+
+        applicationContextUtil.publisherEvent(new ApplicationEvent(EventNameConstant.initAndInjectBeans));
     }
 
     /**
@@ -139,6 +170,8 @@ public class BeanStartUtil {
                 annotationHandler.processClass(annotation, cla, applicationContextUtil);
             }
         }
+        applicationContextUtil.publisherEvent(new ApplicationEvent(EventNameConstant.scanBeanDefinitionClass));
+
     }
 
 
@@ -185,6 +218,9 @@ public class BeanStartUtil {
                 }
             }
         }
+
+        applicationContextUtil.publisherEvent(new ApplicationEvent(EventNameConstant.scanBeanDefinitionField));
+
     }
 
     /**
@@ -232,6 +268,9 @@ public class BeanStartUtil {
                 }
             }
         }
+
+        applicationContextUtil.publisherEvent(new ApplicationEvent(EventNameConstant.scanBeanDefinitionMethod));
+
     }
 
 
@@ -243,10 +282,10 @@ public class BeanStartUtil {
     public void loadAnnotationHandler() {
         List<BeanDefinition> beanDefinitions = applicationContextUtil.getBeanDefinitions(AnnotationHandler.class);
         for (BeanDefinition beanDefinition : beanDefinitions) {
-            beanCreateUtil.newInstance(beanDefinition);
+            applicationContextUtil.newInstance(beanDefinition);
             applicationContextUtil.addAnnotationHandler(beanDefinition.getBean());
         }
-
+        applicationContextUtil.publisherEvent(new ApplicationEvent(EventNameConstant.loadAnnotationHandler));
     }
 
     /**
@@ -277,11 +316,18 @@ public class BeanStartUtil {
     public void loadEventListener() {
         List<BeanDefinition> beanDefinitions = applicationContextUtil.getBeanDefinitions(ApplicationListener.class);
         beanDefinitions.forEach(beanDefinition -> {
-            beanCreateUtil.createBean(beanDefinition);
-            ApplicationListener bean = beanDefinition.getBean();
-            ApplicationEvent applicationEvent = bean.getEvent();
-            eventListenerUtil.addListener(applicationEvent, bean);
+            EventListener annotation = AnnotationUtil.getAnnotation(beanDefinition.getAnnotatedElement(), EventListener.class);
+            if (annotation == null) {
+                return;
+            }
+            String[] strings = annotation.eventName();
+            applicationContextUtil.newInstance(beanDefinition);
+            ApplicationListener applicationListener = beanDefinition.getBean();
+            for (String eventName : strings) {
+                applicationContextUtil.addApplicationListener(eventName, applicationListener);
+            }
         });
 
+        applicationContextUtil.publisherEvent(new ApplicationEvent(EventNameConstant.loadEventListener));
     }
 }

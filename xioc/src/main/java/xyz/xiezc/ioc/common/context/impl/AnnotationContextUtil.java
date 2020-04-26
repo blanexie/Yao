@@ -1,6 +1,7 @@
 package xyz.xiezc.ioc.common.context.impl;
 
 
+import cn.hutool.core.annotation.AnnotationUtil;
 import lombok.Data;
 import xyz.xiezc.ioc.annotation.AnnotationHandler;
 import xyz.xiezc.ioc.common.context.AnnotationContext;
@@ -18,10 +19,10 @@ import java.util.Set;
 @Data
 public class AnnotationContextUtil implements AnnotationContext {
 
-//    public static Set<Class<? extends Annotation>> excludeAnnotation = new HashSet<>() {{
-//        add(Override.class);
-//        add(Deprecated.class);
-//    }};
+    public static Set<Class<? extends Annotation>> excludeAnnotation = new HashSet<>() {{
+        add(Override.class);
+        add(Deprecated.class);
+    }};
 
     /**
      * 作用于类上面的注解
@@ -54,8 +55,9 @@ public class AnnotationContextUtil implements AnnotationContext {
     @Override
     public <T extends Annotation> void addAnnotationHandler(AnnotationHandler<T> annotationHandler) {
         //获取对应的注解
+
         Class<? extends Annotation> annotation = annotationHandler.getAnnotationType();
-        ElementType[] value = cn.hutool.core.annotation.AnnotationUtil.getTargetType(annotation);
+        ElementType[] value = AnnotationUtil.getTargetType(annotation);
         for (ElementType elementType : value) {
             //作用于类上
             if (elementType == ElementType.TYPE) {
@@ -79,6 +81,16 @@ public class AnnotationContextUtil implements AnnotationContext {
                 this.annoAndHandlerMap.put(annotation, annotationHandler);
             }
         }
+    }
+
+    @Override
+    public void addNotHandleAnnotation(Class<? extends Annotation> clazz) {
+        excludeAnnotation.add(clazz);
+    }
+
+    @Override
+    public boolean isNotHandleAnnotation(Class<? extends Annotation> clazz) {
+        return excludeAnnotation.contains(clazz);
     }
 
     @Override

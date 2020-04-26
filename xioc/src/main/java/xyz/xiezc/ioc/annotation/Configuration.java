@@ -1,6 +1,7 @@
 package xyz.xiezc.ioc.annotation;
 
 import xyz.xiezc.ioc.annotation.handler.ComponentAnnotationHandler;
+import xyz.xiezc.ioc.annotation.handler.ConfigurationAnnotationHandler;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -20,5 +21,5 @@ public @interface Configuration {
     String value() default "";
 
 
-    Class<? extends AnnotationHandler> annotatonHandler = ComponentAnnotationHandler.class;
+    Class<? extends AnnotationHandler> annotatonHandler = ConfigurationAnnotationHandler.class;
 }

@@ -1,11 +1,12 @@
-package xyz.xiezc.ioc;
+package xyz.xiezc.ioc.common.context.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
-import lombok.Getter;
-import lombok.Setter;
+import xyz.xiezc.ioc.common.context.BeanCreateContext;
+import xyz.xiezc.ioc.common.context.BeanDefinitionContext;
 import xyz.xiezc.ioc.common.create.BeanCreateStrategy;
+import xyz.xiezc.ioc.common.exception.CircularDependenceException;
 import xyz.xiezc.ioc.definition.BeanDefinition;
 import xyz.xiezc.ioc.definition.FieldDefinition;
 import xyz.xiezc.ioc.definition.MethodDefinition;
@@ -13,19 +14,57 @@ import xyz.xiezc.ioc.definition.ParamDefinition;
 import xyz.xiezc.ioc.enums.BeanStatusEnum;
 import xyz.xiezc.ioc.enums.BeanTypeEnum;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
-public class BeanCreateUtil {
+public class BeanCreateContextUtil implements BeanCreateContext {
 
-    @Setter
-    @Getter
-    ApplicationContextUtil applicationContextUtil;
+    BeanDefinitionContext beanDefinitionContext;
 
-    public void addBeanFactoryStrategy(BeanCreateStrategy strategy) {
-        strategy.setBeanCreateUtil(this);
-        applicationContextUtil.putBeanCreateStrategy(strategy);
+    public BeanCreateContextUtil(BeanDefinitionContext beanDefinitionContext) {
+        this.beanDefinitionContext = beanDefinitionContext;
     }
 
+    /**
+     * 正在创建中的bean缓存，用来判断循环依赖的
+     */
+    Map<String, BeanDefinition> preparingBeanMap = new HashMap<>();
+    /**
+     *
+     */
+    Map<BeanTypeEnum, BeanCreateStrategy> beanCreateStrategyMap = new HashMap<>();
+
+
+    @Override
+    public void putBeanCreateStrategy(BeanCreateStrategy beanCreateStrategy) {
+        beanCreateStrategyMap.put(beanCreateStrategy.getBeanTypeEnum(), beanCreateStrategy);
+    }
+
+    @Override
+    public BeanCreateStrategy getBeanCreateStrategy(BeanTypeEnum beanTypeEnum) {
+        return beanCreateStrategyMap.get(beanTypeEnum);
+    }
+
+    /**
+     * 移除正在创建中的bean
+     *
+     * @param beanDefinition
+     */
+    public void removeCreatingBeanDefinition(BeanDefinition beanDefinition) {
+        preparingBeanMap.remove(beanDefinition.getBeanName());
+    }
+
+    @Override
+    public boolean isCircularDependenceBeanDefinition(BeanDefinition beanDefinition) {
+        if (preparingBeanMap.get(beanDefinition.getBeanName()) == null) {
+            preparingBeanMap.put(beanDefinition.getBeanName(), beanDefinition);
+            return false;
+        }
+        return true;
+    }
+
+    @Override
     public BeanDefinition createBean(BeanDefinition beanDefinition) {
         if (beanDefinition.getBeanStatus() == BeanStatusEnum.Completed
                 || beanDefinition.getBeanStatus() == BeanStatusEnum.injectField
@@ -33,15 +72,15 @@ public class BeanCreateUtil {
             return beanDefinition;
         }
         //判断循环依赖， 同时把BeanDefinition 放路创建中的缓存map中
-        if (applicationContextUtil.isCircularDependenceBeanDefinition(beanDefinition)) {
-            throw new RuntimeException("出现循环依赖，依赖的bean：" + beanDefinition.toString());
+        if (isCircularDependenceBeanDefinition(beanDefinition)) {
+            throw new CircularDependenceException(beanDefinition.toString());
         }
         //创建 bean
         BeanTypeEnum beanTypeEnum = beanDefinition.getBeanTypeEnum();
-        BeanCreateStrategy beanCreateStrategy = applicationContextUtil.getBeanCreateStrategy(beanTypeEnum);
+        BeanCreateStrategy beanCreateStrategy = getBeanCreateStrategy(beanTypeEnum);
         beanCreateStrategy.createBean(beanDefinition);
         //移除缓存
-        applicationContextUtil.removeCreatingBeanDefinition(beanDefinition);
+        removeCreatingBeanDefinition(beanDefinition);
         return beanDefinition;
     }
 
@@ -50,6 +89,7 @@ public class BeanCreateUtil {
      *
      * @param annotationFiledDefinitions
      */
+    @Override
     public void checkFieldDefinitions(Set<FieldDefinition> annotationFiledDefinitions) {
         annotationFiledDefinitions = CollectionUtil.emptyIfNull(annotationFiledDefinitions);
         for (FieldDefinition annotationFiledDefinition : annotationFiledDefinitions) {
@@ -69,14 +109,16 @@ public class BeanCreateUtil {
 
             String beanName = annotationFiledDefinition.getBeanName();
             Class<?> fieldType = annotationFiledDefinition.getFieldType();
-            BeanDefinition beanDefinition = applicationContextUtil.getInjectBeanDefinition(beanName, fieldType);
+            BeanDefinition beanDefinition = beanDefinitionContext.getInjectBeanDefinition(beanName, fieldType);
             annotationFiledDefinition.setObj(beanDefinition);
         }
     }
 
+
+    @Override
     public BeanDefinition newInstance(BeanDefinition beanDefinition) {
         //先创建类
-        if (beanDefinition.getBeanStatus() == BeanStatusEnum.HalfCooked) {
+        if (beanDefinition.getBeanStatus() == BeanStatusEnum.Original) {
             Class<?> beanClass = beanDefinition.getBeanClass();
             Object bean = ReflectUtil.newInstanceIfPossible(beanClass);
             beanDefinition.setBean(bean);
@@ -90,6 +132,7 @@ public class BeanCreateUtil {
      *
      * @param methodBeanInvoke
      */
+    @Override
     public void checkMethodParam(MethodDefinition methodBeanInvoke) {
         if (methodBeanInvoke == null) {
             return;
@@ -105,7 +148,7 @@ public class BeanCreateUtil {
             }
             String beanName = paramDefinition.getBeanName();
             Class paramType = paramDefinition.getParamType();
-            BeanDefinition beanDefinition = applicationContextUtil.getInjectBeanDefinition(beanName, paramType);
+            BeanDefinition beanDefinition = beanDefinitionContext.getInjectBeanDefinition(beanName, paramType);
             paramDefinition.setParam(beanDefinition);
         }
     }
@@ -131,6 +174,7 @@ public class BeanCreateUtil {
      *
      * @param beanDefinition
      */
+    @Override
     public void doInitMethod(BeanDefinition beanDefinition) {
         //调用对应bean的init方法
         MethodDefinition initMethodDefinition = beanDefinition.getInitMethodDefinition();
@@ -145,18 +189,20 @@ public class BeanCreateUtil {
      *
      * @param beanDefinition
      */
+    @Override
     public void injectFieldValue(BeanDefinition beanDefinition) {
         //设置字段的属性值
         Set<FieldDefinition> annotationFiledDefinitions = beanDefinition.getAnnotationFiledDefinitions();
         annotationFiledDefinitions = CollectionUtil.emptyIfNull(annotationFiledDefinitions);
         for (FieldDefinition fieldDefinition : annotationFiledDefinitions) {
-            Object obj = fieldDefinition.getObj();
+            var obj = fieldDefinition.getObj();
             if (obj instanceof BeanDefinition) {
-                obj = this.createBean((BeanDefinition) obj);
+                BeanDefinition fieldBeanDefinition = (BeanDefinition) obj;
+                fieldBeanDefinition = this.createBean(fieldBeanDefinition);
+                obj = fieldBeanDefinition.getBean();
             }
             ReflectUtil.setFieldValue(beanDefinition.getBean(), fieldDefinition.getFieldName(), obj);
         }
     }
-
 
 }

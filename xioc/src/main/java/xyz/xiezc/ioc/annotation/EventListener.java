@@ -1,15 +1,22 @@
 package xyz.xiezc.ioc.annotation;
 
-import xyz.xiezc.ioc.annotation.handler.InitAnnotationHandler;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target({ElementType.METHOD})
+/**
+ * 事件处理器的注解
+ */
+@Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Init {
+@Component
+public @interface EventListener {
 
-    Class<? extends AnnotationHandler> annotatonHandler = InitAnnotationHandler.class;
+    /**
+     * 被注解的事件处理器需要处理的事件名称
+     * @return
+     */
+    String[] eventName();
 }

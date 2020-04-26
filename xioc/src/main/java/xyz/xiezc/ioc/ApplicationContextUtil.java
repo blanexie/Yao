@@ -1,38 +1,51 @@
 package xyz.xiezc.ioc;
 
+import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 import cn.hutool.setting.Setting;
 import lombok.Data;
 import xyz.xiezc.ioc.annotation.AnnotationHandler;
-import xyz.xiezc.ioc.common.context.AnnotationContext;
-import xyz.xiezc.ioc.common.context.BeanDefinitionContext;
-import xyz.xiezc.ioc.common.context.PreparingBeanDefinitionContext;
-import xyz.xiezc.ioc.common.context.PropertiesContext;
+import xyz.xiezc.ioc.common.context.*;
+import xyz.xiezc.ioc.common.context.impl.*;
 import xyz.xiezc.ioc.common.create.BeanCreateStrategy;
-import xyz.xiezc.ioc.common.create.impl.SimpleBeanCreateStategy;
+import xyz.xiezc.ioc.common.event.ApplicationEvent;
+import xyz.xiezc.ioc.common.event.ApplicationListener;
 import xyz.xiezc.ioc.definition.BeanDefinition;
+import xyz.xiezc.ioc.definition.FieldDefinition;
+import xyz.xiezc.ioc.definition.MethodDefinition;
 import xyz.xiezc.ioc.enums.BeanTypeEnum;
 
 import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
 
 /**
  * 容器，装载bean的容器,以及其他的所有的需要存放的对象都在这里
  */
 @Data
-public class ApplicationContextUtil implements BeanDefinitionContext, AnnotationContext, PreparingBeanDefinitionContext, PropertiesContext {
+public class ApplicationContextUtil implements BeanDefinitionContext, AnnotationContext, EventPublisherContext, BeanCreateContext, PropertiesContext {
 
     Log log = LogFactory.get(ApplicationContextUtil.class);
 
-    private AnnotationContext annotationContext;
+    /**
+     * 全局线程池
+     */
+    public static ExecutorService executorService = ThreadUtil.newExecutor(1, 100);
 
-    private PreparingBeanDefinitionContext preparingBeanDefinitionContext;
 
-    private PropertiesContext propertiesContext;
+    private BeanDefinitionContext beanDefinitionContext = new BeanDefinitionContextUtil();
 
-    private BeanDefinitionContext beanDefinitionContext;
+    private AnnotationContext annotationContext = new AnnotationContextUtil();
+
+    private BeanCreateContext beanCreateContext = new BeanCreateContextUtil(beanDefinitionContext);
+
+    private PropertiesContext propertiesContext = new PropertiesContextUtil();
+
+    private EventPublisherContext eventPublisherContext = new EventPublisherContextUtil();
+
 
     @Override
     public <T extends Annotation> void addAnnotationHandler(AnnotationHandler<T> annotationHandler) {
@@ -77,22 +90,57 @@ public class ApplicationContextUtil implements BeanDefinitionContext, Annotation
 
     @Override
     public void putBeanCreateStrategy(BeanCreateStrategy beanCreateStrategy) {
-        preparingBeanDefinitionContext.putBeanCreateStrategy(beanCreateStrategy);
+        beanCreateContext.putBeanCreateStrategy(beanCreateStrategy);
     }
 
     @Override
     public BeanCreateStrategy getBeanCreateStrategy(BeanTypeEnum beanTypeEnum) {
-        return preparingBeanDefinitionContext.getBeanCreateStrategy(beanTypeEnum);
+        return beanCreateContext.getBeanCreateStrategy(beanTypeEnum);
     }
 
     @Override
     public void removeCreatingBeanDefinition(BeanDefinition beanDefinition) {
-        preparingBeanDefinitionContext.removeCreatingBeanDefinition(beanDefinition);
+        beanCreateContext.removeCreatingBeanDefinition(beanDefinition);
     }
 
     @Override
     public boolean isCircularDependenceBeanDefinition(BeanDefinition beanDefinition) {
-        return preparingBeanDefinitionContext.isCircularDependenceBeanDefinition(beanDefinition);
+        return beanCreateContext.isCircularDependenceBeanDefinition(beanDefinition);
+    }
+
+    @Override
+    public BeanDefinition createBean(BeanDefinition beanDefinition) {
+        return beanCreateContext.createBean(beanDefinition);
+    }
+
+    @Override
+    public void checkFieldDefinitions(Set<FieldDefinition> annotationFiledDefinitions) {
+        beanCreateContext.checkFieldDefinitions(annotationFiledDefinitions);
+    }
+
+    @Override
+    public BeanDefinition newInstance(BeanDefinition beanDefinition) {
+        return beanCreateContext.newInstance(beanDefinition);
+    }
+
+    @Override
+    public void checkMethodParam(MethodDefinition methodBeanInvoke) {
+        beanCreateContext.checkMethodParam(methodBeanInvoke);
+    }
+
+    @Override
+    public void checkInitMethod(MethodDefinition methodBeanInvoke) {
+        beanCreateContext.checkInitMethod(methodBeanInvoke);
+    }
+
+    @Override
+    public void doInitMethod(BeanDefinition beanDefinition) {
+        beanCreateContext.doInitMethod(beanDefinition);
+    }
+
+    @Override
+    public void injectFieldValue(BeanDefinition beanDefinition) {
+        beanCreateContext.injectFieldValue(beanDefinition);
     }
 
     @Override
@@ -143,5 +191,25 @@ public class ApplicationContextUtil implements BeanDefinitionContext, Annotation
     @Override
     public List<BeanDefinition> getBeanDefinitions(Class<?> beanClass) {
         return beanDefinitionContext.getBeanDefinitions(beanClass);
+    }
+
+    @Override
+    public void addApplicationListener(String eventName, ApplicationListener listener) {
+        eventPublisherContext.addApplicationListener(eventName, listener);
+    }
+
+    @Override
+    public void removeApplicationListener(String eventName) {
+        eventPublisherContext.removeApplicationListener(eventName);
+    }
+
+    @Override
+    public void removeAllListeners() {
+        eventPublisherContext.removeAllListeners();
+    }
+
+    @Override
+    public void publisherEvent(ApplicationEvent event) {
+        eventPublisherContext.publisherEvent(event);
     }
 }
