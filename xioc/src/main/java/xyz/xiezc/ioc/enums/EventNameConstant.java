@@ -2,6 +2,7 @@ package xyz.xiezc.ioc.enums;
 
 public class EventNameConstant {
 
+    public static final String XiocStart = "XiocStart";
     public static final String loadPropertie = "loadPropertie";
 
     public static final String loadBeanDefinition = "loadBeanDefinition";
@@ -19,5 +20,7 @@ public class EventNameConstant {
     public static final String scanBeanDefinitionMethod = "scanBeanDefinitionMethod";
 
     public static final String initAndInjectBeans = "initAndInjectBeans";
+
+    public static final String XiocEnd = "XiocEnd";
 
 }

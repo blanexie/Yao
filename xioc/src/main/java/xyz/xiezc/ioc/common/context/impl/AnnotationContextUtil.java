@@ -1,7 +1,6 @@
 package xyz.xiezc.ioc.common.context.impl;
 
 
-import cn.hutool.aop.ProxyUtil;
 import cn.hutool.core.annotation.AnnotationUtil;
 import lombok.Data;
 import xyz.xiezc.ioc.annotation.AnnotationHandler;

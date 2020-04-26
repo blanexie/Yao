@@ -5,6 +5,9 @@ import lombok.Data;
 import xyz.xiezc.ioc.common.event.ApplicationEvent;
 import xyz.xiezc.ioc.enums.EventNameConstant;
 
+import static xyz.xiezc.ioc.enums.EventNameConstant.loadBeanDefinition;
+import static xyz.xiezc.ioc.enums.EventNameConstant.loadPropertie;
+
 /**
  * 超级简单的依赖注入小框架
  * <p>
@@ -60,8 +63,10 @@ public final class Xioc {
     public Xioc run(Class<?> clazz) {
         //开始启动框架
         BeanLoadUtil beanLoadUtil = xioc.getBeanLoadUtil();
+        applicationContextUtil.publisherEvent(new ApplicationEvent(EventNameConstant.XiocStart));
         //加载配置
         beanLoadUtil.loadPropertie();
+        applicationContextUtil.publisherEvent(new ApplicationEvent(loadPropertie));
 
         //加载框架中的bean
         beanLoadUtil.loadBeanDefinition(ClassUtil.getPackage(Xioc.class));
@@ -70,6 +75,7 @@ public final class Xioc {
         //加载bean信息， 加载用户传入的地址的bean
         String packagePath = ClassUtil.getPackage(clazz);
         beanLoadUtil.loadBeanDefinition(packagePath);
+        applicationContextUtil.publisherEvent(new ApplicationEvent(loadBeanDefinition));
 
         //加载BeanFactoryUtil,并简单初始化bean创建器
         beanLoadUtil.loadBeanCreateStategy();
@@ -86,7 +92,7 @@ public final class Xioc {
         beanLoadUtil.scanBeanDefinitionMethod();
         //注入依赖和初始化
         beanLoadUtil.initAndInjectBeans();
-        applicationContextUtil.publisherEvent(new ApplicationEvent(EventNameConstant.initAndInjectBeans));
+        applicationContextUtil.publisherEvent(new ApplicationEvent(EventNameConstant.XiocEnd));
         return xioc;
     }
 

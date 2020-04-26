@@ -16,12 +16,14 @@ import xyz.xiezc.ioc.annotation.Component;
 import xyz.xiezc.ioc.annotation.Configuration;
 import xyz.xiezc.ioc.annotation.EventListener;
 import xyz.xiezc.ioc.common.create.BeanCreateStrategy;
+import xyz.xiezc.ioc.common.event.ApplicationEvent;
 import xyz.xiezc.ioc.common.event.ApplicationListener;
 import xyz.xiezc.ioc.common.exception.CircularDependenceException;
 import xyz.xiezc.ioc.definition.AnnotationAndHandler;
 import xyz.xiezc.ioc.definition.BeanDefinition;
 import xyz.xiezc.ioc.definition.FieldDefinition;
 import xyz.xiezc.ioc.definition.MethodDefinition;
+import xyz.xiezc.ioc.enums.EventNameConstant;
 
 import java.io.File;
 import java.lang.annotation.Annotation;
@@ -61,6 +63,8 @@ public class BeanLoadUtil {
             bean.setApplicationContext(applicationContextUtil);
             applicationContextUtil.putBeanCreateStrategy(bean);
         }
+        applicationContextUtil.publisherEvent(new ApplicationEvent(EventNameConstant.loadBeanCreateStategy));
+
     }
 
 
@@ -75,6 +79,7 @@ public class BeanLoadUtil {
         for (Class<?> aClass : classes) {
             this.loadBeanDefinition(aClass);
         }
+
     }
 
     /**
@@ -118,6 +123,8 @@ public class BeanLoadUtil {
                 throw e1;
             }
         });
+
+        applicationContextUtil.publisherEvent(new ApplicationEvent(EventNameConstant.initAndInjectBeans));
     }
 
     /**
@@ -163,6 +170,8 @@ public class BeanLoadUtil {
                 annotationHandler.processClass(annotation, cla, applicationContextUtil);
             }
         }
+        applicationContextUtil.publisherEvent(new ApplicationEvent(EventNameConstant.scanBeanDefinitionClass));
+
     }
 
 
@@ -209,6 +218,9 @@ public class BeanLoadUtil {
                 }
             }
         }
+
+        applicationContextUtil.publisherEvent(new ApplicationEvent(EventNameConstant.scanBeanDefinitionField));
+
     }
 
     /**
@@ -256,6 +268,9 @@ public class BeanLoadUtil {
                 }
             }
         }
+
+        applicationContextUtil.publisherEvent(new ApplicationEvent(EventNameConstant.scanBeanDefinitionMethod));
+
     }
 
 
@@ -270,6 +285,7 @@ public class BeanLoadUtil {
             applicationContextUtil.newInstance(beanDefinition);
             applicationContextUtil.addAnnotationHandler(beanDefinition.getBean());
         }
+        applicationContextUtil.publisherEvent(new ApplicationEvent(EventNameConstant.loadAnnotationHandler));
     }
 
     /**
@@ -311,5 +327,7 @@ public class BeanLoadUtil {
                 applicationContextUtil.addApplicationListener(eventName, applicationListener);
             }
         });
+
+        applicationContextUtil.publisherEvent(new ApplicationEvent(EventNameConstant.loadEventListener));
     }
 }

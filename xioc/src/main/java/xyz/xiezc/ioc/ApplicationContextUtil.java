@@ -35,6 +35,7 @@ public class ApplicationContextUtil implements BeanDefinitionContext, Annotation
      */
     public static ExecutorService executorService = ThreadUtil.newExecutor(1, 100);
 
+
     private BeanDefinitionContext beanDefinitionContext = new BeanDefinitionContextUtil();
 
     private AnnotationContext annotationContext = new AnnotationContextUtil();
@@ -44,6 +45,7 @@ public class ApplicationContextUtil implements BeanDefinitionContext, Annotation
     private PropertiesContext propertiesContext = new PropertiesContextUtil();
 
     private EventPublisherContext eventPublisherContext = new EventPublisherContextUtil();
+
 
     @Override
     public <T extends Annotation> void addAnnotationHandler(AnnotationHandler<T> annotationHandler) {
