@@ -2,22 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="eb4483da-4f71-48f9-b035-099c27477286" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/common/create/BeanCreateStrategy.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/common/create/BeanFactoryStrategy.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/common/create/BeanFactoryUtil.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/common/create/FactoryBeanCreateStrategy.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/common/create/MethodBeanCreateStrategy.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/Xioc.java" beforeDir="false" afterPath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/Xioc.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/common/AnnoUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/common/AnnotationUtil.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/common/BeanScanUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/common/BeanScanUtil.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/common/ContextUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/common/ContextUtil.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/common/XiocUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/common/XiocUtil.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/definition/BeanDefinition.java" beforeDir="false" afterPath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/definition/BeanDefinition.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/definition/FactoryBean.java" beforeDir="false" afterPath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/definition/FactoryBean.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/enums/BeanScopeEnum.java" beforeDir="false" afterPath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/enums/BeanTypeEnum.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/starter/annotationHandler/BeanAnnotationHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/starter/annotationHandler/BeanAnnotationHandler.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/starter/target/" />
     <ignored path="$PROJECT_DIR$/example/target/" />
@@ -33,20 +18,29 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/common/BeanScanUtil.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1248">
-              <caret line="301" lean-forward="true" selection-start-line="301" selection-end-line="301" />
+            <state relative-caret-position="74">
+              <caret line="226" selection-start-line="226" selection-end-line="226" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/definition/AnnotationAndHandler.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="90">
+              <caret line="8" column="13" selection-start-line="8" selection-start-column="13" selection-end-line="8" selection-end-column="13" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/Xioc.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="396">
-              <caret line="85" column="24" selection-start-line="85" selection-start-column="24" selection-end-line="85" selection-end-column="24" />
+              <caret line="85" column="29" lean-forward="true" selection-start-line="85" selection-start-column="29" selection-end-line="85" selection-end-column="29" />
             </state>
           </provider>
         </entry>
@@ -128,15 +122,6 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/definition/BeanDefinition.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="220">
-              <caret line="80" column="29" selection-start-line="80" selection-start-column="29" selection-end-line="80" selection-end-column="29" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/common/XiocUtil.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="389">
@@ -213,8 +198,8 @@
         <option value="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/common/create/BeanFactoryStrategy.java" />
         <option value="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/common/create/BeanCreateStrategy.java" />
         <option value="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/common/create/BeanFactoryUtil.java" />
-        <option value="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/common/BeanScanUtil.java" />
         <option value="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/Xioc.java" />
+        <option value="$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/common/BeanScanUtil.java" />
       </list>
     </option>
   </component>
@@ -345,17 +330,6 @@
               <item name="main" type="462c0819:PsiDirectoryNode" />
               <item name="java" type="462c0819:PsiDirectoryNode" />
               <item name="ioc" type="462c0819:PsiDirectoryNode" />
-              <item name="common" type="462c0819:PsiDirectoryNode" />
-              <item name="create" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="yao" type="b2602c69:ProjectViewProjectNode" />
-              <item name="yao" type="462c0819:PsiDirectoryNode" />
-              <item name="xioc" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="ioc" type="462c0819:PsiDirectoryNode" />
               <item name="definition" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -458,7 +432,7 @@
       <workItem from="1587346636842" duration="2307000" />
       <workItem from="1587367507648" duration="24812000" />
       <workItem from="1587454367017" duration="10907000" />
-      <workItem from="1587732126584" duration="7082000" />
+      <workItem from="1587732126584" duration="7367000" />
     </task>
     <task id="LOCAL-00001" summary="1">
       <created>1586795275086</created>
@@ -530,17 +504,23 @@
       <option name="project" value="LOCAL" />
       <updated>1587474853818</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="Merge branch 'master' of https://github.com/blanexie/Yao&#10;&#10;# Conflicts:&#10;#&#9;.idea/workspace.xml">
+      <created>1587749436417</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1587749436417</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="45108000" />
+    <option name="totallyTimeSpent" value="45393000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1440" height="825" extended-state="0" />
-    <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.26037195" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.26037195" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Designer" order="2" />
       <window_info id="Image Layers" order="3" />
@@ -562,7 +542,7 @@
       <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
       <window_info anchor="bottom" id="Java Enterprise" order="10" weight="0.3287858" />
       <window_info anchor="bottom" id="Database Changes" order="11" />
-      <window_info anchor="bottom" id="Version Control" order="12" weight="0.420191" />
+      <window_info active="true" anchor="bottom" id="Version Control" order="12" visible="true" weight="0.60436565" />
       <window_info anchor="bottom" id="Tail" order="13" />
       <window_info anchor="bottom" id="Messages" order="14" visible="true" weight="0.3287858" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -662,13 +642,6 @@
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="jar://$USER_HOME$/jdk-11.0.3.jdk/Contents/Home/lib/src.zip!/jdk.jfr/jdk/jfr/AnnotationElement.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="128">
-          <caret line="69" column="19" selection-start-line="69" selection-start-column="19" selection-end-line="69" selection-end-column="19" />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$USER_HOME$/jdk-11.0.3.jdk/Contents/Home/lib/src.zip!/java.base/java/lang/reflect/AnnotatedElement.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="121">
@@ -1050,13 +1023,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/common/BeanScanUtil.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1248">
-          <caret line="301" lean-forward="true" selection-start-line="301" selection-end-line="301" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/common/XiocUtil.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="389">
@@ -1067,7 +1033,21 @@
     <entry file="file://$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/Xioc.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="396">
-          <caret line="85" column="24" selection-start-line="85" selection-start-column="24" selection-end-line="85" selection-end-column="24" />
+          <caret line="85" column="29" lean-forward="true" selection-start-line="85" selection-start-column="29" selection-end-line="85" selection-end-column="29" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/definition/AnnotationAndHandler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="8" column="13" selection-start-line="8" selection-start-column="13" selection-end-line="8" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/xioc/src/main/java/xyz/xiezc/ioc/common/BeanScanUtil.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="74">
+          <caret line="226" selection-start-line="226" selection-end-line="226" />
         </state>
       </provider>
     </entry>
