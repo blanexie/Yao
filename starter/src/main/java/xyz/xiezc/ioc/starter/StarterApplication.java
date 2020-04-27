@@ -13,13 +13,10 @@ import xyz.xiezc.ioc.test.StarterC;
 @Configuration
 public class StarterApplication {
 
-    @Inject
-    StarterC starterC;
-
     public static void main(String[] args) {
-        Xioc.getSingleton().run(StarterApplication.class);
+        Xioc xioc = Xioc.run(StarterApplication.class);
 
-        BeanDefinition beanDefinition = Xioc.getSingleton().getApplicationContextUtil().getBeanDefinition(StarterA.class);
+        BeanDefinition beanDefinition = xioc.getApplicationContextUtil().getBeanDefinition(StarterA.class);
         StarterA bean = beanDefinition.getBean();
         bean.print();
     }

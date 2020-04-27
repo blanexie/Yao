@@ -34,6 +34,8 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
+import static xyz.xiezc.ioc.enums.EventNameConstant.loadPropertie;
+
 /**
  * bean 类扫描加载工具
  */
@@ -308,6 +310,8 @@ public class BeanLoadUtil {
         }
         //配置文件的设置
         applicationContextUtil.addSetting(setting);
+        applicationContextUtil.publisherEvent(new ApplicationEvent(loadPropertie));
+
     }
 
     /**
