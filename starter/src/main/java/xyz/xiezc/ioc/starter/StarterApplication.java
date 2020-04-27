@@ -13,9 +13,6 @@ import xyz.xiezc.ioc.test.StarterC;
 @Configuration
 public class StarterApplication {
 
-    @Inject
-    StarterC starterC;
-
     public static void main(String[] args) {
         Xioc xioc = Xioc.run(StarterApplication.class);
 

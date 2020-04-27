@@ -48,8 +48,6 @@ public class ApplicationContextUtil implements BeanDefinitionContext, Annotation
     private EventPublisherContext eventPublisherContext = new EventPublisherContextUtil();
 
 
-
-
     @Override
     public <T extends Annotation> void addAnnotationHandler(AnnotationHandler<T> annotationHandler) {
         annotationContext.addAnnotationHandler(annotationHandler);
