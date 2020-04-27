@@ -1,4 +1,4 @@
-package xyz.xiezc.web.common;
+package xyz.xiezc.ioc.starter.web.common;
 
 import cn.hutool.core.util.StrUtil;
 

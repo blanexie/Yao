@@ -37,10 +37,9 @@
             <groupId>xyz.xiezc</groupId>
             <artifactId>xioc</artifactId>
         </dependency>
-
         <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-server</artifactId>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
         </dependency>
 
     </dependencies>

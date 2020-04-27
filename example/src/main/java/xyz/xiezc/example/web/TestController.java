@@ -1,9 +1,9 @@
 package xyz.xiezc.example.web;
 
 import lombok.Data;
-import xyz.xiezc.web.annotation.Controller;
-import xyz.xiezc.web.annotation.GetMapping;
-import xyz.xiezc.web.annotation.PostMapping;
+import xyz.xiezc.ioc.starter.web.annotation.Controller;
+import xyz.xiezc.ioc.starter.web.annotation.GetMapping;
+import xyz.xiezc.ioc.starter.web.annotation.PostMapping;
 
 @Data
 @Controller("/test")
