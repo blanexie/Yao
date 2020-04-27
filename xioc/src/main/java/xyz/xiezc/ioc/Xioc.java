@@ -3,10 +3,10 @@ package xyz.xiezc.ioc;
 import cn.hutool.core.util.ClassUtil;
 import lombok.Data;
 import xyz.xiezc.ioc.common.event.ApplicationEvent;
+import xyz.xiezc.ioc.common.event.ApplicationListener;
 import xyz.xiezc.ioc.enums.EventNameConstant;
 
 import static xyz.xiezc.ioc.enums.EventNameConstant.loadBeanDefinition;
-import static xyz.xiezc.ioc.enums.EventNameConstant.loadPropertie;
 
 /**
  * 超级简单的依赖注入小框架
@@ -26,56 +26,25 @@ public final class Xioc {
     private final ApplicationContextUtil applicationContextUtil = new ApplicationContextUtil();
 
     /**
-     * 扫描工具
-     */
-    private final BeanLoadUtil beanLoadUtil = new BeanLoadUtil(applicationContextUtil);
-
-    /**
      * 加载其他starter需要扫描的package路径
      */
     public final String starterPackage = "xyz.xiezc.ioc.starter";
-
-    /**
-     * 单例模式
-     */
-    private static Xioc xioc = new Xioc();
-
-    /**
-     *
-     */
-    private Xioc() {
-    }
-
-    /**
-     * 单例模式的获取
-     *
-     * @return
-     */
-    public static Xioc getSingleton() {
-        return xioc;
-    }
 
     /**
      * 启动方法,
      *
      * @param clazz 传入的启动类, 以这个启动类所在目录为根目录开始扫描bean类
      */
-    public Xioc run(Class<?> clazz) {
+    public static Xioc run(Class<?> clazz) {
+        Xioc xioc = new Xioc();
         //开始启动框架
-        BeanLoadUtil beanLoadUtil = xioc.getBeanLoadUtil();
-        applicationContextUtil.publisherEvent(new ApplicationEvent(EventNameConstant.XiocStart));
+        BeanLoadUtil beanLoadUtil = xioc.applicationContextUtil.getBeanLoadUtil();
+        xioc.applicationContextUtil.publisherEvent(new ApplicationEvent(EventNameConstant.XiocStart));
+
         //加载配置
         beanLoadUtil.loadPropertie();
-        applicationContextUtil.publisherEvent(new ApplicationEvent(loadPropertie));
-
-        //加载框架中的bean
-        beanLoadUtil.loadBeanDefinition(ClassUtil.getPackage(Xioc.class));
-        //加载starter中的bean
-        beanLoadUtil.loadBeanDefinition(xioc.starterPackage);
-        //加载bean信息， 加载用户传入的地址的bean
-        String packagePath = ClassUtil.getPackage(clazz);
-        beanLoadUtil.loadBeanDefinition(packagePath);
-        applicationContextUtil.publisherEvent(new ApplicationEvent(loadBeanDefinition));
+        //加载BeanDefinition， 主要加载框架中的，各个starter路径下的和传入的class路径下的BeanDefinition
+        xioc.loadBeanDefinition(clazz, beanLoadUtil);
 
         //加载BeanFactoryUtil,并简单初始化bean创建器
         beanLoadUtil.loadBeanCreateStategy();
@@ -83,18 +52,48 @@ public final class Xioc {
         beanLoadUtil.loadAnnotationHandler();
         //加载容器中的事件处理相关的bean
         beanLoadUtil.loadEventListener();
+        xioc.scanBeanDefinition(beanLoadUtil);
 
+        //注入依赖和初始化
+        beanLoadUtil.initAndInjectBeans();
+        xioc.applicationContextUtil.publisherEvent(new ApplicationEvent(EventNameConstant.XiocEnd));
+        return xioc;
+    }
+
+    /**
+     * 扫描容器中的所有BeanDefinition的注解信息， 并处理
+     *
+     * @param beanLoadUtil
+     */
+    private void scanBeanDefinition(BeanLoadUtil beanLoadUtil) {
         //扫描容器中的bean， 处理所有在bean类上的注解
         beanLoadUtil.scanBeanDefinitionClass();
         //扫描容器中的bean，处理bean上的字段的自定义注解
         beanLoadUtil.scanBeanDefinitionField();
         //扫描容器中的bean, 处理方法
         beanLoadUtil.scanBeanDefinitionMethod();
-        //注入依赖和初始化
-        beanLoadUtil.initAndInjectBeans();
-        applicationContextUtil.publisherEvent(new ApplicationEvent(EventNameConstant.XiocEnd));
-        return xioc;
     }
 
+    /**
+     * 三个加载逻辑放在一起
+     *
+     * @param clazz
+     * @param beanLoadUtil
+     */
+    private void loadBeanDefinition(Class<?> clazz, BeanLoadUtil beanLoadUtil) {
+        //加载框架中的bean
+        beanLoadUtil.loadBeanDefinition(ClassUtil.getPackage(Xioc.class));
+        //加载starter中的bean
+        beanLoadUtil.loadBeanDefinition(starterPackage);
+        //加载bean信息， 加载用户传入的地址的bean
+        String packagePath = ClassUtil.getPackage(clazz);
+        beanLoadUtil.loadBeanDefinition(packagePath);
+        applicationContextUtil.publisherEvent(new ApplicationEvent(loadBeanDefinition));
+    }
+
+    public Xioc addApplicationListener(String eventName, ApplicationListener applicationListener) {
+        applicationContextUtil.addApplicationListener(eventName, applicationListener);
+        return this;
+    }
 
 }

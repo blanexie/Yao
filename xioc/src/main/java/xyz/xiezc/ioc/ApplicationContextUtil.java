@@ -30,11 +30,12 @@ public class ApplicationContextUtil implements BeanDefinitionContext, Annotation
 
     Log log = LogFactory.get(ApplicationContextUtil.class);
 
+    private final BeanLoadUtil beanLoadUtil = new BeanLoadUtil(this);
+
     /**
      * 全局线程池
      */
     public static ExecutorService executorService = ThreadUtil.newExecutor(1, 100);
-
 
     private BeanDefinitionContext beanDefinitionContext = new BeanDefinitionContextUtil();
 
@@ -45,6 +46,8 @@ public class ApplicationContextUtil implements BeanDefinitionContext, Annotation
     private PropertiesContext propertiesContext = new PropertiesContextUtil();
 
     private EventPublisherContext eventPublisherContext = new EventPublisherContextUtil();
+
+
 
 
     @Override

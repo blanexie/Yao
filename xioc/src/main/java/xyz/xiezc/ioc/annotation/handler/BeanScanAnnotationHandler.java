@@ -16,6 +16,7 @@ import xyz.xiezc.ioc.definition.MethodDefinition;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
 @Component
 public class BeanScanAnnotationHandler extends AnnotationHandler<BeanScan> {
 
@@ -47,7 +48,7 @@ public class BeanScanAnnotationHandler extends AnnotationHandler<BeanScan> {
             packages.add(string);
         }
         for (String aPackage : packages) {
-            Xioc.getSingleton().getBeanLoadUtil().loadBeanDefinition(aPackage);
+            contextUtil.getBeanLoadUtil().loadBeanDefinition(aPackage);
         }
     }
 
