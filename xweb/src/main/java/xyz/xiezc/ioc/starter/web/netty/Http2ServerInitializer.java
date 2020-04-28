@@ -45,7 +45,7 @@ public class Http2ServerInitializer extends ChannelInitializer<SocketChannel> {
         @Override
         public UpgradeCodec newUpgradeCodec(CharSequence protocol) {
             if (AsciiString.contentEquals(Http2CodecUtil.HTTP_UPGRADE_PROTOCOL_NAME, protocol)) {
-                return new Http2ServerUpgradeCodec(new HelloWorldHttp2HandlerBuilder().build());
+                return new Http2ServerUpgradeCodec(new Http2HandlerBuilder().build());
             } else {
                 return null;
             }
@@ -90,9 +90,7 @@ public class Http2ServerInitializer extends ChannelInitializer<SocketChannel> {
         final ChannelPipeline p = ch.pipeline();
         final HttpServerCodec sourceCodec = new HttpServerCodec();
         final HttpServerUpgradeHandler upgradeHandler = new HttpServerUpgradeHandler(sourceCodec, upgradeCodecFactory);
-        final CleartextHttp2ServerUpgradeHandler cleartextHttp2ServerUpgradeHandler =
-                new CleartextHttp2ServerUpgradeHandler(sourceCodec, upgradeHandler,
-                                                       new HelloWorldHttp2HandlerBuilder().build());
+        final CleartextHttp2ServerUpgradeHandler cleartextHttp2ServerUpgradeHandler = new CleartextHttp2ServerUpgradeHandler(sourceCodec, upgradeHandler, new Http2HandlerBuilder().build());
 
         p.addLast(cleartextHttp2ServerUpgradeHandler);
         p.addLast(new SimpleChannelInboundHandler<HttpMessage>() {
@@ -101,7 +99,7 @@ public class Http2ServerInitializer extends ChannelInitializer<SocketChannel> {
                 // If this handler is hit then no upgrade has been attempted and the client is just talking HTTP.
                 System.err.println("Directly talking: " + msg.protocolVersion() + " (no upgrade was attempted)");
                 ChannelPipeline pipeline = ctx.pipeline();
-                pipeline.addAfter(ctx.name(), null, new HelloWorldHttp1Handler("Direct. No Upgrade Attempted."));
+                pipeline.addAfter(ctx.name(), null, new Http1Handler("Direct. No Upgrade Attempted."));
                 pipeline.replace(this, null, new HttpObjectAggregator(maxHttpContentLength));
                 ctx.fireChannelRead(ReferenceCountUtil.retain(msg));
             }

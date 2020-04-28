@@ -4,6 +4,9 @@ package xyz.xiezc.ioc;
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.resource.ClassPathResource;
+import cn.hutool.core.io.resource.ResourceUtil;
+import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
@@ -25,7 +28,9 @@ import xyz.xiezc.ioc.definition.FieldDefinition;
 import xyz.xiezc.ioc.definition.MethodDefinition;
 import xyz.xiezc.ioc.enums.EventNameConstant;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileFilter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.util.Collection;
@@ -33,6 +38,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static xyz.xiezc.ioc.enums.EventNameConstant.loadPropertie;
 
@@ -291,27 +297,37 @@ public class BeanLoadUtil {
     }
 
     /**
+     * 框架只认三个配置文件的名称， 如果需要导入其他的配置文件， 需要在这个三个主配置文件中指明
      * 加载配置文件
      */
     public void loadPropertie() {
         //读取classpath下的Application.setting，不使用变量
-        File file = FileUtil.file("application.setting");
-        Setting setting;
-        if (file.exists()) {
-            setting = new Setting("application.setting");
-        } else {
-            setting = new Setting();
+        //优先加载框架主要的配置文件
+        File file1 = FileUtil.file("yao.setting");
+        if (FileUtil.exist(file1)) {
+            applicationContextUtil.addSetting(new Setting(file1.getPath(), true));
         }
-        String str = setting.getStr("other.setting.path");
-        String[] split = StrUtil.split(str, ",");
-        for (String s : split) {
-            Setting setting1 = new Setting(s);
-            setting.addSetting(setting1);
+        File file2 = FileUtil.file("xioc.setting");
+        if (FileUtil.exist(file2)) {
+            applicationContextUtil.addSetting(new Setting(file2.getPath(), true));
         }
-        //配置文件的设置
-        applicationContextUtil.addSetting(setting);
+        File file3 = FileUtil.file("xweb.setting");
+        if (FileUtil.exist(file3)) {
+            applicationContextUtil.addSetting(new Setting(file3.getPath(), true));
+        }
+        //加载关联的配置文件
+        String s = applicationContextUtil.getSetting().get("setting.import.path");
+        if (StrUtil.isNotBlank(s)) {
+            String[] split = s.split(",");
+            for (String s1 : split) {
+                File file4 = FileUtil.file(s1);
+                if (FileUtil.exist(file4)) {
+                    applicationContextUtil.addSetting(new Setting(file4.getPath(), true));
+                }
+            }
+        }
+        //发布事件
         applicationContextUtil.publisherEvent(new ApplicationEvent(loadPropertie));
-
     }
 
     /**

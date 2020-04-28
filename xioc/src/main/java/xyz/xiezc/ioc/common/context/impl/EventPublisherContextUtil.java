@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
  */
 public class EventPublisherContextUtil implements EventPublisherContext {
 
-    Map<String, List<ApplicationListener>> listenersMap = MapUtil.newHashMap();
+    Map<String, List<ApplicationListener>> listenersMap = new HashMap<>();
 
 
     @Override
@@ -50,7 +50,7 @@ public class EventPublisherContextUtil implements EventPublisherContext {
 
     @Override
     public void publisherEvent(ApplicationEvent event) {
-        List<ApplicationListener> applicationListeners = listenersMap.get(event);
+        List<ApplicationListener> applicationListeners = listenersMap.get(event.getEventName());
         if (CollUtil.isEmpty(applicationListeners)) {
             return;
         }

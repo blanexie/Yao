@@ -40,10 +40,10 @@ import io.netty.handler.codec.http.HttpUtil;
 /**
  * HTTP handler that responds with a "Hello World"
  */
-public class HelloWorldHttp1Handler extends SimpleChannelInboundHandler<FullHttpRequest> {
+public class Http1Handler extends SimpleChannelInboundHandler<FullHttpRequest> {
     private final String establishApproach;
 
-    public HelloWorldHttp1Handler(String establishApproach) {
+    public Http1Handler(String establishApproach) {
         this.establishApproach = checkNotNull(establishApproach, "establishApproach");
     }
 
@@ -55,7 +55,7 @@ public class HelloWorldHttp1Handler extends SimpleChannelInboundHandler<FullHttp
         boolean keepAlive = HttpUtil.isKeepAlive(req);
 
         ByteBuf content = ctx.alloc().buffer();
-        content.writeBytes(HelloWorldHttp2Handler.RESPONSE_BYTES.duplicate());
+        content.writeBytes(Http2Handler.RESPONSE_BYTES.duplicate());
         ByteBufUtil.writeAscii(content, " - via " + req.protocolVersion() + " (" + establishApproach + ")");
 
         FullHttpResponse response = new DefaultFullHttpResponse(HTTP_1_1, OK, content);

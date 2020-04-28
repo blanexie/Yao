@@ -1,6 +1,8 @@
 package xyz.xiezc.ioc;
 
 import cn.hutool.core.util.ClassUtil;
+import cn.hutool.log.Log;
+import cn.hutool.log.LogFactory;
 import lombok.Data;
 import xyz.xiezc.ioc.common.event.ApplicationEvent;
 import xyz.xiezc.ioc.common.event.ApplicationListener;
@@ -19,6 +21,8 @@ import static xyz.xiezc.ioc.enums.EventNameConstant.loadBeanDefinition;
  */
 @Data
 public final class Xioc {
+
+    static Log log = LogFactory.get(Xioc.class);
 
     /**
      * 装载依赖的容器. 当依赖全部注入完成的时候,这个集合会清空
@@ -57,6 +61,7 @@ public final class Xioc {
         //注入依赖和初始化
         beanLoadUtil.initAndInjectBeans();
         xioc.applicationContextUtil.publisherEvent(new ApplicationEvent(EventNameConstant.XiocEnd));
+        log.info("xioc 容器加载完成");
         return xioc;
     }
 

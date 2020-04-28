@@ -17,7 +17,11 @@
             <groupId>xyz.xiezc</groupId>
             <artifactId>xioc</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>xyz.xiezc</groupId>
+            <artifactId>xweb</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
 </project>

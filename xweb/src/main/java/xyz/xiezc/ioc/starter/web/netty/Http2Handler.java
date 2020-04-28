@@ -15,6 +15,10 @@
 
 package xyz.xiezc.ioc.starter.web.netty;
 
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.URLUtil;
+import cn.hutool.extra.servlet.ServletUtil;
+import cn.hutool.http.HttpUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.ChannelHandlerContext;
@@ -40,12 +44,12 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 /**
  * A simple handler that responds with the message "Hello World!".
  */
-public final class HelloWorldHttp2Handler extends Http2ConnectionHandler implements Http2FrameListener {
+public final class Http2Handler extends Http2ConnectionHandler implements Http2FrameListener {
 
     static final ByteBuf RESPONSE_BYTES = unreleasableBuffer(copiedBuffer("Hello World", CharsetUtil.UTF_8));
 
-    HelloWorldHttp2Handler(Http2ConnectionDecoder decoder, Http2ConnectionEncoder encoder,
-                           Http2Settings initialSettings) {
+    Http2Handler(Http2ConnectionDecoder decoder, Http2ConnectionEncoder encoder,
+                 Http2Settings initialSettings) {
         super(decoder, encoder, initialSettings);
     }
 
@@ -70,7 +74,7 @@ public final class HelloWorldHttp2Handler extends Http2ConnectionHandler impleme
         if (evt instanceof HttpServerUpgradeHandler.UpgradeEvent) {
             HttpServerUpgradeHandler.UpgradeEvent upgradeEvent =
                     (HttpServerUpgradeHandler.UpgradeEvent) evt;
-            onHeadersRead(ctx, 1, http1HeadersToHttp2Headers(upgradeEvent.upgradeRequest()), 0 , true);
+            onHeadersRead(ctx, 1, http1HeadersToHttp2Headers(upgradeEvent.upgradeRequest()), 0, true);
         }
         super.userEventTriggered(ctx, evt);
     }
@@ -107,12 +111,18 @@ public final class HelloWorldHttp2Handler extends Http2ConnectionHandler impleme
     public void onHeadersRead(ChannelHandlerContext ctx, int streamId,
                               Http2Headers headers, int padding, boolean endOfStream) {
         if (endOfStream) {
+
+
+
             ByteBuf content = ctx.alloc().buffer();
             content.writeBytes(RESPONSE_BYTES.duplicate());
             ByteBufUtil.writeAscii(content, " - via HTTP/2");
             sendResponse(ctx, streamId, content);
         }
     }
+
+
+
 
     @Override
     public void onHeadersRead(ChannelHandlerContext ctx, int streamId, Http2Headers headers, int streamDependency,
