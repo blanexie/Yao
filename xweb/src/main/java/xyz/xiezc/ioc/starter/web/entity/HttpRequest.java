@@ -16,11 +16,11 @@ public class HttpRequest {
 
     String method;
 
-    List<HttpHeader> headers=new ArrayList<>();
+    List<HttpHeader> headers = new ArrayList<>();
 
-    Map<String,List<String>> paramMap=new HashMap<>();
+    Map<String, List<String>> paramMap;
 
-    public static void build(String queryStr) {
+    public static HttpRequest build(String queryStr) {
         HttpRequest httpRequest = new HttpRequest();
         Map<String, List<String>> reqParms = new HashMap<>();
         if (queryStr.contains("?")) {
@@ -29,13 +29,19 @@ public class HttpRequest {
             String parmsStr = split[1];
             String[] split1 = parmsStr.split("&");
             for (String param : split1) {
-                String[] split3 = StrUtil.split(paramStr, "=");
-                List<String> strings = paramMap.get(split3[0]);
-                HttpHeader httpHeader = new HttpHeader(param);
-
+                String[] split3 = StrUtil.split(param, "=");
+                List<String> strings = reqParms.get(split3[0]);
+                if (strings == null) {
+                    strings = new ArrayList<>();
+                    reqParms.put(split3[0], strings);
+                }
+                strings.add(split3[1]);
             }
+        }else{
+            httpRequest.setPath(queryStr);
         }
-
+        httpRequest.setParamMap(reqParms);
+        return httpRequest;
     }
 
 }

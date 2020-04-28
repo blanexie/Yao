@@ -34,13 +34,15 @@ public final class Xioc {
      */
     public final String starterPackage = "xyz.xiezc.ioc.starter";
 
+    static Xioc xioc;
+
     /**
      * 启动方法,
      *
      * @param clazz 传入的启动类, 以这个启动类所在目录为根目录开始扫描bean类
      */
     public static Xioc run(Class<?> clazz) {
-        Xioc xioc = new Xioc();
+        xioc = new Xioc();
         //开始启动框架
         BeanLoadUtil beanLoadUtil = xioc.applicationContextUtil.getBeanLoadUtil();
         xioc.applicationContextUtil.publisherEvent(new ApplicationEvent(EventNameConstant.XiocStart));
@@ -64,6 +66,11 @@ public final class Xioc {
         log.info("xioc 容器加载完成");
         return xioc;
     }
+
+    public static ApplicationContextUtil getApplicationContext() {
+        return xioc.getApplicationContextUtil();
+    }
+
 
     /**
      * 扫描容器中的所有BeanDefinition的注解信息， 并处理

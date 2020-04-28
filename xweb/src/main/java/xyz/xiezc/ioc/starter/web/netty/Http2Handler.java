@@ -15,27 +15,19 @@
 
 package xyz.xiezc.ioc.starter.web.netty;
 
-import cn.hutool.core.util.StrUtil;
-import cn.hutool.core.util.URLUtil;
-import cn.hutool.extra.servlet.ServletUtil;
-import cn.hutool.http.HttpUtil;
+import cn.hutool.json.JSONUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.HttpHeaderNames;
-import io.netty.handler.codec.http.HttpMethod;
-import io.netty.handler.codec.http.HttpScheme;
-import io.netty.handler.codec.http.HttpServerUpgradeHandler;
-import io.netty.handler.codec.http2.DefaultHttp2Headers;
-import io.netty.handler.codec.http2.Http2ConnectionDecoder;
-import io.netty.handler.codec.http2.Http2ConnectionEncoder;
-import io.netty.handler.codec.http2.Http2ConnectionHandler;
-import io.netty.handler.codec.http2.Http2Flags;
-import io.netty.handler.codec.http2.Http2FrameListener;
-import io.netty.handler.codec.http2.Http2Headers;
-import io.netty.handler.codec.http2.Http2Settings;
+import io.netty.handler.codec.http.*;
+import io.netty.handler.codec.http2.*;
 import io.netty.util.CharsetUtil;
+import xyz.xiezc.ioc.ApplicationContextUtil;
+import xyz.xiezc.ioc.Xioc;
+import xyz.xiezc.ioc.definition.BeanDefinition;
+import xyz.xiezc.ioc.starter.web.DispatcherHandler;
+import xyz.xiezc.ioc.starter.web.entity.HttpRequest;
+import xyz.xiezc.ioc.starter.web.entity.HttpResponse;
 
 import static io.netty.buffer.Unpooled.copiedBuffer;
 import static io.netty.buffer.Unpooled.unreleasableBuffer;
@@ -111,17 +103,22 @@ public final class Http2Handler extends Http2ConnectionHandler implements Http2F
     public void onHeadersRead(ChannelHandlerContext ctx, int streamId,
                               Http2Headers headers, int padding, boolean endOfStream) {
         if (endOfStream) {
+            CharSequence method = headers.method();
+            HttpRequest httpRequest = HttpRequest.build(headers.path().toString());
+            httpRequest.setMethod(method.toString());
+            ApplicationContextUtil applicationContext = Xioc.getApplicationContext();
 
-
-
+            BeanDefinition beanDefinition = applicationContext.getBeanDefinition(DispatcherHandler.class);
+            DispatcherHandler bean = beanDefinition.getBean();
+            HttpResponse httpResponse = bean.doRequest(httpRequest);
+            Object body = httpResponse.getBody();
+            String s = JSONUtil.toJsonStr(body);
             ByteBuf content = ctx.alloc().buffer();
-            content.writeBytes(RESPONSE_BYTES.duplicate());
-            ByteBufUtil.writeAscii(content, " - via HTTP/2");
+            content.writeCharSequence(s, cn.hutool.core.util.CharsetUtil.CHARSET_UTF_8);
+           // ByteBufUtil.writeAscii(content, " - via HTTP/2");
             sendResponse(ctx, streamId, content);
         }
     }
-
-
 
 
     @Override

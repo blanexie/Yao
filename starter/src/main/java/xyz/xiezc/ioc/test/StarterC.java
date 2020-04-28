@@ -1,18 +1,16 @@
 package xyz.xiezc.ioc.test;
 
 
-import xyz.xiezc.ioc.annotation.Component;
-import xyz.xiezc.ioc.annotation.Inject;
-import xyz.xiezc.ioc.starter.StarterApplication;
+import xyz.xiezc.ioc.starter.web.annotation.Controller;
+import xyz.xiezc.ioc.starter.web.annotation.GetMapping;
 
-@Component
+@Controller("start")
 public class StarterC {
 
-    @Inject
-    StarterApplication StarterAp;
 
-    public void print() {
-        System.out.println("StarterC StarterCStarterCStarterC");
+    @GetMapping("print")
+    public String print() {
+        return "200 OK";
     }
 
 
