@@ -15,6 +15,9 @@
 
 package xyz.xiezc.ioc.starter.web.netty;
 
+import cn.hutool.cache.Cache;
+import cn.hutool.cache.CacheUtil;
+import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.json.JSONUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
@@ -22,9 +25,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.*;
 import io.netty.handler.codec.http2.*;
 import io.netty.util.CharsetUtil;
-import xyz.xiezc.ioc.ApplicationContextUtil;
-import xyz.xiezc.ioc.Xioc;
-import xyz.xiezc.ioc.definition.BeanDefinition;
 import xyz.xiezc.ioc.starter.web.DispatcherHandler;
 import xyz.xiezc.ioc.starter.web.entity.HttpRequest;
 import xyz.xiezc.ioc.starter.web.entity.HttpResponse;
@@ -37,8 +37,6 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
  * A simple handler that responds with the message "Hello World!".
  */
 public final class Http2Handler extends Http2ConnectionHandler implements Http2FrameListener {
-
-    static final ByteBuf RESPONSE_BYTES = unreleasableBuffer(copiedBuffer("Hello World", CharsetUtil.UTF_8));
 
     Http2Handler(Http2ConnectionDecoder decoder, Http2ConnectionEncoder encoder,
                  Http2Settings initialSettings) {
@@ -81,9 +79,9 @@ public final class Http2Handler extends Http2ConnectionHandler implements Http2F
     /**
      * Sends a "Hello World" DATA frame to the client.
      */
-    private void sendResponse(ChannelHandlerContext ctx, int streamId, ByteBuf payload) {
+    private void sendResponse(ChannelHandlerContext ctx, int streamId, ByteBuf payload, Http2Headers headers) {
         // Send a frame for the response status
-        Http2Headers headers = new DefaultHttp2Headers().status(OK.codeAsText());
+
         encoder().writeHeaders(ctx, streamId, headers, 0, false, ctx.newPromise());
         encoder().writeData(ctx, streamId, payload, 0, true, ctx.newPromise());
 
@@ -93,8 +91,17 @@ public final class Http2Handler extends Http2ConnectionHandler implements Http2F
     @Override
     public int onDataRead(ChannelHandlerContext ctx, int streamId, ByteBuf data, int padding, boolean endOfStream) {
         int processed = data.readableBytes() + padding;
+        HttpRequest httpRequest = DispatcherHandler.requestCache.get(streamId);
+        if (httpRequest == null) {
+            Http2Headers respHeaders = new DefaultHttp2Headers().status(HttpResponseStatus.REQUEST_TIMEOUT.codeAsText());
+            sendResponse(ctx, streamId, data.retain(), respHeaders);
+            return processed;
+        }
+        CharSequence charSequence = data.readCharSequence(data.readableBytes(), CharsetUtil.UTF_8);
+      //TODO   httpRequest.addBody(charSequence.toString());
         if (endOfStream) {
-            sendResponse(ctx, streamId, data.retain());
+            HttpResponse httpResponse = DispatcherHandler.doRequest(httpRequest);
+            dealResonse(ctx, streamId, httpResponse);
         }
         return processed;
     }
@@ -102,22 +109,39 @@ public final class Http2Handler extends Http2ConnectionHandler implements Http2F
     @Override
     public void onHeadersRead(ChannelHandlerContext ctx, int streamId,
                               Http2Headers headers, int padding, boolean endOfStream) {
+        HttpRequest httpRequest = getHttpRequest(headers);
+        httpRequest.setReqId(streamId);
         if (endOfStream) {
-            CharSequence method = headers.method();
-            HttpRequest httpRequest = HttpRequest.build(headers.path().toString());
-            httpRequest.setMethod(method.toString());
-            ApplicationContextUtil applicationContext = Xioc.getApplicationContext();
-
-            BeanDefinition beanDefinition = applicationContext.getBeanDefinition(DispatcherHandler.class);
-            DispatcherHandler bean = beanDefinition.getBean();
-            HttpResponse httpResponse = bean.doRequest(httpRequest);
-            Object body = httpResponse.getBody();
-            String s = JSONUtil.toJsonStr(body);
-            ByteBuf content = ctx.alloc().buffer();
-            content.writeCharSequence(s, cn.hutool.core.util.CharsetUtil.CHARSET_UTF_8);
-           // ByteBufUtil.writeAscii(content, " - via HTTP/2");
-            sendResponse(ctx, streamId, content);
+            HttpResponse httpResponse = DispatcherHandler.doRequest(httpRequest);
+            dealResonse(ctx, streamId, httpResponse);
+        } else {
+            DispatcherHandler.requestCache.put(streamId, httpRequest);
         }
+    }
+
+    private void dealResonse(ChannelHandlerContext ctx, int streamId, HttpResponse httpResponse) {
+        Http2Headers respHeaders = new DefaultHttp2Headers().status(httpResponse.getHttpResponseStatus().code() + "");
+        if (httpResponse.getHeaders() != null && !httpResponse.getHeaders().isEmpty()) {
+            httpResponse.getHeaders().stream().forEach(httpHeader -> {
+                respHeaders.add(httpHeader.getKey(), httpHeader.getValue());
+            });
+        }
+        Object body = httpResponse.getBody();
+        String s = JSONUtil.toJsonStr(body);
+        ByteBuf content = ctx.alloc().buffer();
+        content.writeCharSequence(s, CharsetUtil.UTF_8);
+        DispatcherHandler.requestCache.remove(streamId);
+        sendResponse(ctx, streamId, content, respHeaders);
+    }
+
+    private HttpRequest getHttpRequest(Http2Headers headers) {
+        CharSequence method = headers.method();
+        HttpRequest httpRequest = HttpRequest.build(headers.path().toString());
+        httpRequest.setMethod(method.toString());
+        headers.forEach(a -> {
+            httpRequest.addHeader(a.getKey().toString(), a.getValue().toString());
+        });
+        return httpRequest;
     }
 
 

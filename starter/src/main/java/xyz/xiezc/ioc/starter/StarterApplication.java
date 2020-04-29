@@ -15,9 +15,6 @@ public class StarterApplication {
 
     public static void main(String[] args) {
         Xioc xioc = Xioc.run(StarterApplication.class);
-
-        BeanDefinition beanDefinition = xioc.getApplicationContextUtil().getBeanDefinition(StarterC.class);
-        StarterC webServerListener = beanDefinition.getBean();
     }
 
 }

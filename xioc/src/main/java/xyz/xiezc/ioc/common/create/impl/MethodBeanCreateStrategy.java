@@ -75,7 +75,7 @@ public class MethodBeanCreateStrategy implements BeanCreateStrategy {
                             paramDefinition.getParam()
                     ).collect(Collectors.toList()).toArray();
             //调用方法， 获取结果
-            Object invoke = ReflectUtil.invoke(bean, invokeMethodBean.getMethodName(), objects);
+            Object invoke = ReflectUtil.invoke(bean, invokeMethodBean.getMethod(), objects);
             beanDefinition.setBean(invoke);
             beanDefinition.setBeanStatus(BeanStatusEnum.HalfCooked);
         }

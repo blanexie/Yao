@@ -177,7 +177,7 @@ public abstract class AnnotationHandler<T extends Annotation> extends Annotation
         if (CollUtil.isNotEmpty(collect)) {
             MethodDefinition methodDefinition = new MethodDefinition();
             methodDefinition.setBeanDefinition(beanDefinition);
-            methodDefinition.setMethodName(method.getName());
+            methodDefinition.setMethod(method);
             methodDefinition.setReturnType(method.getReturnType());
             ParamDefinition[] methodParamsAndAnnotaton = AsmUtil.getMethodParamsAndAnnotaton(method);
             methodDefinition.setParamDefinitions(methodParamsAndAnnotaton);

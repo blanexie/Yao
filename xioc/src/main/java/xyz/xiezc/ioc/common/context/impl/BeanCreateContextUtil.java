@@ -180,7 +180,7 @@ public class BeanCreateContextUtil implements BeanCreateContext {
         MethodDefinition initMethodDefinition = beanDefinition.getInitMethodDefinition();
         if (initMethodDefinition != null) {
             Object bean = beanDefinition.getBean();
-            ReflectUtil.invoke(bean, initMethodDefinition.getMethodName());
+            ReflectUtil.invoke(bean, initMethodDefinition.getMethod());
         }
     }
 

@@ -1,7 +1,6 @@
 package xyz.xiezc.ioc.annotation.handler;
 
 import cn.hutool.aop.ProxyUtil;
-import cn.hutool.aop.aspects.Aspect;
 import cn.hutool.core.util.ClassUtil;
 import xyz.xiezc.ioc.ApplicationContextUtil;
 import xyz.xiezc.ioc.annotation.AnnotationHandler;
@@ -46,12 +45,13 @@ public class AopAnnotationHandler extends AnnotationHandler<Aop> {
         BeanDefinition AopAspectBeanDefinition = contextUtil.getBeanDefinition(annotation.value());
         contextUtil.newInstance(AopAspectBeanDefinition);
         AopAspect aspectBean = AopAspectBeanDefinition.getBean();
-        String methodName = methodDefinition.getMethodName();
         //获取被切方法
-        BeanDefinition parentBeanDefinition = methodDefinition.getBeanDefinition();
-        Method declaredMethod = ClassUtil.getPublicMethod(parentBeanDefinition.getBeanClass(), methodName);
-        aspectBean.addMethod(declaredMethod);
+        Method method = methodDefinition.getMethod();
+        if (ClassUtil.isPublic(method)) {
+            aspectBean.addMethod(method);
+        }
         //设置bean实例
+        BeanDefinition parentBeanDefinition = methodDefinition.getBeanDefinition();
         contextUtil.newInstance(parentBeanDefinition);
         Object parentBean = parentBeanDefinition.getBean();
         beanDefinition.setBean(ProxyUtil.proxy(parentBean, aspectBean));

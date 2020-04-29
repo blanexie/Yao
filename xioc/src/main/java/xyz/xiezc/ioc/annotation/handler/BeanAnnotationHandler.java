@@ -32,7 +32,7 @@ public class BeanAnnotationHandler extends AnnotationHandler<Bean> {
         //MethodBean的特殊性，所以beanName 和class重新设置下
         String beanName = annotation.value();
         if (StrUtil.isBlank(beanName)) {
-            beanName = methodDefinition.getMethodName();
+            beanName = methodDefinition.getMethod().getName();
         }
         beanDefinitionMethod.setBeanName(beanName);
         beanClass = getRealBeanClass(beanDefinitionMethod);

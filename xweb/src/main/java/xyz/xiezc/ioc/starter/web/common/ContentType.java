@@ -12,6 +12,9 @@ import java.nio.charset.Charset;
  */
 public enum ContentType {
 
+
+    Default(""),
+
     /**
      * 标准表单编码，当action为get时候，浏览器用x-www-form-urlencoded的编码方式把form数据转换成一个字串（name1=value1&amp;name2=value2…）
      */
@@ -54,8 +57,9 @@ public enum ContentType {
      * @return
      */
     public static ContentType getByValue(String value) {
+        String[] split = value.split(";");
         for (ContentType contentType : values()) {
-            if (StrUtil.equalsIgnoreCase(contentType.getValue(), value)) {
+            if (StrUtil.equalsIgnoreCase(contentType.getValue(), split[0])) {
                 return contentType;
             }
         }

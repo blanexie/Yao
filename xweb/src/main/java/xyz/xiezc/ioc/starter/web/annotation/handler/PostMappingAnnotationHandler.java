@@ -1,6 +1,7 @@
 package xyz.xiezc.ioc.starter.web.annotation.handler;
 
 import cn.hutool.core.annotation.AnnotationUtil;
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.URLUtil;
 import xyz.xiezc.ioc.ApplicationContextUtil;
@@ -35,7 +36,7 @@ public class PostMappingAnnotationHandler extends AnnotationHandler<PostMapping>
         String controllerMapping = controller.value();
         String methodReqMapping = annotation.value();
         String path = StrUtil.join("/", controllerMapping, methodReqMapping);
-        DispatcherHandler.postMethods.put(URLUtil.normalize(path), methodDefinition);
+        DispatcherHandler.postMethods.put(FileUtil.normalize("/"+path), methodDefinition);
     }
 
     @Override

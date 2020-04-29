@@ -42,7 +42,7 @@ public class Http2OrHttpHandler extends ApplicationProtocolNegotiationHandler {
         if (ApplicationProtocolNames.HTTP_1_1.equals(protocol)) {
             ctx.pipeline().addLast(new HttpServerCodec(),
                                    new HttpObjectAggregator(MAX_CONTENT_LENGTH),
-                                   new Http1Handler("ALPN Negotiation"));
+                                   new Http1Handler());
             return;
         }
 

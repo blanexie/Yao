@@ -3,6 +3,7 @@ package xyz.xiezc.ioc.definition;
 import lombok.Data;
 
 import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -25,7 +26,7 @@ public class MethodDefinition {
     /**
      * 方法的名称
      */
-    String methodName;
+    Method method;
 
     /**
      * 方法的参数
@@ -38,7 +39,7 @@ public class MethodDefinition {
         return "MethodDefinition{" +
                 "beanDefinition=" + beanDefinition +
                 ", returnType=" + returnType +
-                ", methodName='" + methodName + '\'' +
+                ", methodName='" + method + '\'' +
                 ", paramDefinitions=" + Arrays.toString(paramDefinitions) +
                 '}';
     }
@@ -50,13 +51,13 @@ public class MethodDefinition {
         MethodDefinition that = (MethodDefinition) o;
         return Objects.equals(getBeanDefinition(), that.getBeanDefinition()) &&
                 Objects.equals(getReturnType(), that.getReturnType()) &&
-                Objects.equals(getMethodName(), that.getMethodName()) &&
+                Objects.equals(getMethod(), that.getMethod()) &&
                 Arrays.equals(getParamDefinitions(), that.getParamDefinitions());
     }
 
     @Override
     public int hashCode() {
-        int result = Objects.hash(getBeanDefinition(), getReturnType(), getMethodName());
+        int result = Objects.hash(getBeanDefinition(), getReturnType(), getMethod());
         result = 31 * result + Arrays.hashCode(getParamDefinitions());
         return result;
     }
