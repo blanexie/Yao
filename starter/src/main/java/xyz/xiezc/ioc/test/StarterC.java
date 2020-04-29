@@ -9,8 +9,8 @@ public class StarterC {
 
 
     @GetMapping("print")
-    public String print() {
-        return "200 OK";
+    public String print(String z) {
+        return "200 OK" + z;
     }
 
 
