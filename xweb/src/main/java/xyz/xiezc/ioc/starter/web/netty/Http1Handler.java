@@ -121,7 +121,7 @@ public class Http1Handler extends SimpleChannelInboundHandler<FullHttpRequest> {
                     fileUpload.setSize(attribute.getByteBuf().readableBytes());
                     httpContent.setName(attribute.getName());//attribute.getName(), attribute.getValue());
                     httpContent.setFileUpload(fileUpload);
-                    httpContent.setHttpDataType(HttpContent.HttpDataType.Attribute);
+                    httpContent.setHttpDataType(HttpContent.HttpDataType.FileUpload);
                 }
             }
         }

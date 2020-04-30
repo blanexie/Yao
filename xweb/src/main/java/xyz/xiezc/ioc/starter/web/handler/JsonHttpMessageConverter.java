@@ -8,17 +8,15 @@ import cn.hutool.json.JSONUtil;
 import xyz.xiezc.ioc.annotation.Component;
 import xyz.xiezc.ioc.definition.MethodDefinition;
 import xyz.xiezc.ioc.definition.ParamDefinition;
-import xyz.xiezc.ioc.starter.web.DispatcherHandler;
 import xyz.xiezc.ioc.starter.web.annotation.RequestBody;
 import xyz.xiezc.ioc.starter.web.common.ContentType;
+import xyz.xiezc.ioc.starter.web.entity.HttpContent;
 import xyz.xiezc.ioc.starter.web.entity.HttpRequest;
-import xyz.xiezc.ioc.starter.web.entity.HttpResponse;
-import xyz.xiezc.ioc.starter.web.enums.HttpResponseStatus;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 @Component
 public class JsonHttpMessageConverter implements HttpMessageConverter<Object> {
@@ -36,7 +34,7 @@ public class JsonHttpMessageConverter implements HttpMessageConverter<Object> {
 
 
     @Override
-    public HttpResponse read(MethodDefinition methodDefinition, ContentType contentType, HttpRequest request) throws IOException {
+    public Object[] doRead(MethodDefinition methodDefinition, ContentType contentType, HttpRequest request) throws IOException {
         ParamDefinition[] paramDefinitions = methodDefinition.getParamDefinitions();
         ParamDefinition requestBodyParam = null;
         for (ParamDefinition paramDefinition : paramDefinitions) {
@@ -50,29 +48,23 @@ public class JsonHttpMessageConverter implements HttpMessageConverter<Object> {
 
         //有一个RequestBody参数的配置
         if (requestBodyParam != null) {
+            Object param = null;
             ParamDefinition paramDefinition = requestBodyParam;
-            List<String> body = new ArrayList<>(
-
-            );
-            //TODO
-            String bodyStr = body.get(0);
-            //数组的
-            if (JSONUtil.isJsonArray(bodyStr)) {
+            List<HttpContent> bodyList = request.getBodyList();
+            String bodyStr = bodyList.get(0).getValue();
+            Class paramType = paramDefinition.getParamType();
+            if (ClassUtil.isSimpleValueType(paramType)) {
+                param = JSONUtil.toBean(bodyStr, paramType);
+            }
+            if (paramType.isArray()) {
                 JSONArray objects = JSONUtil.parseArray(bodyStr);
-                Class paramType = paramDefinition.getParamType();
-                if (ClassUtil.isAssignable(paramType, List.class) || ClassUtil.isAssignable(paramType, Set.class)) {
-                    paramDefinition.setParam(CollUtil.toCollection(objects));
-                }
-                if (paramType.isArray()) {
-                    paramDefinition.setParam(objects.toArray());
-                }
+                param = objects.toArray();
             }
-            if (JSONUtil.isJsonObj(bodyStr)) {
-                Object o = JSONUtil.toBean(bodyStr, paramDefinition.getParamType());
-                HttpResponse httpResponse = DispatcherHandler.invokeMappingMethod(methodDefinition, o);
-                return httpResponse;
+            if (ClassUtil.isAssignable(Collection.class, paramType)) {
+                JSONArray objects = JSONUtil.parseArray(bodyStr);
+                param = CollUtil.toCollection(objects);
             }
-            return DispatcherHandler.failHeader(HttpResponseStatus.BAD_REQUEST, "无法正确解析");
+            return new Object[]{param};
         }
         throw new RuntimeException(methodDefinition.getMethod().getName() + "需要一个@RequestBody注解 ");
     }

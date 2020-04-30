@@ -16,16 +16,19 @@
 
 package xyz.xiezc.ioc.starter.web.handler;
 
+import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ClassUtil;
 import xyz.xiezc.ioc.definition.MethodDefinition;
 import xyz.xiezc.ioc.definition.ParamDefinition;
+import xyz.xiezc.ioc.starter.web.DispatcherHandler;
 import xyz.xiezc.ioc.starter.web.common.ContentType;
 import xyz.xiezc.ioc.starter.web.entity.HttpRequest;
 import xyz.xiezc.ioc.starter.web.entity.HttpResponse;
 
 import java.io.IOException;
+import java.lang.reflect.AnnotatedElement;
 import java.util.Collection;
 import java.util.List;
 
@@ -44,9 +47,13 @@ public interface HttpMessageConverter<T> {
     /**
      *
      */
-    HttpResponse read(MethodDefinition methodDefinition, ContentType contentType, HttpRequest request)
+    Object[] doRead(MethodDefinition methodDefinition, ContentType contentType, HttpRequest request)
             throws IOException;
 
+    default HttpResponse read(MethodDefinition methodDefinition, ContentType contentType, HttpRequest request) throws IOException {
+        Object[] objects = doRead(methodDefinition, contentType, request);
+        return DispatcherHandler.invokeMappingMethod(methodDefinition, objects);
+    }
 
     default Object paramMapping(List<String> params, ParamDefinition paramDefinition) {
         Class paramType = paramDefinition.getParamType();

@@ -24,7 +24,7 @@ public class QueryStrHttpMessageConverter implements HttpMessageConverter {
     }
 
     @Override
-    public HttpResponse read(MethodDefinition methodDefinition, ContentType contentType, HttpRequest request) throws IOException {
+    public Object[] doRead(MethodDefinition methodDefinition, ContentType contentType, HttpRequest request) throws IOException {
         Map<String, List<String>> paramMap = request.getParamMap();
         ParamDefinition[] paramDefinitions = methodDefinition.getParamDefinitions();
         Object[] paramObjs = new Object[paramDefinitions.length];
@@ -38,11 +38,8 @@ public class QueryStrHttpMessageConverter implements HttpMessageConverter {
             }
             paramObjs[i] = paramMapping(params, paramDefinition);
         }
-
-        HttpResponse httpResponse = DispatcherHandler.invokeMappingMethod(methodDefinition, paramObjs);
-        return httpResponse;
+        return paramObjs;
     }
-
 
 
 }
