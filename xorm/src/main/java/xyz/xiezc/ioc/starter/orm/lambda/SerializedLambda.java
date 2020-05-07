@@ -58,6 +58,14 @@ public class SerializedLambda implements Serializable {
             throw ExceptionUtils.mpe("该方法仅能传入 lambda 表达式产生的合成类");
         }
         try (ObjectInputStream objIn = new ObjectInputStream(new ByteArrayInputStream(SerializationUtils.serialize(lambda))) {
+            /**
+             * 实现反序列化的类型的替换， 使用我们自定义的类型来替换java.lang.invoke.SerializedLambda类。
+             * 为何可以替换成功， 因为反序列化的时候使用的是反射的方式赋值对象的， 只要两个类的方法名称或者字段名一样，反射调用就是没有问题的。
+             * @param objectStreamClass
+             * @return
+             * @throws IOException
+             * @throws ClassNotFoundException
+             */
             @Override
             protected Class<?> resolveClass(ObjectStreamClass objectStreamClass) throws IOException, ClassNotFoundException {
                 Class<?> clazz = super.resolveClass(objectStreamClass);
@@ -132,7 +140,7 @@ public class SerializedLambda implements Serializable {
     @Override
     public String toString() {
         return String.format("%s -> %s::%s", getFunctionalInterfaceClassName(), getImplClass().getSimpleName(),
-            implMethodName);
+                implMethodName);
     }
 
 }

@@ -49,19 +49,22 @@ public final class Xioc {
 
         //加载配置
         beanLoadUtil.loadPropertie();
+        log.info("xioc配置加载完成");
         //加载BeanDefinition， 主要加载框架中的，各个starter路径下的和传入的class路径下的BeanDefinition
         xioc.loadBeanDefinition(clazz, beanLoadUtil);
-
         //加载BeanFactoryUtil,并简单初始化bean创建器
         beanLoadUtil.loadBeanCreateStategy();
         //加载注解处理器， 并简单初始化bean
         beanLoadUtil.loadAnnotationHandler();
+        log.info("xioc的所有注解处理器加载完成");
         //加载容器中的事件处理相关的bean
         beanLoadUtil.loadEventListener();
+        log.info("xioc的事件处理器加载完成");
         xioc.scanBeanDefinition(beanLoadUtil);
-
+        log.info("xioc的BeanDefinition加载完成");
         //注入依赖和初始化
         beanLoadUtil.initAndInjectBeans();
+        log.info("xioc的bean初始化完成");
         xioc.applicationContextUtil.publisherEvent(new ApplicationEvent(EventNameConstant.XiocEnd));
         log.info("xioc 容器加载完成");
         return xioc;

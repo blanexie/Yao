@@ -37,6 +37,8 @@ public class MybatisLoader implements ApplicationListener {
 
     Log log = LogFactory.get(MybatisLoader.class);
 
+    public static List<String> mapperScan = new ArrayList<>();
+
     /**
      * 处理mapper 接口和mapper.xml配置文件
      */
@@ -114,7 +116,6 @@ public class MybatisLoader implements ApplicationListener {
      * @return
      */
     private List<String> getMapperScanPackage() {
-        List<String> mapperScan = XormConfiguration.mapperScan;
         String s = Xioc.getApplicationContext().getSetting().get("mybatis.mappers.scan");
         if (StrUtil.isNotBlank(s)) {
             mapperScan.add(s);
@@ -127,8 +128,8 @@ public class MybatisLoader implements ApplicationListener {
 
     @Override
     public void doExecute(ApplicationEvent applicationEvent) {
-        try { //获得配置文件的位置
-
+        try {
+            //获得配置文件的位置
             Setting setting = Xioc.getApplicationContext().getSetting();
             String configPath = setting.getStr("mybatis.config", "mybatis-config.xml");
             //创建解析配置文件

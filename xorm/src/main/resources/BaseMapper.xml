@@ -1,163 +1,163 @@
-<?xml version="1.0" encoding="utf-8" standalone="no"?>
-<mapper namespace="xyz.xiezc.mzi.dao.mapper.AlbumMapper">
-    <resultMap id="BaseResultMap" type="xyz.xiezc.mzi.dao.entity.Album">
-        <id column="id" property="id"/>
-        <result column="create_time" property="createTime"/>
-        <result column="type" property="type"/>
-        <result column="publish_time" property="publishTime"/>
-        <result column="cover_id" property="coverId"/>
-        <result column="see" property="see"/>
-        <result column="title" property="title"/>
-    </resultMap>
-    <sql id="XZCExample_Where_Clause">
-        <where>
-            <foreach collection="oredCriteria" item="criteria" separator="or">
-                <if test="criteria.valid">
-                    <trim prefix="(" prefixOverrides="and" suffix=")">
-                        <foreach collection="criteria.criteria" item="criterion">
-                            <choose>
-                                <when test="criterion.noValue">and ${criterion.condition}</when>
-                                <when test="criterion.singleValue">and ${criterion.condition} #{criterion.value}</when>
-                                <when test="riterion.betweenValue">and ${criterion.condition} #{criterion.value} and
-                                    #{criterion.secondValue}
-                                </when>
-                                <when test="criterion.listValue">
-                                    and ${criterion.condition}
-                                    <foreach close=")" collection="criterion.value" item="listItem" open="("
-                                             separator=",">#{listItem}
-                                    </foreach>
-                                </when>
-                            </choose>
-                        </foreach>
-                    </trim>
-                </if>
-            </foreach>
-        </where>
-    </sql>
-    <sql id="Update_By_XZCExample_Where_Clause">
-        <where>
-            <foreach collection="example.oredCriteria" item="criteria" separator="or">
-                <if test="criteria.valid">
-                    <trim prefix="(" prefixOverrides="and" suffix=")">
-                        <foreach collection="criteria.criteria" item="criterion">
-                            <choose>
-                                <when test="criterion.noValue">and ${criterion.condition}</when>
-                                <when test="criterion.singleValue">and ${criterion.condition} #{criterion.value}</when>
-                                <when test="criterion.betweenValue">and ${criterion.condition} #{criterion.value} and
-                                    #{criterion.secondValue}
-                                </when>
-                                <when test="criterion.listValue">
-                                    and ${criterion.condition}
-                                    <foreach close=")" collection="criterion.value" item="listItem" open="("
-                                             separator=",">#{listItem}
-                                    </foreach>
-                                </when>
-                            </choose>
-                        </foreach>
-                    </trim>
-                </if>
-            </foreach>
-        </where>
-    </sql>
-    <sql id="XZCBase_Column_List">id,create_time,type,publish_time,cover_id,see,title</sql>
-    <select id="selectByExample" parameterType="xyz.xiezc.ioc.starter.orm.common.Example" resultMap="XZCBaseResultMap">
-        select
-        <if test="distinct">distinct</if>
-        <include refid="XZCBase_Column_List"/>
-        from t_album
-        <if test="_parameter != null">
-            <include refid="XZCExample_Where_Clause"/>
-        </if>
-        <if test="orderByClause != null">order by ${orderByClause}</if>
-        <if test="limit != null">
-            <if test="offset != null">limit ${offset}, ${limit}</if>
-            <if test="offset == null">limit ${limit}</if>
-        </if>
-    </select>
-    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="XZCBaseResultMap">
-        select
-        <include refid="XZCBase_Column_List"/>
-        from t_album whereid = #{id}
-    </select>
-    <select id="deleteByPrimaryKey" parameterType="java.lang.Integer">delete from t_albumwhere id= #{id}</select>
-    <select id="deleteByExample" parameterType="xyz.xiezc.ioc.starter.orm.common.Example">
-        delete from t_album
-        <if test="_parameter != null">
-            <include refid="XZCExample_Where_Clause"/>
-        </if>
-    </select>
-    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="xyz.xiezc.mzi.dao.entity.Album"
-            useGeneratedKeys="true">insert into t_album (create_time,type,publish_time,cover_id,see,title ) values
-        (#{createTime},#{type},#{publishTime},#{coverId},#{see},#{title} )
-    </insert>
-    <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="xyz.xiezc.mzi.dao.entity.Album"
-            useGeneratedKeys="true">
-        insert into t_album
-        <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="createTime != null">create_time</if>
-            <if test="type != null">type</if>
-            <if test="publishTime != null">publish_time</if>
-            <if test="coverId != null">cover_id</if>
-            <if test="see != null">see</if>
-            <if test="title != null">title</if>
-        </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="createTime != null">#{createTime},</if>
-            <if test="type != null">#{type},</if>
-            <if test="publishTime != null">#{publishTime},</if>
-            <if test="coverId != null">#{coverId},</if>
-            <if test="see != null">#{see},</if>
-            <if test="title != null">#{title},</if>
-        </trim>
-    </insert>
-    <select id="countByExample" parameterType="xyz.xiezc.ioc.starter.orm.common.Example" resultType="java.lang.Long">
-        select count(*) from t_album
-        <if test="_parameter != null">
-            <include refid="Example_Where_Clause"/>
-        </if>
-    </select>
-    <update id="updateByExampleSelective" parameterType="map">
-        update t_album
-        <set>
-            <if test="record.id != null">id= #{record.id},</if>
-            <if test="record.createTime != null">create_time= #{record.createTime},</if>
-            <if test="record.type != null">type= #{record.type},</if>
-            <if test="record.publishTime != null">publish_time= #{record.publishTime},</if>
-            <if test="record.coverId != null">cover_id= #{record.coverId},</if>
-            <if test="record.see != null">see= #{record.see},</if>
-            <if test="record.title != null">title= #{record.title},</if>
-        </set>
-        <if test="_parameter  != null">
-            <include refid="Update_By_XZCExample_Where_Clause"/>
-        </if>
-    </update>
+<!--<?xml version="1.0" encoding="utf-8" standalone="no"?>-->
+<!--<mapper namespace="xyz.xiezc.mzi.dao.mapper.AlbumMapper">-->
+<!--    <resultMap id="BaseResultMap" type="xyz.xiezc.mzi.dao.entity.Album">-->
+<!--        <id column="id" property="id"/>-->
+<!--        <result column="create_time" property="createTime"/>-->
+<!--        <result column="type" property="type"/>-->
+<!--        <result column="publish_time" property="publishTime"/>-->
+<!--        <result column="cover_id" property="coverId"/>-->
+<!--        <result column="see" property="see"/>-->
+<!--        <result column="title" property="title"/>-->
+<!--    </resultMap>-->
+<!--    <sql id="XZCExample_Where_Clause">-->
+<!--        <where>-->
+<!--            <foreach collection="oredCriteria" item="criteria" separator="or">-->
+<!--                <if test="criteria.valid">-->
+<!--                    <trim prefix="(" prefixOverrides="and" suffix=")">-->
+<!--                        <foreach collection="criteria.criteria" item="criterion">-->
+<!--                            <choose>-->
+<!--                                <when test="criterion.noValue">and ${criterion.condition}</when>-->
+<!--                                <when test="criterion.singleValue">and ${criterion.condition} #{criterion.value}</when>-->
+<!--                                <when test="riterion.betweenValue">and ${criterion.condition} #{criterion.value} and-->
+<!--                                    #{criterion.secondValue}-->
+<!--                                </when>-->
+<!--                                <when test="criterion.listValue">-->
+<!--                                    and ${criterion.condition}-->
+<!--                                    <foreach close=")" collection="criterion.value" item="listItem" open="("-->
+<!--                                             separator=",">#{listItem}-->
+<!--                                    </foreach>-->
+<!--                                </when>-->
+<!--                            </choose>-->
+<!--                        </foreach>-->
+<!--                    </trim>-->
+<!--                </if>-->
+<!--            </foreach>-->
+<!--        </where>-->
+<!--    </sql>-->
+<!--    <sql id="Update_By_XZCExample_Where_Clause">-->
+<!--        <where>-->
+<!--            <foreach collection="example.oredCriteria" item="criteria" separator="or">-->
+<!--                <if test="criteria.valid">-->
+<!--                    <trim prefix="(" prefixOverrides="and" suffix=")">-->
+<!--                        <foreach collection="criteria.criteria" item="criterion">-->
+<!--                            <choose>-->
+<!--                                <when test="criterion.noValue">and ${criterion.condition}</when>-->
+<!--                                <when test="criterion.singleValue">and ${criterion.condition} #{criterion.value}</when>-->
+<!--                                <when test="criterion.betweenValue">and ${criterion.condition} #{criterion.value} and-->
+<!--                                    #{criterion.secondValue}-->
+<!--                                </when>-->
+<!--                                <when test="criterion.listValue">-->
+<!--                                    and ${criterion.condition}-->
+<!--                                    <foreach close=")" collection="criterion.value" item="listItem" open="("-->
+<!--                                             separator=",">#{listItem}-->
+<!--                                    </foreach>-->
+<!--                                </when>-->
+<!--                            </choose>-->
+<!--                        </foreach>-->
+<!--                    </trim>-->
+<!--                </if>-->
+<!--            </foreach>-->
+<!--        </where>-->
+<!--    </sql>-->
+<!--    <sql id="XZCBase_Column_List">id,create_time,type,publish_time,cover_id,see,title</sql>-->
+<!--    <select id="selectByExample" parameterType="xyz.xiezc.ioc.starter.orm.common.Example" resultMap="XZCBaseResultMap">-->
+<!--        select-->
+<!--        <if test="distinct">distinct</if>-->
+<!--        <include refid="XZCBase_Column_List"/>-->
+<!--        from t_album-->
+<!--        <if test="_parameter != null">-->
+<!--            <include refid="XZCExample_Where_Clause"/>-->
+<!--        </if>-->
+<!--        <if test="orderByClause != null">order by ${orderByClause}</if>-->
+<!--        <if test="limit != null">-->
+<!--            <if test="offset != null">limit ${offset}, ${limit}</if>-->
+<!--            <if test="offset == null">limit ${limit}</if>-->
+<!--        </if>-->
+<!--    </select>-->
+<!--    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="XZCBaseResultMap">-->
+<!--        select-->
+<!--        <include refid="XZCBase_Column_List"/>-->
+<!--        from t_album whereid = #{id}-->
+<!--    </select>-->
+<!--    <select id="deleteByPrimaryKey" parameterType="java.lang.Integer">delete from t_albumwhere id= #{id}</select>-->
+<!--    <select id="deleteByExample" parameterType="xyz.xiezc.ioc.starter.orm.common.Example">-->
+<!--        delete from t_album-->
+<!--        <if test="_parameter != null">-->
+<!--            <include refid="XZCExample_Where_Clause"/>-->
+<!--        </if>-->
+<!--    </select>-->
+<!--    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="xyz.xiezc.mzi.dao.entity.Album"-->
+<!--            useGeneratedKeys="true">insert into t_album (create_time,type,publish_time,cover_id,see,title ) values-->
+<!--        (#{createTime},#{type},#{publishTime},#{coverId},#{see},#{title} )-->
+<!--    </insert>-->
+<!--    <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="xyz.xiezc.mzi.dao.entity.Album"-->
+<!--            useGeneratedKeys="true">-->
+<!--        insert into t_album-->
+<!--        <trim prefix="(" suffix=")" suffixOverrides=",">-->
+<!--            <if test="createTime != null">create_time</if>-->
+<!--            <if test="type != null">type</if>-->
+<!--            <if test="publishTime != null">publish_time</if>-->
+<!--            <if test="coverId != null">cover_id</if>-->
+<!--            <if test="see != null">see</if>-->
+<!--            <if test="title != null">title</if>-->
+<!--        </trim>-->
+<!--        <trim prefix="values (" suffix=")" suffixOverrides=",">-->
+<!--            <if test="createTime != null">#{createTime},</if>-->
+<!--            <if test="type != null">#{type},</if>-->
+<!--            <if test="publishTime != null">#{publishTime},</if>-->
+<!--            <if test="coverId != null">#{coverId},</if>-->
+<!--            <if test="see != null">#{see},</if>-->
+<!--            <if test="title != null">#{title},</if>-->
+<!--        </trim>-->
+<!--    </insert>-->
+<!--    <select id="countByExample" parameterType="xyz.xiezc.ioc.starter.orm.common.Example" resultType="java.lang.Long">-->
+<!--        select count(*) from t_album-->
+<!--        <if test="_parameter != null">-->
+<!--            <include refid="Example_Where_Clause"/>-->
+<!--        </if>-->
+<!--    </select>-->
+<!--    <update id="updateByExampleSelective" parameterType="map">-->
+<!--        update t_album-->
+<!--        <set>-->
+<!--            <if test="record.id != null">id= #{record.id},</if>-->
+<!--            <if test="record.createTime != null">create_time= #{record.createTime},</if>-->
+<!--            <if test="record.type != null">type= #{record.type},</if>-->
+<!--            <if test="record.publishTime != null">publish_time= #{record.publishTime},</if>-->
+<!--            <if test="record.coverId != null">cover_id= #{record.coverId},</if>-->
+<!--            <if test="record.see != null">see= #{record.see},</if>-->
+<!--            <if test="record.title != null">title= #{record.title},</if>-->
+<!--        </set>-->
+<!--        <if test="_parameter  != null">-->
+<!--            <include refid="Update_By_XZCExample_Where_Clause"/>-->
+<!--        </if>-->
+<!--    </update>-->
 
-    <update id="updateByExample" parameterType="map">
-        update t_album
-        <if test="_parameter != null">
-            <include refid="Update_By_XZCExample_Where_Clause"/>
-        </if>
-    </update>
-
-
-    <update id="updateByPrimaryKeySelective" parameterType="xyz.xiezc.mzi.dao.entity.Album">
-        update t_album
-        <set>
-            <if test="createTime != null">create_time = #{createTime},</if>
-            <if test="type != null">type = #{type},</if>
-            <if test="publishTime != null">publish_time = #{publishTime},</if>
-            <if test="coverId != null">cover_id = #{coverId},</if>
-            <if test="see != null">see = #{see},</if>
-            <if test="title != null">title = #{title},</if>
-        </set>
-        where id= #{id}
-    </update>
+<!--    <update id="updateByExample" parameterType="map">-->
+<!--        update t_album-->
+<!--        <if test="_parameter != null">-->
+<!--            <include refid="Update_By_XZCExample_Where_Clause"/>-->
+<!--        </if>-->
+<!--    </update>-->
 
 
-    <update id="updateByPrimaryKey" parameterType="xyz.xiezc.mzi.dao.entity.Album">update t_album set
-        create_time=#{createTime},type=#{type},publish_time=#{publishTime},cover_id=#{coverId},see=#{see},title=#{title},
-        where id = #{id}
-    </update>
+<!--    <update id="updateByPrimaryKeySelective" parameterType="xyz.xiezc.mzi.dao.entity.Album">-->
+<!--        update t_album-->
+<!--        <set>-->
+<!--            <if test="createTime != null">create_time = #{createTime},</if>-->
+<!--            <if test="type != null">type = #{type},</if>-->
+<!--            <if test="publishTime != null">publish_time = #{publishTime},</if>-->
+<!--            <if test="coverId != null">cover_id = #{coverId},</if>-->
+<!--            <if test="see != null">see = #{see},</if>-->
+<!--            <if test="title != null">title = #{title},</if>-->
+<!--        </set>-->
+<!--        where id= #{id}-->
+<!--    </update>-->
 
 
-</mapper>
+<!--    <update id="updateByPrimaryKey" parameterType="xyz.xiezc.mzi.dao.entity.Album">update t_album set-->
+<!--        create_time=#{createTime},type=#{type},publish_time=#{publishTime},cover_id=#{coverId},see=#{see},title=#{title},-->
+<!--        where id = #{id}-->
+<!--    </update>-->
+
+
+<!--</mapper>-->

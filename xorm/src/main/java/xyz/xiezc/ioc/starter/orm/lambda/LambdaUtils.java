@@ -97,7 +97,7 @@ public final class LambdaUtils {
      */
     public static <T> EntityTableDefine.ColumnProp getColumnProp(SFunction<T, ?> func) {
         SerializedLambda resolve = LambdaUtils.resolve(func);
-      return getColumnProp(resolve);
+        return getColumnProp(resolve);
     }
 
     /**
@@ -106,7 +106,7 @@ public final class LambdaUtils {
      * @param resolve
      * @return
      */
-    public static  EntityTableDefine.ColumnProp getColumnProp(SerializedLambda resolve) {
+    public static EntityTableDefine.ColumnProp getColumnProp(SerializedLambda resolve) {
         String implMethodName = resolve.getImplMethodName();
         Class<?> implClass = resolve.getImplClass();
         if (implMethodName.startsWith("get")) {
