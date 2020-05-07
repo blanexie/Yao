@@ -315,6 +315,10 @@ public class BeanLoadUtil {
         if (FileUtil.exist(file3)) {
             applicationContextUtil.addSetting(new Setting(file3.getPath(), true));
         }
+        File file5= FileUtil.file("app.setting");
+        if (FileUtil.exist(file5)) {
+            applicationContextUtil.addSetting(new Setting(file5.getPath(), true));
+        }
         //加载关联的配置文件
         String s = applicationContextUtil.getSetting().get("setting.import.path");
         if (StrUtil.isNotBlank(s)) {

@@ -5,7 +5,9 @@ import xyz.xiezc.ioc.Xioc;
 import xyz.xiezc.ioc.annotation.Component;
 import xyz.xiezc.ioc.annotation.Inject;
 import xyz.xiezc.ioc.starter.WebConfiguration;
+import xyz.xiezc.ioc.starter.orm.annotation.MapperScan;
 
+@MapperScan("xyz.xiezc.example.web")
 @Component
 public class ExampleApplication {
 

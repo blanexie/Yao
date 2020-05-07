@@ -11,6 +11,7 @@ import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
+import io.netty.handler.codec.http2.Http2Headers;
 import xyz.xiezc.ioc.annotation.Component;
 import xyz.xiezc.ioc.definition.BeanDefinition;
 import xyz.xiezc.ioc.definition.MethodDefinition;
@@ -33,6 +34,8 @@ public class DispatcherHandler {
 
     static Log log = LogFactory.get(DispatcherHandler.class);
 
+
+    public static Cache<Integer, Http2Headers> headerCache = CacheUtil.newTimedCache(30000);
     public static Cache<Integer, HttpRequest> requestCache = CacheUtil.newTimedCache(30000);
     public static Map<String, MethodDefinition> getMethods = new HashMap<>();
     public static Map<String, MethodDefinition> postMethods = new HashMap<>();

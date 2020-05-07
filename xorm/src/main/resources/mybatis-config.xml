@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <properties resource="app.properties"></properties>
+
+    <settings>
+        <!-- 打印sql日志 -->
+        <setting name="logImpl" value="STDOUT_LOGGING" />
+    </settings>
+    <environments default="development">
+        <environment id="development">
+            <transactionManager type="JDBC"/>
+            <dataSource type="POOLED">
+                <property name="driver" value="${mybatis.driver}"/>
+                <property name="url" value="${mybatis.url}"/>
+                <property name="username" value="${mybatis.username}"/>
+                <property name="password" value="${mybatis.password}"/>
+            </dataSource>
+        </environment>
+    </environments>
+
+
+</configuration>

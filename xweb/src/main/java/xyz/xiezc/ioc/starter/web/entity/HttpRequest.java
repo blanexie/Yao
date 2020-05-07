@@ -27,7 +27,13 @@ public class HttpRequest {
 
     Map<String, List<String>> paramMap;
 
-    List<HttpContent> bodyList=new ArrayList<>();
+    List<HttpContent> bodyList = new ArrayList<>();
+
+    /**
+     * 是否是HTTP2应用
+     */
+    boolean isHttp2;
+
 
     public void addBody(HttpContent content) {
         bodyList.add(content);

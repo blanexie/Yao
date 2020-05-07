@@ -15,23 +15,25 @@
 
 package xyz.xiezc.ioc.starter.web.netty;
 
-import cn.hutool.cache.Cache;
-import cn.hutool.cache.CacheUtil;
-import cn.hutool.core.thread.ThreadUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONNull;
 import cn.hutool.json.JSONUtil;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufUtil;
+import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.*;
+import io.netty.handler.codec.http.multipart.HttpPostMultipartRequestDecoder;
 import io.netty.handler.codec.http2.*;
 import io.netty.util.CharsetUtil;
+import lombok.SneakyThrows;
 import xyz.xiezc.ioc.starter.web.DispatcherHandler;
+import xyz.xiezc.ioc.starter.web.common.ContentType;
+import xyz.xiezc.ioc.starter.web.entity.HttpContent;
+import xyz.xiezc.ioc.starter.web.entity.HttpHeader;
 import xyz.xiezc.ioc.starter.web.entity.HttpRequest;
 import xyz.xiezc.ioc.starter.web.entity.HttpResponse;
 
-import static io.netty.buffer.Unpooled.copiedBuffer;
-import static io.netty.buffer.Unpooled.unreleasableBuffer;
-import static io.netty.handler.codec.http.HttpResponseStatus.OK;
+import java.util.List;
 
 /**
  * A simple handler that responds with the message "Hello World!".
@@ -88,34 +90,54 @@ public final class Http2Handler extends Http2ConnectionHandler implements Http2F
         // no need to call flush as channelReadComplete(...) will take care of it.
     }
 
+    @SneakyThrows
     @Override
     public int onDataRead(ChannelHandlerContext ctx, int streamId, ByteBuf data, int padding, boolean endOfStream) {
+        ctx.pipeline().addLast(new HttpObjectAggregator(Http2ServerInitializer.maxHttpContentLength));
         int processed = data.readableBytes() + padding;
+
         HttpRequest httpRequest = DispatcherHandler.requestCache.get(streamId);
         if (httpRequest == null) {
             Http2Headers respHeaders = new DefaultHttp2Headers().status(HttpResponseStatus.REQUEST_TIMEOUT.codeAsText());
             sendResponse(ctx, streamId, data.retain(), respHeaders);
             return processed;
         }
-        CharSequence charSequence = data.readCharSequence(data.readableBytes(), CharsetUtil.UTF_8);
-      //TODO   httpRequest.addBody(charSequence.toString());
+        //TODO   httpRequest.addBody(charSequence.toString());
         if (endOfStream) {
             HttpResponse httpResponse = DispatcherHandler.doRequest(httpRequest);
-            dealResonse(ctx, streamId, httpResponse);
+            sendResponse(ctx, streamId, httpResponse);
+//            HttpResponse httpResponse = DispatcherHandler.doRequest(httpRequest);
+//            dealResonse(ctx, streamId, httpResponse);
         }
         return processed;
+    }
+
+    private void sendResponse(ChannelHandlerContext ctx, int streamId, HttpResponse httpResponse) {
+        ByteBuf data = ctx.alloc().buffer();
+        List<HttpHeader> headers = httpResponse.getHeaders();
+        Http2Headers respHeaders = new DefaultHttp2Headers();
+        headers.forEach(httpHeader -> {
+            respHeaders.add(httpHeader.getKey(), httpHeader.getValue());
+        });
+        respHeaders.status(HttpResponseStatus.OK.codeAsText());
+        Object body = httpResponse.getBody();
+        data.clear();
+        data.writeCharSequence(JSONUtil.toJsonStr(body), CharsetUtil.UTF_8);
+        sendResponse(ctx, streamId, data, respHeaders);
     }
 
     @Override
     public void onHeadersRead(ChannelHandlerContext ctx, int streamId,
                               Http2Headers headers, int padding, boolean endOfStream) {
+
+
         HttpRequest httpRequest = getHttpRequest(headers);
         httpRequest.setReqId(streamId);
         if (endOfStream) {
             HttpResponse httpResponse = DispatcherHandler.doRequest(httpRequest);
             dealResonse(ctx, streamId, httpResponse);
         } else {
-            DispatcherHandler.requestCache.put(streamId, httpRequest);
+            DispatcherHandler.headerCache.put(streamId, headers);
         }
     }
 

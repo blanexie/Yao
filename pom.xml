@@ -28,6 +28,7 @@
         <module>starter</module>
         <module>example</module>
         <module>xweb</module>
+        <module>xorm</module>
     </modules>
     <dependencies>
 
@@ -66,7 +67,16 @@
                 <artifactId>xioc</artifactId>
                 <version>0.0.1-SNAPSHOT</version>
             </dependency>
-
+            <dependency>
+                <groupId>org.mybatis</groupId>
+                <artifactId>mybatis</artifactId>
+                <version>3.5.4</version>
+            </dependency>
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>8.0.20</version>
+            </dependency>
             <!-- https://mvnrepository.com/artifact/org.ow2.asm/asm -->
             <dependency>
                 <groupId>org.ow2.asm</groupId>

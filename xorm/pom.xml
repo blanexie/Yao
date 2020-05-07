@@ -9,37 +9,29 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>xyz.xiezc</groupId>
-    <artifactId>example</artifactId>
+    <artifactId>xorm</artifactId>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+    </properties>
 
     <dependencies>
         <dependency>
             <groupId>xyz.xiezc</groupId>
             <artifactId>xioc</artifactId>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.mybatis/mybatis -->
         <dependency>
-            <groupId>xyz.xiezc</groupId>
-            <artifactId>starter</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>xyz.xiezc</groupId>
-            <artifactId>xweb</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis</artifactId>
 
-        <dependency>
-            <groupId>xyz.xiezc</groupId>
-            <artifactId>xorm</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
         </dependency>
-
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <scope>provided</scope>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
         </dependency>
 
     </dependencies>
-
 </project>
