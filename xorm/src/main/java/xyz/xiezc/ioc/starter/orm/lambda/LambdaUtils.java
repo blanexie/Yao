@@ -15,11 +15,18 @@
  */
 package xyz.xiezc.ioc.starter.orm.lambda;
 
+import cn.hutool.log.Log;
+import cn.hutool.log.LogFactory;
+import lombok.SneakyThrows;
+import xyz.xiezc.ioc.starter.orm.common.YaoMybatisException;
 import xyz.xiezc.ioc.starter.orm.util.ExceptionUtils;
 import xyz.xiezc.ioc.starter.orm.util.StringUtil;
 import xyz.xiezc.ioc.starter.orm.xml.EntityTableDefine;
 
+import java.lang.invoke.SerializedLambda;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -35,6 +42,7 @@ import static java.util.Locale.ENGLISH;
  */
 public final class LambdaUtils {
 
+    static Log log = LogFactory.get(LambdaUtils.class);
     /**
      * 字段映射
      */
@@ -46,23 +54,36 @@ public final class LambdaUtils {
     private static final Map<Class<?>, WeakReference<SerializedLambda>> FUNC_CACHE = new ConcurrentHashMap<>();
 
     /**
-     * 解析 lambda 表达式, 该方法只是调用了 {@link SerializedLambda#resolve(SFunction)} 中的方法，在此基础上加了缓存。
+     * 解析 lambda 表达式, 该方法只是调用了getSerializedLambda方法，在此基础上加了缓存。
      * 该缓存可能会在任意不定的时间被清除
      *
      * @param func 需要解析的 lambda 对象
      * @param <T>  类型，被调用的 Function 对象的目标类型
      * @return 返回解析后的结果
-     * @see SerializedLambda#resolve(SFunction)
      */
     public static <T> SerializedLambda resolve(SFunction<T, ?> func) {
         Class<?> clazz = func.getClass();
         return Optional.ofNullable(FUNC_CACHE.get(clazz))
                 .map(WeakReference::get)
                 .orElseGet(() -> {
-                    SerializedLambda lambda = SerializedLambda.resolve(func);
-                    FUNC_CACHE.put(clazz, new WeakReference<>(lambda));
-                    return lambda;
+                    try {
+                        SerializedLambda lambda = getSerializedLambda(func);
+                        FUNC_CACHE.put(clazz, new WeakReference<>(lambda));
+                        return lambda;
+                    } catch (Exception e) {
+                        log.error(e);
+                        throw new YaoMybatisException(e);
+                    }
                 });
+    }
+
+    private static <T, R> SerializedLambda getSerializedLambda(SFunction<T, R> func) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        // 直接调用writeReplace
+        Method writeReplace = func.getClass().getDeclaredMethod("writeReplace");
+        writeReplace.setAccessible(true);
+        Object sl = writeReplace.invoke(func);
+        java.lang.invoke.SerializedLambda serializedLambda = (java.lang.invoke.SerializedLambda) sl;
+        return serializedLambda;
     }
 
     /**
@@ -101,14 +122,26 @@ public final class LambdaUtils {
     }
 
     /**
+     * 正常化类名称，将类名称中的 / 替换为 .
+     *
+     * @param name 名称
+     * @return 正常的类名
+     */
+    private static String normalName(String name) {
+        return name.replace('/', '.');
+    }
+
+    /**
      * 获取对应的表字段与对象的属性关系对象
      *
      * @param resolve
      * @return
      */
+    @SneakyThrows
     public static EntityTableDefine.ColumnProp getColumnProp(SerializedLambda resolve) {
         String implMethodName = resolve.getImplMethodName();
-        Class<?> implClass = resolve.getImplClass();
+        String s = normalName(resolve.getImplClass());
+        Class<?> implClass = Class.forName(s);
         if (implMethodName.startsWith("get")) {
             return getColumnProp(implClass, implMethodName, "get");
         }

@@ -25,7 +25,8 @@ public class TestController {
 
     @GetMapping("testGet")
     public String testGet(Integer id) {
-        Example.Criteria criteria = Example.of().createCriteria().andEqualTo(Album::getId, 3450);
+        Example.Criteria criteria = Example.of().createCriteria()
+                .andEqualTo(Album::getId, 3450);
         List<Album> album = albumMapper.selectByExample(criteria.build());
         return JSONUtil.toJsonStr(album);
     }
