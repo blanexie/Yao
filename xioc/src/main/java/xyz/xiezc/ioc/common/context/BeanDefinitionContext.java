@@ -27,7 +27,7 @@ public interface BeanDefinitionContext {
      *
      * @param beanName
      * @param beanClass
-     * @return
+     * @return 可能为null
      */
     BeanDefinition getBeanDefinition(String beanName, Class<?> beanClass);
 

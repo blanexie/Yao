@@ -58,15 +58,15 @@ public final class Xioc {
         //加载BeanFactoryUtil,并简单初始化bean创建器
         beanLoadUtil.loadBeanCreateStategy();
 
-        //加载注解处理器， 并简单初始化bean
-       // beanLoadUtil.loadAnnotationHandler();
-        log.info("xioc的所有注解处理器加载完成");
+        beanLoadUtil.loadAnnotationHandler();
+
+
         //加载容器中的事件处理相关的bean
         beanLoadUtil.loadEventListener();
         log.info("xioc的事件处理器加载完成");
         xioc.scanBeanDefinition(beanLoadUtil);
-
         log.info("xioc的BeanDefinition加载完成");
+
         //注入依赖和初始化
         beanLoadUtil.initAndInjectBeans();
         log.info("xioc的bean初始化完成");
@@ -88,10 +88,6 @@ public final class Xioc {
     private void scanBeanDefinition(BeanLoadUtil beanLoadUtil) {
         //扫描容器中的bean， 处理所有在bean类上的注解
         beanLoadUtil.scanBeanDefinitionClass();
-        //扫描容器中的bean，处理bean上的字段的自定义注解
-        beanLoadUtil.scanBeanDefinitionField();
-        //扫描容器中的bean, 处理方法
-        beanLoadUtil.scanBeanDefinitionMethod();
     }
 
     /**

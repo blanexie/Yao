@@ -1,8 +1,10 @@
 package xyz.xiezc.ioc.common.context.impl;
 
+import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
+import xyz.xiezc.ioc.annotation.Inject;
 import xyz.xiezc.ioc.common.context.BeanCreateContext;
 import xyz.xiezc.ioc.common.context.BeanDefinitionContext;
 import xyz.xiezc.ioc.common.create.BeanCreateStrategy;
@@ -109,8 +111,14 @@ public class BeanCreateContextUtil implements BeanCreateContext {
 
             String beanName = annotationFiledDefinition.getBeanName();
             Class<?> fieldType = annotationFiledDefinition.getFieldType();
-            BeanDefinition beanDefinition = beanDefinitionContext.getInjectBeanDefinition(beanName, fieldType);
-            annotationFiledDefinition.setObj(beanDefinition);
+            Inject annotation = AnnotationUtil.getAnnotation(annotationFiledDefinition.getAnnotatedElement(), Inject.class);
+            if (annotation != null && annotation.requrie()) {
+                BeanDefinition beanDefinition = beanDefinitionContext.getInjectBeanDefinition(beanName, fieldType);
+                annotationFiledDefinition.setObj(beanDefinition);
+            } else {
+                BeanDefinition beanDefinition = beanDefinitionContext.getBeanDefinition(beanName, fieldType);
+                annotationFiledDefinition.setObj(beanDefinition);
+            }
         }
     }
 
