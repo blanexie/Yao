@@ -12,6 +12,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 import io.netty.handler.codec.http2.Http2Headers;
+import xyz.xiezc.ioc.Xioc;
 import xyz.xiezc.ioc.annotation.Component;
 import xyz.xiezc.ioc.definition.BeanDefinition;
 import xyz.xiezc.ioc.definition.MethodDefinition;
@@ -97,6 +98,7 @@ public class DispatcherHandler {
 
     public static HttpResponse invokeMappingMethod(MethodDefinition methodDefinition, Object... paramObjs) {
         BeanDefinition beanDefinition = methodDefinition.getBeanDefinition();
+        beanDefinition = Xioc.getApplicationContext().getInjectBeanDefinition(beanDefinition.getBeanName(), beanDefinition.getBeanClass());
         Object bean = beanDefinition.getBean();
         Object invoke = ReflectUtil.invoke(bean, methodDefinition.getMethod(), paramObjs);
         HttpResponse httpResponse = new HttpResponse();

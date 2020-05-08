@@ -209,7 +209,11 @@ public class BeanCreateContextUtil implements BeanCreateContext {
                 fieldBeanDefinition = this.createBean(fieldBeanDefinition);
                 obj = fieldBeanDefinition.getBean();
             }
-            ReflectUtil.setFieldValue(beanDefinition.getBean(), fieldDefinition.getFieldName(), obj);
+            if (beanDefinition.getBeanTypeEnum() == BeanTypeEnum.factoryBean) {
+                ReflectUtil.setFieldValue(beanDefinition.getFactoryBean(), fieldDefinition.getFieldName(), obj);
+            } else {
+                ReflectUtil.setFieldValue(beanDefinition.getBean(), fieldDefinition.getFieldName(), obj);
+            }
         }
     }
 

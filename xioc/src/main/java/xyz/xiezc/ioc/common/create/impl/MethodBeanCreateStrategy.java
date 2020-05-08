@@ -64,7 +64,7 @@ public class MethodBeanCreateStrategy implements BeanCreateStrategy {
                     continue;
                 }
                 if (param instanceof BeanDefinition) {
-                    BeanDefinition beanDefinitionParam = applicationContextUtil.getBeanDefinition(paramDefinition.getBeanName(), paramDefinition.getParamType());
+                    BeanDefinition beanDefinitionParam = applicationContextUtil.getInjectBeanDefinition(paramDefinition.getBeanName(), paramDefinition.getParamType());
                     beanDefinitionParam = applicationContextUtil.createBean(beanDefinitionParam);
                     param = beanDefinitionParam.getBean();
                 }

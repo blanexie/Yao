@@ -85,6 +85,14 @@ public class BeanDefinition {
      */
     private Object bean;
 
+    public Object getFactoryBean(){
+        if (getBeanTypeEnum() == BeanTypeEnum.factoryBean) {
+            return bean;
+        }
+        return null;
+    }
+
+
     /**
      * 返回具体的bean实例
      *
