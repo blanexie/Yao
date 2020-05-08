@@ -1,5 +1,6 @@
 package xyz.xiezc.ioc.starter.orm.xml;
 
+import cn.hutool.core.io.FileUtil;
 import lombok.Data;
 import org.apache.ibatis.builder.BuilderException;
 import org.w3c.dom.*;
@@ -7,6 +8,7 @@ import org.xml.sax.InputSource;
 import xyz.xiezc.ioc.starter.orm.util.DocumentUtil;
 
 import javax.xml.parsers.DocumentBuilder;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -44,7 +46,17 @@ public class DocumentMapperDefine {
             inputSource.getCharacterStream().close();
         }
     }
-
+    public DocumentMapperDefine(File path) throws IOException {
+        InputSource inputSource = new InputSource(FileUtil.getInputStream(path));
+        try {
+            this.path = path.toPath();
+            inputSource.setEncoding("utf8");
+            document = this.createDocument(inputSource);
+            nameSpace = getNameSpace();
+        } finally {
+            inputSource.getCharacterStream().close();
+        }
+    }
     public DocumentMapperDefine(Path path) throws IOException {
         InputSource inputSource = new InputSource(Files.newBufferedReader(path));
         try {

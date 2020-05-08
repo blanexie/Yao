@@ -6,6 +6,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
+import lombok.Synchronized;
 import xyz.xiezc.ioc.ApplicationContextUtil;
 import xyz.xiezc.ioc.common.asm.AsmUtil;
 import xyz.xiezc.ioc.common.context.AnnotationContext;
@@ -25,7 +26,6 @@ import java.util.stream.Collectors;
  * @date 2019/04/04 15:01
  */
 public abstract class AnnotationHandler<T extends Annotation> extends AnnotationOrder {
-
 
     public abstract Class<T> getAnnotationType();
 
@@ -84,12 +84,17 @@ public abstract class AnnotationHandler<T extends Annotation> extends Annotation
     }
 
 
-    public BeanDefinition dealBeanAnnotation(Annotation annotation, Class clazz, ApplicationContextUtil applicationContextUtil) {
-        Class<?> beanClass = clazz;
+    public static BeanDefinition dealBeanAnnotation(Annotation annotation, Class clazz, ApplicationContextUtil applicationContextUtil) {
         String beanName = AnnotationUtil.getAnnotationValue(clazz, annotation.annotationType(), "value");
         if (StrUtil.isBlank(beanName)) {
             beanName = clazz.getTypeName();
         }
+        return dealBeanAnnotation(beanName, clazz, applicationContextUtil);
+    }
+
+
+    public static BeanDefinition dealBeanAnnotation(String beanName, Class clazz, ApplicationContextUtil applicationContextUtil) {
+        Class<?> beanClass = clazz;
         //获取容器中是否存在这个bean
         BeanDefinition beanDefinition = applicationContextUtil.getBeanDefinition(beanName, beanClass);
         //如果容器中不存在 这个bean。 就要放入
@@ -149,7 +154,7 @@ public abstract class AnnotationHandler<T extends Annotation> extends Annotation
         List<Annotation> collect = CollUtil.newArrayList(annotations)
                 .stream()
                 .filter(annotation -> !annotationContext.isNotHandleAnnotation(annotation.annotationType()))
-                .filter(annotation -> annotationContext.getFieldAnnotationHandler(annotation.annotationType()) != null)
+                //.filter(annotation -> annotationContext.getFieldAnnotationHandler(annotation.annotationType()) != null)
                 .collect(Collectors.toList());
 
         if (CollUtil.isNotEmpty(collect)) {
@@ -164,14 +169,15 @@ public abstract class AnnotationHandler<T extends Annotation> extends Annotation
     }
 
 
-    private MethodDefinition dealMethodDefinition(Method method, BeanDefinition beanDefinition, AnnotationContext annotationContext) {
+    private static MethodDefinition dealMethodDefinition(Method method, BeanDefinition beanDefinition, AnnotationContext annotationContext) {
         //获取字段上的所有注解
         Annotation[] annotations = cn.hutool.core.annotation.AnnotationUtil.getAnnotations(method, true);
         //校验排除一些注解
         List<Annotation> collect = CollUtil.newArrayList(annotations)
                 .stream()
-                .filter(annotation -> !annotationContext.isNotHandleAnnotation(annotation.annotationType()))
-                .filter(annotation -> annotationContext.getMethodAnnotationHandler(annotation.annotationType()) != null)
+                .filter(annotation ->
+                        !annotationContext.isNotHandleAnnotation(annotation.annotationType())
+                )
                 .collect(Collectors.toList());
 
         if (CollUtil.isNotEmpty(collect)) {

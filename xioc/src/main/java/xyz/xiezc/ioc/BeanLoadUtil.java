@@ -99,7 +99,7 @@ public class BeanLoadUtil {
         if (component != null) {
             AnnotationHandler annotationHandler = applicationContextUtil.getClassAnnotationHandler(Component.class);
             if (annotationHandler == null) {
-                Class<? extends AnnotationHandler> annotatonHandler = Component.annotatonHandler;
+                Class<? extends AnnotationHandler> annotatonHandler = component.annotatonHandler();
                 annotationHandler = ReflectUtil.newInstanceIfPossible(annotatonHandler);
                 applicationContextUtil.addAnnotationHandler(annotationHandler);
             }
@@ -110,7 +110,7 @@ public class BeanLoadUtil {
         if (configuration != null) {
             AnnotationHandler annotationHandler = applicationContextUtil.getClassAnnotationHandler(Configuration.class);
             if (annotationHandler == null) {
-                Class<? extends AnnotationHandler> annotatonHandler = Configuration.annotatonHandler;
+                Class<? extends AnnotationHandler> annotatonHandler = configuration.annotatonHandler();
                 annotationHandler = ReflectUtil.newInstanceIfPossible(annotatonHandler);
                 applicationContextUtil.addAnnotationHandler(annotationHandler);
             }
@@ -246,7 +246,7 @@ public class BeanLoadUtil {
             if (annotationMethodDefinitions == null) {
                 continue;
             }
-            //检查每个字段的注解
+            //检查每个方法的注解
             for (MethodDefinition methodDefinition : annotationMethodDefinitions) {
                 Annotation[] annotations = cn.hutool.core.annotation.AnnotationUtil.getAnnotations(methodDefinition.getAnnotatedElement(), true);
                 if (annotations == null || annotations.length == 0) {
@@ -315,10 +315,16 @@ public class BeanLoadUtil {
         if (FileUtil.exist(file3)) {
             applicationContextUtil.addSetting(new Setting(file3.getPath(), true));
         }
-        File file5= FileUtil.file("app.setting");
+        File file5 = FileUtil.file("app.setting");
         if (FileUtil.exist(file5)) {
             applicationContextUtil.addSetting(new Setting(file5.getPath(), true));
         }
+
+        File file6 = FileUtil.file("app.properties");
+        if (FileUtil.exist(file6)) {
+            applicationContextUtil.addSetting(new Setting(file6, CharsetUtil.CHARSET_UTF_8, true));
+        }
+
         //加载关联的配置文件
         String s = applicationContextUtil.getSetting().get("setting.import.path");
         if (StrUtil.isNotBlank(s)) {

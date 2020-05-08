@@ -21,6 +21,6 @@ public @interface Bean {
     /**
      * 注解处理器
      */
-    Class<? extends AnnotationHandler> annotationHandler= BeanAnnotationHandler.class;
+    Class<? extends AnnotationHandler> annotationHandler() default BeanAnnotationHandler.class;
 
 }

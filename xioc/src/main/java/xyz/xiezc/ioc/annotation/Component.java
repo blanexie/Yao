@@ -25,5 +25,5 @@ public @interface Component {
     String value() default "";
 
 
-    Class<? extends AnnotationHandler> annotatonHandler = ComponentAnnotationHandler.class;
+    Class<? extends AnnotationHandler> annotatonHandler () default ComponentAnnotationHandler.class;
 }

@@ -34,7 +34,9 @@ public final class Xioc {
      */
     public final String starterPackage = "xyz.xiezc.ioc.starter";
 
-    static Xioc xioc;
+     static Xioc xioc;
+
+    public  static Class<?> bootClass;
 
     /**
      * 启动方法,
@@ -43,6 +45,7 @@ public final class Xioc {
      */
     public static Xioc run(Class<?> clazz) {
         xioc = new Xioc();
+        bootClass = clazz;
         //开始启动框架
         BeanLoadUtil beanLoadUtil = xioc.applicationContextUtil.getBeanLoadUtil();
         xioc.applicationContextUtil.publisherEvent(new ApplicationEvent(EventNameConstant.XiocStart));
@@ -54,13 +57,15 @@ public final class Xioc {
         xioc.loadBeanDefinition(clazz, beanLoadUtil);
         //加载BeanFactoryUtil,并简单初始化bean创建器
         beanLoadUtil.loadBeanCreateStategy();
+
         //加载注解处理器， 并简单初始化bean
-        beanLoadUtil.loadAnnotationHandler();
+       // beanLoadUtil.loadAnnotationHandler();
         log.info("xioc的所有注解处理器加载完成");
         //加载容器中的事件处理相关的bean
         beanLoadUtil.loadEventListener();
         log.info("xioc的事件处理器加载完成");
         xioc.scanBeanDefinition(beanLoadUtil);
+
         log.info("xioc的BeanDefinition加载完成");
         //注入依赖和初始化
         beanLoadUtil.initAndInjectBeans();

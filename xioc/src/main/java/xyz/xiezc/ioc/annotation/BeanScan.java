@@ -35,7 +35,7 @@ public @interface BeanScan {
     Class<?>[] basePackageClasses() default {};
 
 
-    Class<? extends AnnotationHandler> annotationHandler = BeanScanAnnotationHandler.class;
+    Class<? extends AnnotationHandler> annotationHandler () default BeanScanAnnotationHandler.class;
 
 
 }

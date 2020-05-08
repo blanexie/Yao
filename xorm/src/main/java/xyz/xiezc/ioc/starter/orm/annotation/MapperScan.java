@@ -1,9 +1,6 @@
 package xyz.xiezc.ioc.starter.orm.annotation;
 
-import xyz.xiezc.ioc.annotation.AnnotationHandler;
 import xyz.xiezc.ioc.annotation.Component;
-import xyz.xiezc.ioc.annotation.handler.BeanAnnotationHandler;
-import xyz.xiezc.ioc.starter.orm.annotation.handler.MapperScanAnnotationHandler;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -19,10 +16,5 @@ import java.lang.annotation.Target;
 public @interface MapperScan {
 
     String[] value() ;
-
-    /**
-     * 注解处理器
-     */
-    Class<? extends AnnotationHandler> annotationHandler= MapperScanAnnotationHandler.class;
 
 }

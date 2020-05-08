@@ -28,6 +28,7 @@ public @interface Inject {
      */
     String value() default "";
 
+    boolean requrie() default true;
 
-    Class<? extends AnnotationHandler> annotatonHandler = InjectAnnotationHandler.class;
+    Class<? extends AnnotationHandler> annotatonHandler() default InjectAnnotationHandler.class;
 }

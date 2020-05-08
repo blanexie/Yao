@@ -25,6 +25,6 @@ public @interface Aop {
     /**
      * 注解处理器
      */
-    Class<? extends AnnotationHandler> annotatonHandler = AopAnnotationHandler.class;
+    Class<? extends AnnotationHandler> annotatonHandler() default AopAnnotationHandler.class;
 
 }

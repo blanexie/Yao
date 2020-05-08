@@ -32,12 +32,17 @@ public class MybatisConfigDefine {
         this.mybatisConfigPath = mybatisConfigPath;
     }
 
-
+    /**
+     * 检验配置
+     *
+     * @throws ParserConfigurationException
+     * @throws IOException
+     * @throws SAXException
+     */
     public void checkMybatisConfig() throws ParserConfigurationException, IOException, SAXException {
         DocumentBuilder documentBuilder = DocumentUtil.getDocumentBuilder(true);
         InputStream resourceAsStream = Resources.getResourceAsStream(mybatisConfigPath);
         configDocument = documentBuilder.parse(resourceAsStream);
-        //获得配置的envName
         checkEnvironments();
         checkMappers();
     }
@@ -102,7 +107,8 @@ public class MybatisConfigDefine {
             stringBuffer.append(s).append(",");
         }
         stringBuffer.deleteCharAt(stringBuffer.length() - 1);
-        Xioc.getApplicationContext().getSetting().put("mybatis.mappers.xml.config",stringBuffer.toString());
+        Xioc.getApplicationContext().getSetting()
+                .put("mybatis.mappers.xml.config", stringBuffer.toString());
     }
 
     /**
@@ -123,7 +129,9 @@ public class MybatisConfigDefine {
 
         Node item = environments.item(0);
         Node development = item.getAttributes().getNamedItem("default");
-        if (StringUtil.isNullOrEmpty(envName) || Objects.equals(development.getNodeValue(), envName)) {
+        if (StringUtil.isNullOrEmpty(envName)
+                || Objects.equals(development.getNodeValue(), envName)
+        ) {
             return;
         } else {
             Element environments1 = (Element) item;

@@ -21,5 +21,5 @@ public @interface Configuration {
     String value() default "";
 
 
-    Class<? extends AnnotationHandler> annotatonHandler = ConfigurationAnnotationHandler.class;
+    Class<? extends AnnotationHandler> annotatonHandler() default ConfigurationAnnotationHandler.class;
 }
