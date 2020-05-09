@@ -36,7 +36,7 @@ public class FactoryBeanCreateStrategy implements BeanCreateStrategy {
         applicationContextUtil.checkInitMethod(initMethodDefinition);
 
         //先创建类
-        if (beanDefinition.getBeanStatus() == BeanStatusEnum.HalfCooked) {
+        if (beanDefinition.getBeanStatus() == BeanStatusEnum.Original) {
             Class<?> beanClass = beanDefinition.getBeanClass();
             Object bean = ReflectUtil.newInstanceIfPossible(beanClass);
             beanDefinition.setBean(bean);

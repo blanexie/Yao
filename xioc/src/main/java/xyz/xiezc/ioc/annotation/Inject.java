@@ -30,5 +30,4 @@ public @interface Inject {
 
     boolean requrie() default true;
 
-    Class<? extends AnnotationHandler> annotatonHandler() default InjectAnnotationHandler.class;
 }

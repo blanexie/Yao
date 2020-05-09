@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package xyz.xiezc.ioc.starter.orm;
+package xyz.xiezc.ioc.starter.orm.bean;
 
 
 import cn.hutool.core.io.resource.Resource;
@@ -38,8 +38,8 @@ import org.apache.ibatis.transaction.TransactionFactory;
 import org.apache.ibatis.type.TypeHandler;
 import org.w3c.dom.Document;
 import xyz.xiezc.ioc.annotation.Init;
-import xyz.xiezc.ioc.annotation.Inject;
 import xyz.xiezc.ioc.definition.FactoryBean;
+import xyz.xiezc.ioc.starter.orm.common.YaoManagedTransactionFactory;
 import xyz.xiezc.ioc.starter.orm.common.YaoMybatisException;
 import xyz.xiezc.ioc.starter.orm.xml.DocumentMapperDefine;
 import xyz.xiezc.ioc.starter.orm.xml.XMLMapperBuilder;
@@ -86,7 +86,7 @@ public class SqlSessionFactoryBean implements FactoryBean<SqlSessionFactory> {
 
     private Configuration configuration;
 
-    private List<DocumentMapperDefine> mapperLocations;
+    private List<DocumentMapperDefine> documentMapperDefines;
 
     private DataSource dataSource;
 
@@ -282,8 +282,8 @@ public class SqlSessionFactoryBean implements FactoryBean<SqlSessionFactory> {
      * This property being based on Spring's resource abstraction also allows for specifying
      * resource patterns here: e.g. "classpath*:sqlmap/*-mapper.xml".
      */
-    public void setMapperLocations(List<DocumentMapperDefine> mapperLocations) {
-        this.mapperLocations = mapperLocations;
+    public void setDocumentMapperDefines(List<DocumentMapperDefine> documentMapperDefines) {
+        this.documentMapperDefines = documentMapperDefines;
     }
 
     /**
@@ -501,24 +501,27 @@ public class SqlSessionFactoryBean implements FactoryBean<SqlSessionFactory> {
 
         configuration.setEnvironment(new Environment(this.environment, this.transactionFactory, this.dataSource));
 
-        if (!isEmpty(this.mapperLocations)) {
-            for (DocumentMapperDefine mapperLocation : this.mapperLocations) {
-                if (mapperLocation == null) {
+        if (!isEmpty(this.documentMapperDefines)) {
+            for (DocumentMapperDefine documentMapperDefine : this.documentMapperDefines) {
+                if (documentMapperDefine == null) {
                     continue;
                 }
                 try {
-                    Document document = mapperLocation.getDocument();
+                    Document document = documentMapperDefine.getDocument();
+                    String name = documentMapperDefine.getMapperDefine().getMapperInterface().getName();
                     XPathParser xPathParser = new XPathParser(document, true, configuration.getVariables(), new XMLMapperEntityResolver());
-                    XMLMapperBuilder xmlMapperBuilder = new XMLMapperBuilder(xPathParser, configuration, mapperLocation.toString(), configuration.getSqlFragments());
+                    XMLMapperBuilder xmlMapperBuilder = new XMLMapperBuilder(xPathParser, configuration, name, configuration.getSqlFragments());
                     xmlMapperBuilder.parse();
+                 //   Class<?> mapperInterface = documentMapperDefine.getMapperDefine().getMapperInterface();
+                  //  configuration.addMapper(mapperInterface);
                 } catch (Exception e) {
-                    throw new YaoMybatisException("Failed to parse mapping resource: '" + mapperLocation + "'", e);
+                    throw new YaoMybatisException("Failed to parse mapping resource: '" + documentMapperDefine + "'", e);
                 } finally {
                     ErrorContext.instance().reset();
                 }
 
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Parsed mapper file: '" + mapperLocation + "'");
+                    LOGGER.debug("Parsed mapper file: '" + documentMapperDefine + "'");
                 }
             }
         } else {

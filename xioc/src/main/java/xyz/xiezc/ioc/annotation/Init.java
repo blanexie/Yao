@@ -11,5 +11,4 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Init {
 
-    Class<? extends AnnotationHandler> annotatonHandler = InitAnnotationHandler.class;
 }

@@ -11,7 +11,6 @@ import java.util.Set;
 @Data
 public class EntityTableDefine {
 
-
     public static final Class ExampleName = Example.class;
 
     /**

@@ -38,21 +38,6 @@ public class MapperDefine {
      */
     Class<?> mapperInterface;
 
-    /**
-     * 生成的代理类
-     */
-    Object mapper;
-
-
-    public BeanDefinition toBeanDefinition() {
-        BeanDefinition beanDefinition = new BeanDefinition();
-        beanDefinition.setBean(mapper);
-        beanDefinition.setBeanClass(mapperInterface);
-        beanDefinition.setBeanName(mapperInterface.getName());
-        beanDefinition.setBeanStatus(BeanStatusEnum.Completed);
-        return beanDefinition;
-    }
-
     public MapperDefine(Class<?> mapperInterface) {
         this.init(mapperInterface);
     }

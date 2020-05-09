@@ -51,7 +51,8 @@ public class WebServerListener implements ApplicationListener {
     @Override
     public void doExecute(ApplicationEvent applicationEvent) {
         log.info("正在启动web服务.........");
-        List<BeanDefinition> beanDefinitions = Xioc.getApplicationContext().getBeanDefinitions(HttpMessageConverter.class);
+        List<BeanDefinition> beanDefinitions = Xioc.getApplicationContext()
+                .getBeanDefinitions(HttpMessageConverter.class);
         for (BeanDefinition beanDefinition : beanDefinitions) {
             HttpMessageConverter httpMessageConverter = beanDefinition.getBean();
             List<ContentType> supportContentType = httpMessageConverter.getSupportContentType();

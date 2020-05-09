@@ -20,5 +20,4 @@ public @interface Value {
 
     String value() default "";
 
-    Class<? extends AnnotationHandler> annotatonHandler () default ValueAnnotationHandler.class;
 }

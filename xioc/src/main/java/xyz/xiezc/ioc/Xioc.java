@@ -57,10 +57,8 @@ public final class Xioc {
         xioc.loadBeanDefinition(clazz, beanLoadUtil);
         //加载BeanFactoryUtil,并简单初始化bean创建器
         beanLoadUtil.loadBeanCreateStategy();
-
+        //加载注解处理器
         beanLoadUtil.loadAnnotationHandler();
-
-
         //加载容器中的事件处理相关的bean
         beanLoadUtil.loadEventListener();
         log.info("xioc的事件处理器加载完成");

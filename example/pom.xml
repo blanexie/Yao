@@ -19,17 +19,6 @@
         </dependency>
         <dependency>
             <groupId>xyz.xiezc</groupId>
-            <artifactId>starter</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>xyz.xiezc</groupId>
-            <artifactId>xweb</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>xyz.xiezc</groupId>
             <artifactId>xorm</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>

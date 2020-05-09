@@ -6,6 +6,7 @@ import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 import lombok.Getter;
 import lombok.Setter;
+import xyz.xiezc.ioc.Xioc;
 import xyz.xiezc.ioc.enums.BeanStatusEnum;
 import xyz.xiezc.ioc.enums.BeanTypeEnum;
 
@@ -70,12 +71,14 @@ public class BeanDefinition {
 
     /**
      * 需要在初始化完成后进行调用的方法
+     *
      * @Init
      */
     private MethodDefinition initMethodDefinition;
 
     /**
      * methodBean 的类型的bean调用的方法
+     *
      * @Bean
      */
     private MethodDefinition invokeMethodBean;
@@ -85,13 +88,13 @@ public class BeanDefinition {
      */
     private Object bean;
 
-    public Object getFactoryBean(){
+
+    public <T> T getFactoryBean() {
         if (getBeanTypeEnum() == BeanTypeEnum.factoryBean) {
-            return bean;
+            return (T) bean;
         }
         return null;
     }
-
 
     /**
      * 返回具体的bean实例
@@ -100,10 +103,13 @@ public class BeanDefinition {
      * @return
      */
     public <T> T getBean() {
-        if (getBeanTypeEnum() == BeanTypeEnum.factoryBean) {
-            return ReflectUtil.invoke(bean, "getObject");
+        if (bean == null) {
+            Xioc.getApplicationContext().createBean(this);
         }
-        return (T) bean;
+        if (getBeanTypeEnum() == BeanTypeEnum.factoryBean) {
+            return ReflectUtil.invoke(this.bean, "getObject");
+        }
+        return (T) this.bean;
     }
 
     public boolean checkBean() {

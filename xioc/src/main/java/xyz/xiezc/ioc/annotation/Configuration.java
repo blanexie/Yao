@@ -18,8 +18,8 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Configuration {
-    String value() default "";
 
+    String value() default "";
 
     Class<? extends AnnotationHandler> annotatonHandler() default ConfigurationAnnotationHandler.class;
 }
