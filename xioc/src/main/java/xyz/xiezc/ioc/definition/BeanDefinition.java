@@ -107,7 +107,7 @@ public class BeanDefinition {
             Xioc.getApplicationContext().createBean(this);
         }
         if (getBeanTypeEnum() == BeanTypeEnum.factoryBean) {
-            return ReflectUtil.invoke(this.bean, "getObject");
+            return (T) ((FactoryBean) this.bean).getObject();
         }
         return (T) this.bean;
     }

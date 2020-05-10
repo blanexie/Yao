@@ -1,17 +1,19 @@
 package xyz.xiezc.ioc.starter.web.handler;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.convert.Convert;
-import cn.hutool.core.util.ClassUtil;
+import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.multipart.DefaultHttpDataFactory;
+import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder;
+import io.netty.handler.codec.http.multipart.InterfaceHttpData;
+import io.netty.handler.codec.http.multipart.MemoryAttribute;
 import xyz.xiezc.ioc.annotation.Component;
 import xyz.xiezc.ioc.definition.MethodDefinition;
 import xyz.xiezc.ioc.definition.ParamDefinition;
-import xyz.xiezc.ioc.starter.web.DispatcherHandler;
 import xyz.xiezc.ioc.starter.web.common.ContentType;
 import xyz.xiezc.ioc.starter.web.entity.HttpRequest;
-import xyz.xiezc.ioc.starter.web.entity.HttpResponse;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,9 +25,11 @@ public class QueryStrHttpMessageConverter implements HttpMessageConverter {
         return CollUtil.newArrayList(ContentType.Default);
     }
 
+
+
     @Override
-    public Object[] doRead(MethodDefinition methodDefinition, ContentType contentType, HttpRequest request) throws IOException {
-        Map<String, List<String>> paramMap = request.getParamMap();
+    public Object[] doRead(MethodDefinition methodDefinition, ContentType contentType, HttpRequest request)  {
+        Map<String, List<String>> paramMap = request.getQueryParamMap();
         ParamDefinition[] paramDefinitions = methodDefinition.getParamDefinitions();
         Object[] paramObjs = new Object[paramDefinitions.length];
         for (int i = 0; i < paramDefinitions.length; i++) {

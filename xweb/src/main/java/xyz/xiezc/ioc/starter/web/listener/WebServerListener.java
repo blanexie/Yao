@@ -15,7 +15,6 @@ import xyz.xiezc.ioc.starter.web.DispatcherHandler;
 import xyz.xiezc.ioc.starter.web.WebServerBootstrap;
 import xyz.xiezc.ioc.starter.web.common.ContentType;
 import xyz.xiezc.ioc.starter.web.handler.HttpMessageConverter;
-import xyz.xiezc.ioc.starter.web.netty.NettyWebServerBootstrap;
 
 import java.util.List;
 
@@ -51,15 +50,6 @@ public class WebServerListener implements ApplicationListener {
     @Override
     public void doExecute(ApplicationEvent applicationEvent) {
         log.info("正在启动web服务.........");
-        List<BeanDefinition> beanDefinitions = Xioc.getApplicationContext()
-                .getBeanDefinitions(HttpMessageConverter.class);
-        for (BeanDefinition beanDefinition : beanDefinitions) {
-            HttpMessageConverter httpMessageConverter = beanDefinition.getBean();
-            List<ContentType> supportContentType = httpMessageConverter.getSupportContentType();
-            for (ContentType contentType : supportContentType) {
-                DispatcherHandler.httpMessageConverterMap.put(contentType, httpMessageConverter);
-            }
-        }
         webServerBootstrap.startWebServer(ssl, port);
     }
 

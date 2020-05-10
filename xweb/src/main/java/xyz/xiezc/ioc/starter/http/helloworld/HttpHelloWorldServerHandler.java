@@ -37,10 +37,14 @@ public class HttpHelloWorldServerHandler extends SimpleChannelInboundHandler<Htt
 
     @Override
     public void channelRead0(ChannelHandlerContext ctx, HttpObject msg) {
-        if (msg instanceof HttpRequest) {
-            HttpRequest req = (HttpRequest) msg;
+        if (msg instanceof FullHttpRequest) {
+            FullHttpRequest req = (FullHttpRequest) msg;
 
             boolean keepAlive = HttpUtil.isKeepAlive(req);
+
+
+
+
             FullHttpResponse response = new DefaultFullHttpResponse(req.protocolVersion(), OK,
                                                                     Unpooled.wrappedBuffer(CONTENT));
             response.headers()

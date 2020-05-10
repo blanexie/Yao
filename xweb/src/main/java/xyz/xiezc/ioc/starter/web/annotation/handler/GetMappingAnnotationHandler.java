@@ -1,6 +1,7 @@
 package xyz.xiezc.ioc.starter.web.annotation.handler;
 
 import cn.hutool.core.annotation.AnnotationUtil;
+import cn.hutool.core.bean.DynaBean;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.URLUtil;
@@ -27,6 +28,9 @@ public class GetMappingAnnotationHandler extends AnnotationHandler<GetMapping> {
     @Override
     public void processClass(GetMapping annotation, Class clazz, ApplicationContextUtil contextUtil) {
 
+        
+
+
     }
 
     @Override
@@ -39,6 +43,9 @@ public class GetMappingAnnotationHandler extends AnnotationHandler<GetMapping> {
         String path = StrUtil.join("/", controllerMapping, methodReqMapping);
         path = "/" + path;
         DispatcherHandler.getMethods.put(FileUtil.normalize(path), methodDefinition);
+
+
+
     }
 
     @Override

@@ -20,6 +20,10 @@ public class ControllerAnnotationHandler extends AnnotationHandler<Controller> {
 
     @Override
     public void processClass(Controller annotation, Class clazz, ApplicationContextUtil contextUtil) {
+
+
+
+
 //        BeanDefinition beanDefinition =dealBeanAnnotation(annotation, clazz, contextUtil);
 //        Class<?> beanClass =getRealBeanClass(beanDefinition);
 //        String value = annotation.value();

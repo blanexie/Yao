@@ -18,11 +18,19 @@ package xyz.xiezc.ioc.starter.http.helloworld;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.handler.codec.http.HttpServerCodec;
-import io.netty.handler.codec.http.HttpServerExpectContinueHandler;
+import io.netty.handler.codec.http.*;
+import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
+import io.netty.handler.codec.http.websocketx.extensions.compression.WebSocketServerCompressionHandler;
 import io.netty.handler.ssl.SslContext;
+import io.netty.handler.stream.ChunkedWriteHandler;
+import xyz.xiezc.ioc.starter.http.file.HttpStaticFileServerHandler;
+import xyz.xiezc.ioc.starter.http.upload.HttpUploadServerHandler;
+import xyz.xiezc.ioc.starter.http.websocketx.server.WebSocketFrameHandler;
+import xyz.xiezc.ioc.starter.http.websocketx.server.WebSocketIndexPageHandler;
 
 public class HttpHelloWorldServerInitializer extends ChannelInitializer<SocketChannel> {
+
+    private static final String WEBSOCKET_PATH = "/websocket";
 
     private final SslContext sslCtx;
 
@@ -32,12 +40,31 @@ public class HttpHelloWorldServerInitializer extends ChannelInitializer<SocketCh
 
     @Override
     public void initChannel(SocketChannel ch) {
-        ChannelPipeline p = ch.pipeline();
+        ChannelPipeline pipeline = ch.pipeline();
         if (sslCtx != null) {
-            p.addLast(sslCtx.newHandler(ch.alloc()));
+            pipeline.addLast(sslCtx.newHandler(ch.alloc()));
         }
-        p.addLast(new HttpServerCodec());
-        p.addLast(new HttpServerExpectContinueHandler());
-        p.addLast(new HttpHelloWorldServerHandler());
+        //正常的请求
+        pipeline.addLast(new HttpServerCodec());
+        pipeline.addLast(new HttpServerExpectContinueHandler());
+        pipeline.addLast(new HttpHelloWorldServerHandler());
+
+        //文件下载
+        pipeline.addLast(new HttpObjectAggregator(65536));
+        pipeline.addLast(new ChunkedWriteHandler());
+        pipeline.addLast(new HttpStaticFileServerHandler());
+
+        //文件上传
+        // Remove the following line if you don't want automatic content compression.
+        pipeline.addLast(new HttpContentCompressor());
+        pipeline.addLast(new HttpUploadServerHandler());
+
+        //WebSocket
+        pipeline.addLast(new HttpObjectAggregator(65536));
+        pipeline.addLast(new WebSocketServerCompressionHandler());
+        pipeline.addLast(new WebSocketServerProtocolHandler(WEBSOCKET_PATH, null, true));
+        pipeline.addLast(new WebSocketIndexPageHandler(WEBSOCKET_PATH));
+        pipeline.addLast(new WebSocketFrameHandler());
+
     }
 }
