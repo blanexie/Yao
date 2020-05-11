@@ -364,7 +364,7 @@ public class SqlSessionFactoryBean implements FactoryBean<SqlSessionFactory> {
      * {@inheritDoc}
      */
     @Init
-    public void afterPropertiesSet() throws Exception {
+    public void afterPropertiesSet() {
 
         notNull(dataSource, "Property 'dataSource' is required");
         notNull(sqlSessionFactoryBuilder, "Property 'sqlSessionFactoryBuilder' is required");
@@ -384,7 +384,7 @@ public class SqlSessionFactoryBean implements FactoryBean<SqlSessionFactory> {
      * @return SqlSessionFactory
      * @throws IOException if loading the config file failed
      */
-    protected SqlSessionFactory buildSqlSessionFactory() throws IOException {
+    protected SqlSessionFactory buildSqlSessionFactory() {
 
         Configuration configuration;
 
@@ -512,8 +512,8 @@ public class SqlSessionFactoryBean implements FactoryBean<SqlSessionFactory> {
                     XPathParser xPathParser = new XPathParser(document, true, configuration.getVariables(), new XMLMapperEntityResolver());
                     XMLMapperBuilder xmlMapperBuilder = new XMLMapperBuilder(xPathParser, configuration, name, configuration.getSqlFragments());
                     xmlMapperBuilder.parse();
-                 //   Class<?> mapperInterface = documentMapperDefine.getMapperDefine().getMapperInterface();
-                  //  configuration.addMapper(mapperInterface);
+                    //   Class<?> mapperInterface = documentMapperDefine.getMapperDefine().getMapperInterface();
+                    //  configuration.addMapper(mapperInterface);
                 } catch (Exception e) {
                     throw new YaoMybatisException("Failed to parse mapping resource: '" + documentMapperDefine + "'", e);
                 } finally {
@@ -537,7 +537,7 @@ public class SqlSessionFactoryBean implements FactoryBean<SqlSessionFactory> {
      * {@inheritDoc}
      */
     @Override
-    public SqlSessionFactory getObject() throws Exception {
+    public SqlSessionFactory getObject() {
         if (this.sqlSessionFactory == null) {
             afterPropertiesSet();
         }

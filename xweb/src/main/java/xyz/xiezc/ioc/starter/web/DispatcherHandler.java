@@ -7,16 +7,15 @@ import cn.hutool.json.JSONUtil;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 import io.netty.buffer.Unpooled;
-import io.netty.handler.codec.http.DefaultFullHttpResponse;
-import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.FullHttpResponse;
-import io.netty.handler.codec.http.HttpUtil;
+import io.netty.handler.codec.http.*;
 import xyz.xiezc.ioc.Xioc;
 import xyz.xiezc.ioc.annotation.Component;
 import xyz.xiezc.ioc.annotation.Init;
 import xyz.xiezc.ioc.definition.BeanDefinition;
 import xyz.xiezc.ioc.definition.MethodDefinition;
 import xyz.xiezc.ioc.starter.web.common.ContentType;
+import xyz.xiezc.ioc.starter.web.common.XWebException;
+import xyz.xiezc.ioc.starter.web.common.XWebUtil;
 import xyz.xiezc.ioc.starter.web.entity.HttpRequest;
 import xyz.xiezc.ioc.starter.web.handler.HttpMessageConverter;
 
@@ -61,12 +60,10 @@ public class DispatcherHandler {
         } else if (StrUtil.equalsIgnoreCase(method, "post")) {
             methodDefinition = postMethods.get(httpRequest.getPath());
         } else {
-            String content = "{\"msg\":\"目前只支持GET和POST请求\"}";
-            throw new RuntimeException(content);
+            throw new XWebException(HttpResponseStatus.NOT_FOUND.code(), "目前只支持GET和POST请求");
         }
         if (methodDefinition == null) {
-            String content = "{\"msg\":\"" + httpRequest.getPath() + " 路径没找到\"}";
-            throw new RuntimeException(content);
+            throw new XWebException(HttpResponseStatus.NOT_FOUND.code(), "路径没找到");
         }
         return methodDefinition;
     }
@@ -106,26 +103,26 @@ public class DispatcherHandler {
             return response;
         } catch (Exception e) {
             log.error(e);
-            FullHttpRequest fullHttpRequest = httpRequest.getFullHttpRequest();
-            FullHttpResponse response = new DefaultFullHttpResponse(fullHttpRequest.protocolVersion(), OK,
-                    Unpooled.wrappedBuffer(JSONUtil.toJsonStr(e.getMessage()).getBytes(CharsetUtil.CHARSET_UTF_8)));
-            return response;
+            return XWebUtil.getErrorResponse(new XWebException(e));
         }
+
+
     }
 
 
     private FullHttpResponse getFullHttpResponse(Object result, HttpRequest httpRequest) throws UnsupportedEncodingException {
-        FullHttpRequest fullHttpRequest = httpRequest.getFullHttpRequest();
-        FullHttpResponse response = new DefaultFullHttpResponse(fullHttpRequest.protocolVersion(), OK,
+        if (result == null) {
+            result = "";
+        }
+        FullHttpResponse response = new DefaultFullHttpResponse(httpRequest.getHttpVersion(), OK,
                 Unpooled.wrappedBuffer(JSONUtil.toJsonStr(result).getBytes(CharsetUtil.UTF_8)));
         response.headers()
                 .set(CONTENT_TYPE, ContentType.JSON.getValue())
                 .setInt(CONTENT_LENGTH, response.content().readableBytes());
 
-        boolean keepAlive = HttpUtil.isKeepAlive(fullHttpRequest);
-
+        boolean keepAlive = httpRequest.isKeepAlive();
         if (keepAlive) {
-            if (!fullHttpRequest.protocolVersion().isKeepAliveDefault()) {
+            if (!httpRequest.getHttpVersion().isKeepAliveDefault()) {
                 response.headers().set(CONNECTION, keepAlive);
             }
         } else {
