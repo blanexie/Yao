@@ -93,6 +93,8 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
         } else {
             handshaker.handshake(ctx.channel(), req);
         }
+
+
     }
 
     private void handleWebSocketFrame(ChannelHandlerContext ctx, WebSocketFrame frame) {
