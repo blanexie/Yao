@@ -17,7 +17,7 @@ import xyz.xiezc.ioc.starter.web.common.ContentType;
 import xyz.xiezc.ioc.starter.web.common.XWebException;
 import xyz.xiezc.ioc.starter.web.common.XWebUtil;
 import xyz.xiezc.ioc.starter.web.entity.HttpRequest;
-import xyz.xiezc.ioc.starter.web.handler.HttpMessageConverter;
+import xyz.xiezc.ioc.starter.web.converter.HttpMessageConverter;
 
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;

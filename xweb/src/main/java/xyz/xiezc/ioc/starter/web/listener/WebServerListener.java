@@ -3,20 +3,13 @@ package xyz.xiezc.ioc.starter.web.listener;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 import lombok.SneakyThrows;
-import xyz.xiezc.ioc.Xioc;
 import xyz.xiezc.ioc.annotation.EventListener;
 import xyz.xiezc.ioc.annotation.Inject;
 import xyz.xiezc.ioc.annotation.Value;
 import xyz.xiezc.ioc.common.event.ApplicationEvent;
 import xyz.xiezc.ioc.common.event.ApplicationListener;
-import xyz.xiezc.ioc.definition.BeanDefinition;
 import xyz.xiezc.ioc.enums.EventNameConstant;
-import xyz.xiezc.ioc.starter.web.DispatcherHandler;
 import xyz.xiezc.ioc.starter.web.WebServerBootstrap;
-import xyz.xiezc.ioc.starter.web.common.ContentType;
-import xyz.xiezc.ioc.starter.web.handler.HttpMessageConverter;
-
-import java.util.List;
 
 @EventListener(eventName = {EventNameConstant.XiocEnd})
 public class WebServerListener implements ApplicationListener {

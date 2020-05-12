@@ -3,7 +3,6 @@ package xyz.xiezc.ioc.starter.web.annotation.handler;
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.core.util.URLUtil;
 import xyz.xiezc.ioc.ApplicationContextUtil;
 import xyz.xiezc.ioc.annotation.AnnotationHandler;
 import xyz.xiezc.ioc.annotation.Component;

@@ -13,23 +13,16 @@ import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.SelfSignedCertificate;
 import xyz.xiezc.ioc.annotation.BeanScan;
 import xyz.xiezc.ioc.annotation.Configuration;
-import xyz.xiezc.ioc.annotation.Init;
-import xyz.xiezc.ioc.common.context.impl.BeanDefinitionContextUtil;
-import xyz.xiezc.ioc.definition.BeanDefinition;
-import xyz.xiezc.ioc.starter.http.helloworld.HttpHelloWorldServerInitializer;
 import xyz.xiezc.ioc.starter.web.WebServerBootstrap;
-
-import java.util.HashMap;
-import java.util.Map;
+import xyz.xiezc.ioc.starter.web.netty.NettyWebServerInitializer;
 
 @Configuration
 @BeanScan(basePackages = {"xyz.xiezc.ioc.starter.web"})
 public class WebConfiguration implements WebServerBootstrap {
 
 
-
     @Override
-    public void startWebServer(boolean ssl, int port,String staticPath) throws Exception {
+    public void startWebServer(boolean ssl, int port, String staticPath) throws Exception {
         // Configure SSL.
         final SslContext sslCtx;
         if (ssl) {
@@ -48,12 +41,12 @@ public class WebConfiguration implements WebServerBootstrap {
             b.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
                     .handler(new LoggingHandler(LogLevel.INFO))
-                    .childHandler(new HttpHelloWorldServerInitializer(sslCtx,staticPath));
+                    .childHandler(new NettyWebServerInitializer(sslCtx, staticPath));
 
             Channel ch = b.bind(port).sync().channel();
 
             System.err.println("Open your web browser and navigate to " +
-                    (ssl? "https" : "http") + "://127.0.0.1:" + port + '/');
+                    (ssl ? "https" : "http") + "://127.0.0.1:" + port + '/');
 
             ch.closeFuture().sync();
         } finally {
