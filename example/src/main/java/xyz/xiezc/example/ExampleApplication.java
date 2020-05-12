@@ -4,6 +4,7 @@ package xyz.xiezc.example;
 import cn.hutool.json.JSONUtil;
 import xyz.xiezc.example.web.Album;
 import xyz.xiezc.example.web.AlbumMapper;
+import xyz.xiezc.example.web.TestController;
 import xyz.xiezc.ioc.Xioc;
 import xyz.xiezc.ioc.annotation.Component;
 import xyz.xiezc.ioc.definition.BeanDefinition;
@@ -18,10 +19,8 @@ public class ExampleApplication {
 
     public static void main(String[] args) {
         Xioc xioc = Xioc.run(ExampleApplication.class);
-//        BeanDefinition injectBeanDefinition = xioc.getApplicationContextUtil().getInjectBeanDefinition(AlbumMapper.class.getName(), AlbumMapper.class);
-//        AlbumMapper bean = injectBeanDefinition.getBean();
-//        Example build = Example.of().createCriteria().andEqualTo(Album::getId, 3500).build();
-//        List<Album> albums = bean.selectByExample(build);
-//        System.out.println(JSONUtil.toJsonStr(albums));
+        BeanDefinition injectBeanDefinition = xioc.getApplicationContextUtil().getBeanDefinition(TestController.class);
+        TestController bean = injectBeanDefinition.getBean();
+
     }
 }

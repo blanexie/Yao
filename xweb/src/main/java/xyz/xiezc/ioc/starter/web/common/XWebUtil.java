@@ -1,6 +1,7 @@
 package xyz.xiezc.ioc.starter.web.common;
 
 import cn.hutool.core.exceptions.ExceptionUtil;
+import cn.hutool.core.util.StrUtil;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpResponse;
@@ -24,6 +25,23 @@ public class XWebUtil {
         );
         response.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/plain; charset=UTF-8");
         return response;
+    }
+
+
+
+    public static String fileExt(String fname) {
+        if (StrUtil.isBlank(fname) || fname.indexOf('.') == -1) {
+            return null;
+        }
+        return fname.substring(fname.lastIndexOf('.') + 1);
+    }
+
+    public static String mimeType(String fileName) {
+        String ext = fileExt(fileName);
+        if (null == ext) {
+            return null;
+        }
+        return MimeType.get(ext);
     }
 
 

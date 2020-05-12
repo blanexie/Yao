@@ -15,39 +15,31 @@
  */
 package xyz.xiezc.ioc.starter.http.file;
 
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
-import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.handler.codec.http.*;
 import io.netty.handler.ssl.SslHandler;
 import io.netty.handler.stream.ChunkedFile;
 import io.netty.util.CharsetUtil;
-import io.netty.util.internal.SystemPropertyUtil;
 import lombok.SneakyThrows;
 import xyz.xiezc.ioc.starter.web.common.ProgressiveFutureListener;
-import xyz.xiezc.ioc.starter.web.common.StringKit;
+import xyz.xiezc.ioc.starter.web.common.XWebException;
+import xyz.xiezc.ioc.starter.web.common.XWebUtil;
 import xyz.xiezc.ioc.starter.web.entity.HttpRequest;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.RandomAccessFile;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.URLConnection;
 import java.net.URLDecoder;
-import java.text.SimpleDateFormat;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
-import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpResponseStatus.*;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_0;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
@@ -98,78 +90,64 @@ import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
  *
  * </pre>
  */
+@ChannelHandler.Sharable
 public class HttpStaticFileServerHandler extends SimpleChannelInboundHandler<HttpRequest> {
 
     public static final String HTTP_DATE_FORMAT = "EEE, dd MMM yyyy HH:mm:ss zzz";
-    static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(HTTP_DATE_FORMAT, Locale.US);
+    public static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(HTTP_DATE_FORMAT, Locale.US);
     public static final String HTTP_DATE_GMT_TIMEZONE = "GMT";
     public static final int HTTP_CACHE_SECONDS = 60;
 
-    Log log = LogFactory.get(HttpStaticFileServerHandler.class);
+    public String staticPath;
+
+    public HttpStaticFileServerHandler(String staticPath) {
+        String s = ClassUtil.getClassPath() + File.separatorChar + staticPath;
+        File file = new File(s);
+        FileUtil.mkdir(file);
+        this.staticPath = s;
+    }
 
 
     @Override
     public void channelRead0(ChannelHandlerContext ctx, HttpRequest request) throws Exception {
-        this.handle(ctx, request);
+        try {
+            this.handle(ctx, request);
+        } catch (Exception e) {
+            FullHttpResponse errorResponse = XWebUtil.getErrorResponse(new XWebException(e));
+            this.sendAndCleanupConnection(ctx, errorResponse, request.isKeepAlive());
+        }
     }
 
 
     @SneakyThrows
     public void handle(ChannelHandlerContext ctx, HttpRequest httpRequest) {
-        io.netty.handler.codec.http.HttpRequest request = httpRequest.getNettyHttpRequest();
-        boolean keepAlive = HttpUtil.isKeepAlive(request);
+        FullHttpRequest request = httpRequest.getNettyHttpRequest();
+        boolean keepAlive = httpRequest.isKeepAlive();
+        //获取静态文件
+        File file = getStaticFile(ctx, request, keepAlive);
+        if (file == null) return;
 
-        final String uri = request.uri();
-        final String path = sanitizeUri(uri);
+        // 检查文件是否有修改，如果没有，直接返回前端
+        if (checkCacheValidation(ctx, request, keepAlive, file)) return;
 
-        File file = new File(path);
-        if (file.isHidden() || !file.exists()) {
-            this.sendError(ctx, NOT_FOUND, keepAlive);
-            return;
-        }
-
-        if (!file.isFile()) {
-            sendError(ctx, FORBIDDEN, keepAlive);
-            return;
-        }
-
-        // Cache Validation
-        String ifModifiedSince = request.headers().get(HttpHeaderNames.IF_MODIFIED_SINCE);
-        if (StrUtil.isNotBlank(ifModifiedSince)) {
-            LocalDateTime ifModifiedSinceDate = LocalDateTime.parse(ifModifiedSince, dateTimeFormatter);
-            LocalDateTime fileLastModifiedDate = LocalDateTime.ofEpochSecond(file.lastModified() / 1000, 0, ZoneOffset.ofHours(8));
-            Duration between = Duration.between(ifModifiedSinceDate, fileLastModifiedDate);
-            long seconds = between.getSeconds();
-            if (seconds == 0) {
-                this.sendNotModified(ctx, keepAlive);
-                return;
-            }
-        }
-
-        RandomAccessFile raf;
-        try {
-            raf = new RandomAccessFile(file, "r");
+        try (RandomAccessFile raf = new RandomAccessFile(file, "r")) {
+            //生成响应信息，并设置基本属性
+            HttpResponse response = getHttpResponse(request, file);
+            // Write the initial line and the header.
+            ctx.write(response);
+            // Write the content.
+            writeFile(ctx, keepAlive, raf);
         } catch (FileNotFoundException ignore) {
             sendError(ctx, NOT_FOUND, keepAlive);
             return;
         }
+    }
+
+
+
+
+    private void writeFile(ChannelHandlerContext ctx, boolean keepAlive, RandomAccessFile raf) throws IOException {
         long fileLength = raf.length();
-
-        HttpResponse response = new DefaultHttpResponse(HTTP_1_1, OK);
-        HttpUtil.setContentLength(response, fileLength);
-        setContentTypeHeader(response, file);
-        setDateAndCacheHeaders(response, file);
-
-        if (!HttpUtil.isKeepAlive(request)) {
-            response.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.CLOSE);
-        } else if (request.protocolVersion().equals(HTTP_1_0)) {
-            response.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
-        }
-
-        // Write the initial line and the header.
-        ctx.write(response);
-
-        // Write the content.
         ChannelFuture sendFileFuture;
         ChannelFuture lastContentFuture;
         if (ctx.pipeline().get(SslHandler.class) == null) {
@@ -177,7 +155,6 @@ public class HttpStaticFileServerHandler extends SimpleChannelInboundHandler<Htt
                     new DefaultFileRegion(raf.getChannel(), 0, fileLength),
                     ctx.newProgressivePromise()
             );
-
             // Write the end marker.
             lastContentFuture = ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);
 
@@ -198,6 +175,52 @@ public class HttpStaticFileServerHandler extends SimpleChannelInboundHandler<Htt
         }
     }
 
+    private HttpResponse getHttpResponse(FullHttpRequest request, File file) {
+
+        HttpResponse response = new DefaultHttpResponse(HTTP_1_1, OK);
+        HttpUtil.setContentLength(response, file.length());
+        setContentTypeHeader(response, file);
+        setDateAndCacheHeaders(response, file);
+
+        if (!HttpUtil.isKeepAlive(request)) {
+            response.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.CLOSE);
+        } else if (request.protocolVersion().equals(HTTP_1_0)) {
+            response.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
+        }
+        return response;
+    }
+
+    private boolean checkCacheValidation(ChannelHandlerContext ctx, FullHttpRequest request, boolean keepAlive, File file) {
+        String ifModifiedSince = request.headers().get(HttpHeaderNames.IF_MODIFIED_SINCE);
+        if (StrUtil.isNotBlank(ifModifiedSince)) {
+            LocalDateTime ifModifiedSinceDate = LocalDateTime.parse(ifModifiedSince, dateTimeFormatter);
+            LocalDateTime fileLastModifiedDate = LocalDateTime.ofEpochSecond(file.lastModified() / 1000, 0, ZoneOffset.ofHours(8));
+            Duration between = Duration.between(ifModifiedSinceDate, fileLastModifiedDate);
+            long seconds = between.getSeconds();
+            if (seconds == 0) {
+                this.sendNotModified(ctx, keepAlive);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private File getStaticFile(ChannelHandlerContext ctx, FullHttpRequest request, boolean keepAlive) {
+        final String uri = request.uri();
+        final String path = sanitizeUri(uri);
+        File file = new File(path);
+        if (file.isHidden() || !file.exists()) {
+            this.sendError(ctx, NOT_FOUND, keepAlive);
+            return null;
+        }
+
+        if (!file.isFile()) {
+            sendError(ctx, FORBIDDEN, keepAlive);
+            return null;
+        }
+        return file;
+    }
+
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         cause.printStackTrace();
@@ -208,7 +231,7 @@ public class HttpStaticFileServerHandler extends SimpleChannelInboundHandler<Htt
 
     private static final Pattern INSECURE_URI = Pattern.compile(".*[<>&\"].*");
 
-    private static String sanitizeUri(String uri) {
+    private String sanitizeUri(String uri) {
         // Decode the path.
         try {
             uri = URLDecoder.decode(uri, "UTF-8");
@@ -232,7 +255,7 @@ public class HttpStaticFileServerHandler extends SimpleChannelInboundHandler<Htt
             return null;
         }
         // Convert to absolute path.
-        return ClassUtil.getClassPath() + File.separator + uri;
+        return this.staticPath + File.separator + uri;
     }
 
 
@@ -252,7 +275,6 @@ public class HttpStaticFileServerHandler extends SimpleChannelInboundHandler<Htt
     private void sendNotModified(ChannelHandlerContext ctx, boolean keepAlive) {
         FullHttpResponse response = new DefaultFullHttpResponse(HTTP_1_1, NOT_MODIFIED, Unpooled.EMPTY_BUFFER);
         setDateHeader(response);
-
         this.sendAndCleanupConnection(ctx, response, keepAlive);
     }
 
@@ -298,7 +320,7 @@ public class HttpStaticFileServerHandler extends SimpleChannelInboundHandler<Htt
         // Date header
         ZoneId of = ZoneId.of(HTTP_DATE_GMT_TIMEZONE);
         ZonedDateTime zonedDateTime = LocalDateTime.now().atZone(of);
-        response.headers().set(HttpHeaderNames.DATE,     dateTimeFormatter.format(zonedDateTime));
+        response.headers().set(HttpHeaderNames.DATE, dateTimeFormatter.format(zonedDateTime));
         // Add cache headers
         response.headers().set(HttpHeaderNames.EXPIRES, zonedDateTime.plusSeconds(HTTP_CACHE_SECONDS).format(dateTimeFormatter));
         response.headers().set(HttpHeaderNames.CACHE_CONTROL, "private, max-age=" + HTTP_CACHE_SECONDS);
@@ -322,7 +344,7 @@ public class HttpStaticFileServerHandler extends SimpleChannelInboundHandler<Htt
      * @param file     file to extract content type
      */
     private static void setContentTypeHeader(HttpResponse response, File file) {
-        String contentType = StringKit.mimeType(file.getName());
+        String contentType = XWebUtil.mimeType(file.getName());
         if (null == contentType) {
             contentType = URLConnection.guessContentTypeFromName(file.getName());
         }

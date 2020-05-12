@@ -26,8 +26,10 @@ import java.util.Map;
 @BeanScan(basePackages = {"xyz.xiezc.ioc.starter.web"})
 public class WebConfiguration implements WebServerBootstrap {
 
+
+
     @Override
-    public void startWebServer(boolean ssl, int port) throws Exception {
+    public void startWebServer(boolean ssl, int port,String staticPath) throws Exception {
         // Configure SSL.
         final SslContext sslCtx;
         if (ssl) {
@@ -46,7 +48,7 @@ public class WebConfiguration implements WebServerBootstrap {
             b.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
                     .handler(new LoggingHandler(LogLevel.INFO))
-                    .childHandler(new HttpHelloWorldServerInitializer(sslCtx));
+                    .childHandler(new HttpHelloWorldServerInitializer(sslCtx,staticPath));
 
             Channel ch = b.bind(port).sync().channel();
 

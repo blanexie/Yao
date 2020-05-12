@@ -1,5 +1,7 @@
 package xyz.xiezc.ioc.starter.web.entity;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.map.MapUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.http.*;
@@ -7,10 +9,7 @@ import io.netty.handler.codec.http.cookie.Cookie;
 import io.netty.util.CharsetUtil;
 import lombok.Data;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Data
 public class HttpRequest {
@@ -20,7 +19,7 @@ public class HttpRequest {
     /**
      * netty的request
      */
-    io.netty.handler.codec.http.HttpRequest nettyHttpRequest;
+    FullHttpRequest nettyHttpRequest;
 
     String path;
 
@@ -32,46 +31,29 @@ public class HttpRequest {
 
     boolean keepAlive;
 
-    String remoteAddress;
-
-    List<HttpContent> contents = new LinkedList<>();
-
     /**
      * 请求地址中的参数
      */
-    Map<String, List<String>> queryParamMap;
+    Map<String, List<String>> queryParamMap = new HashMap<>();
 
     /**
      * body中的参数
      */
-    Map<String, List<String>> bodyParamMap;
+    Map<String, List<String>> bodyParamMap = new HashMap<>();
 
     /**
      * 上传的文件
      */
-    Map<String, FileItem> fileItems;
+    Map<String, FileItem> fileItems = new HashMap<>();
 
+    /**
+     * cookie 信息
+     */
+    Set<Cookie> cookies = new HashSet<>();
 
-    Set<Cookie> cookies;
-
+    /**
+     * body
+     */
     private ByteBuf body = EMPTY_BUF;
-
-    boolean mergeSuccess = false;
-
-
-    public boolean appendContent(HttpContent httpContent) {
-        return contents.add(httpContent);
-    }
-
-    public void setNettyHttpRequest(io.netty.handler.codec.http.HttpRequest nettyHttpRequest) {
-        this.nettyHttpRequest = nettyHttpRequest;
-        QueryStringDecoder queryStringDecoder = new QueryStringDecoder(nettyHttpRequest.uri());
-        queryParamMap = queryStringDecoder.parameters();
-        path = queryStringDecoder.path();
-        HttpMethod method = nettyHttpRequest.method();
-        this.method = method.name();
-        this.httpVersion = nettyHttpRequest.protocolVersion();
-        this.keepAlive = HttpUtil.isKeepAlive(nettyHttpRequest);
-    }
 
 }

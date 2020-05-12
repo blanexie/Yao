@@ -59,9 +59,7 @@ public class JsonHttpMessageConverter implements HttpMessageConverter {
     private Object[] getInvokeParams(HttpRequest request, ParamDefinition paramDefinition) {
         RequestBody requestBody = AnnotationUtil.getAnnotation(paramDefinition.getAnnotatedElement(), RequestBody.class);
         if (requestBody == null) {
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.set("errmsg", "Application/json类型的请求需要配置@RequestBody注解");
-            throw new RuntimeException(jsonObject.toString());
+            throw new XWebException("Application/json类型的请求需要配置@RequestBody注解");
         }
         ByteBuf body = request.getBody();
         CharSequence charSequence = body.readCharSequence(body.readableBytes(), CharsetUtil.CHARSET_UTF_8);
@@ -69,15 +67,16 @@ public class JsonHttpMessageConverter implements HttpMessageConverter {
         Class paramType = paramDefinition.getParamType();
         Object param = null;
         if (ClassUtil.isSimpleValueType(paramType)) {
-            param = JSONUtil.toBean(bodyStr, paramType);
-        }
-        if (paramType.isArray()) {
+
+        } else if (paramType.isArray()) {
             JSONArray objects = JSONUtil.parseArray(bodyStr);
             param = objects.toArray();
-        }
-        if (ClassUtil.isAssignable(Collection.class, paramType)) {
+        } else if (ClassUtil.isAssignable(Collection.class, paramType)) {
             JSONArray objects = JSONUtil.parseArray(bodyStr);
             param = CollUtil.toCollection(objects);
+        } else {
+            //其他类型
+            param = JSONUtil.toBean(bodyStr, paramType);
         }
         return new Object[]{param};
     }

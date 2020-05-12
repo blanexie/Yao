@@ -19,8 +19,9 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
+import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.*;
@@ -46,65 +47,55 @@ import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
  * @author biezhi
  * 2018/10/15
  */
+@ChannelHandler.Sharable
+public class ParseRequestHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
 
-public class MergeRequestHandler extends SimpleChannelInboundHandler<HttpObject> {
+    Log log = LogFactory.get(ParseRequestHandler.class);
 
-    Log log = LogFactory.get(MergeRequestHandler.class);
-
-    private HttpRequest httpRequest;
-
-    private static final HttpDataFactory HTTP_DATA_FACTORY =
-            new DefaultHttpDataFactory(true); // Disk if size exceed
-
-    private static final ByteBuf EMPTY_BUF = Unpooled.copiedBuffer("", CharsetUtil.UTF_8);
-
+    private static final HttpDataFactory HTTP_DATA_FACTORY = new DefaultHttpDataFactory(true); // Disk if size exceed
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, HttpObject msg) {
-        if (msg instanceof io.netty.handler.codec.http.HttpRequest) {
-            httpRequest = new HttpRequest();
-            httpRequest.setNettyHttpRequest((io.netty.handler.codec.http.HttpRequest) msg);
-            return;
-        }
-        if (null != httpRequest && msg instanceof HttpContent) {
-            httpRequest.appendContent((HttpContent) msg);
-        }
-        if (msg instanceof LastHttpContent) {
-            if (null != httpRequest) {
-                parseHttpRequest();
-                ctx.fireChannelRead(httpRequest);
-            } else {
-                ctx.fireChannelRead(msg);
-            }
-        }
+    protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest msg) {
+        HttpRequest httpRequest = parseHttpRequest(ctx,msg);
+        ctx.fireChannelRead(httpRequest);
     }
 
-    private void parseHttpRequest() {
+    private HttpRequest parseHttpRequest(ChannelHandlerContext ctx,FullHttpRequest fullHttpRequest) {
         try {
-            io.netty.handler.codec.http.HttpRequest nettyRequest = httpRequest.getNettyHttpRequest();
-            HttpPostRequestDecoder decoder = new HttpPostRequestDecoder(HTTP_DATA_FACTORY, nettyRequest);
-            boolean isMultipart = decoder.isMultipart();
-
-            List<ByteBuf> byteBuffs = new ArrayList<>(httpRequest.getContents().size());
-
-            for (HttpContent content : httpRequest.getContents()) {
-                if (!isMultipart) {
-                    byteBuffs.add(content.content().copy());
+            //构建我们自己的httpRequest
+            HttpRequest httpRequest = new HttpRequest();
+            httpRequest.setNettyHttpRequest(fullHttpRequest);
+            //解析公共的部分
+            QueryStringDecoder queryStringDecoder = new QueryStringDecoder(fullHttpRequest.uri());
+            httpRequest.setQueryParamMap(queryStringDecoder.parameters());
+            httpRequest.setPath(queryStringDecoder.path());
+            httpRequest.setMethod(fullHttpRequest.method().name());
+            httpRequest.setHttpVersion(fullHttpRequest.protocolVersion());
+            httpRequest.setKeepAlive(HttpUtil.isKeepAlive(fullHttpRequest));
+            //判断请求是get还是post
+            if (StrUtil.equalsIgnoreCase("GET", httpRequest.getMethod())) {
+                return httpRequest;
+            }
+            //post 请求
+            if (StrUtil.equalsIgnoreCase("POST", httpRequest.getMethod())) {
+                httpRequest.setContentType(HttpUtil.getMimeType(fullHttpRequest).toString());
+                HttpPostRequestDecoder decoder = new HttpPostRequestDecoder(HTTP_DATA_FACTORY, fullHttpRequest);
+                //非multipart的类型的post请求，请求中只会有一个HttpContent. 所以
+                if (!decoder.isMultipart()) {
+                    ByteBuf content = fullHttpRequest.content();
+                    ByteBuf byteBuf = ByteBufUtil.readBytes(ctx.alloc(), content, content.readableBytes());
+                    httpRequest.setBody(byteBuf);
+                    return httpRequest;
                 }
-
-                decoder.offer(content);
-                this.readHttpDataChunkByChunk(decoder);
-                content.release();
+                //multipart类型的应用
+                this.readHttpDataChunkByChunk(decoder, httpRequest);
+                parseCookies(httpRequest);
+                return httpRequest;
             }
-            if (!byteBuffs.isEmpty()) {
-                httpRequest.setBody(Unpooled.copiedBuffer(byteBuffs.toArray(new ByteBuf[0])));
-            }
-            parseCookies();
-            httpRequest.setMergeSuccess(true);
+            return httpRequest;
         } catch (Exception e) {
             throw new RuntimeException("build decoder fail", e);
         }
-
     }
 
 
@@ -128,7 +119,7 @@ public class MergeRequestHandler extends SimpleChannelInboundHandler<HttpObject>
     /**
      * Example of reading request by chunk and getting values from chunk to chunk
      */
-    private void readHttpDataChunkByChunk(HttpPostRequestDecoder decoder) {
+    private void readHttpDataChunkByChunk(HttpPostRequestDecoder decoder, HttpRequest httpRequest) {
         try {
             HttpData partialContent = null;
             while (decoder.hasNext()) {
@@ -140,7 +131,7 @@ public class MergeRequestHandler extends SimpleChannelInboundHandler<HttpObject>
                     }
                     try {
                         // new value
-                        writeHttpData(data);
+                        writeHttpData(data, httpRequest);
                     } finally {
                         data.release();
                     }
@@ -158,20 +149,20 @@ public class MergeRequestHandler extends SimpleChannelInboundHandler<HttpObject>
         }
     }
 
-    private void writeHttpData(InterfaceHttpData data) {
+    private void writeHttpData(InterfaceHttpData data, HttpRequest httpRequest) {
         try {
             InterfaceHttpData.HttpDataType dataType = data.getHttpDataType();
             if (dataType == InterfaceHttpData.HttpDataType.Attribute) {
-                parseAttribute((Attribute) data);
+                parseAttribute((Attribute) data, httpRequest);
             } else if (dataType == InterfaceHttpData.HttpDataType.FileUpload) {
-                parseFileUpload((FileUpload) data);
+                parseFileUpload((FileUpload) data, httpRequest);
             }
         } catch (IOException e) {
             log.error("Parse request parameter error", e);
         }
     }
 
-    private void parseAttribute(Attribute attribute) throws IOException {
+    private void parseAttribute(Attribute attribute, HttpRequest httpRequest) throws IOException {
         var name = attribute.getName();
         var value = attribute.getValue();
         Map<String, List<String>> parameters = httpRequest.getBodyParamMap();
@@ -191,7 +182,7 @@ public class MergeRequestHandler extends SimpleChannelInboundHandler<HttpObject>
      *
      * @param fileUpload netty http file upload
      */
-    private void parseFileUpload(FileUpload fileUpload) throws IOException {
+    private void parseFileUpload(FileUpload fileUpload, HttpRequest httpRequest) throws IOException {
         if (!fileUpload.isCompleted()) {
             return;
         }
@@ -203,7 +194,7 @@ public class MergeRequestHandler extends SimpleChannelInboundHandler<HttpObject>
         // because FileUpload will be release after completion of the analysis.
         // tmpFile will be deleted automatically if they are used.
         Path tmpFile = Files.createTempFile(
-                Paths.get(fileUpload.getFile().getParent()), "blade_", "_upload");
+                Paths.get(fileUpload.getFile().getParent()), "xweb_", "_upload");
 
         Path fileUploadPath = Paths.get(fileUpload.getFile().getPath());
         Files.move(fileUploadPath, tmpFile, StandardCopyOption.REPLACE_EXISTING);
@@ -222,8 +213,8 @@ public class MergeRequestHandler extends SimpleChannelInboundHandler<HttpObject>
     }
 
 
-    private void parseCookies() {
-        io.netty.handler.codec.http.HttpRequest nettyHttpRequest = httpRequest.getNettyHttpRequest();
+    private void parseCookies(HttpRequest httpRequest) {
+        FullHttpRequest nettyHttpRequest = httpRequest.getNettyHttpRequest();
         HttpHeaders headers = nettyHttpRequest.headers();
         String headerName = "Cookie";
         String cookieStr = "";

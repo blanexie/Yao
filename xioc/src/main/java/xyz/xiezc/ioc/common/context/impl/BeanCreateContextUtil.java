@@ -5,6 +5,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import xyz.xiezc.ioc.annotation.Inject;
+import xyz.xiezc.ioc.common.NullObj;
 import xyz.xiezc.ioc.common.context.BeanCreateContext;
 import xyz.xiezc.ioc.common.context.BeanDefinitionContext;
 import xyz.xiezc.ioc.common.create.BeanCreateStrategy;
@@ -208,6 +209,10 @@ public class BeanCreateContextUtil implements BeanCreateContext {
                 BeanDefinition fieldBeanDefinition = (BeanDefinition) obj;
                 fieldBeanDefinition = this.createBean(fieldBeanDefinition);
                 obj = fieldBeanDefinition.getBean();
+            }
+            //空的对象， 不用注入
+            if (obj instanceof NullObj) {
+                continue;
             }
             if (beanDefinition.getBeanTypeEnum() == BeanTypeEnum.factoryBean) {
                 ReflectUtil.setFieldValue(beanDefinition.getFactoryBean(), fieldDefinition.getFieldName(), obj);

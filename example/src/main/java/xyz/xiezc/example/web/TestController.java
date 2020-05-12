@@ -1,14 +1,16 @@
 package xyz.xiezc.example.web;
 
+import cn.hutool.json.JSONUtil;
 import xyz.xiezc.ioc.starter.web.annotation.Controller;
-import xyz.xiezc.ioc.starter.web.annotation.GetMapping;
+import xyz.xiezc.ioc.starter.web.annotation.PostMapping;
+import xyz.xiezc.ioc.starter.web.annotation.RequestBody;
 
 @Controller("/")
 public class TestController {
 
 
-    @GetMapping("/test.json")
-    public String get(String param) {
-        return param;
+    @PostMapping("/test.json")
+    public String get(@RequestBody  Album param) {
+        return JSONUtil.toJsonStr(param);
     }
 }

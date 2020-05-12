@@ -55,7 +55,7 @@ public final class HttpHelloWorldServer {
             b.group(bossGroup, workerGroup)
              .channel(NioServerSocketChannel.class)
              .handler(new LoggingHandler(LogLevel.INFO))
-             .childHandler(new HttpHelloWorldServerInitializer(sslCtx));
+             .childHandler(new HttpHelloWorldServerInitializer(sslCtx,""));
 
             Channel ch = b.bind(PORT).sync().channel();
 

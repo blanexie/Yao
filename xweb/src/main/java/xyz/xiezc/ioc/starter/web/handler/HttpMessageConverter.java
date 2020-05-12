@@ -22,10 +22,12 @@ import cn.hutool.core.util.ClassUtil;
 import xyz.xiezc.ioc.definition.MethodDefinition;
 import xyz.xiezc.ioc.definition.ParamDefinition;
 import xyz.xiezc.ioc.starter.web.common.ContentType;
+import xyz.xiezc.ioc.starter.web.entity.FileItem;
 import xyz.xiezc.ioc.starter.web.entity.HttpRequest;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Strategy interface that specifies a converter that can convert from and to HTTP requests and responses.
@@ -43,6 +45,30 @@ public interface HttpMessageConverter {
      *
      */
     Object[] doRead(MethodDefinition methodDefinition, ContentType contentType, HttpRequest request);
+
+
+    default Object[] parseFormData(Map<String, FileItem> fileItems, ParamDefinition[] paramDefinitions, Map<String, List<String>> paramMap) {
+        Object[] res = new Object[paramDefinitions.length];
+        for (int i = 0; i < paramDefinitions.length; i++) {
+            ParamDefinition paramDefinition = paramDefinitions[i];
+            String name = paramDefinition.getParamName();
+            if (ClassUtil.isAssignable(FileItem.class, paramDefinition.getParamType())) {
+                if (fileItems == null) {
+                    res[i] = null;
+                } else {
+                    res[i] = fileItems.get(name);
+                }
+                continue;
+            }
+            List<String> collect = paramMap.get(name);
+            if (collect == null) {
+                res[i] = null;
+                continue;
+            }
+            res[i] = paramMapping(collect, paramDefinition);
+        }
+        return res;
+    }
 
     default Object paramMapping(List<String> params, ParamDefinition paramDefinition) {
         Class paramType = paramDefinition.getParamType();

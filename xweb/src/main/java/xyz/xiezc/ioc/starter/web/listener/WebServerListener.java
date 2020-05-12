@@ -35,6 +35,8 @@ public class WebServerListener implements ApplicationListener {
     boolean ssl = true;
     @Value("xweb.server.port")
     int port = 8443;
+    @Value("xweb.static.path")
+    String staticPath = "/static";
 
     @Override
     public boolean getSync() {
@@ -50,8 +52,7 @@ public class WebServerListener implements ApplicationListener {
     @Override
     public void doExecute(ApplicationEvent applicationEvent) {
         log.info("正在启动web服务.........");
-        webServerBootstrap.startWebServer(ssl, port);
+        webServerBootstrap.startWebServer(ssl, port, staticPath);
     }
-
 
 }

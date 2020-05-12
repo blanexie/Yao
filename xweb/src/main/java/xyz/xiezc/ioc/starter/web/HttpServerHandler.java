@@ -91,7 +91,6 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<HttpRequest> 
     }
 
 
-
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         if (!isResetByPeer(cause)) {
@@ -101,6 +100,9 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<HttpRequest> 
         }
     }
 
+    /**
+     * 非post请求，并且请求的路径不在get请求的controller路径中。 则默认是进行静态文件下载
+     */
     private boolean isStaticFile(String method, String path) {
         Set<String> getPaths = DispatcherHandler.getMethods.keySet();
         if (HttpMethod.POST.name().equals(method) || getPaths.contains(path)) {
@@ -108,6 +110,9 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<HttpRequest> 
         }
         return true;
     }
+
+
+
 
     boolean isResetByPeer(Throwable e) {
         if (null != e.getMessage() &&
