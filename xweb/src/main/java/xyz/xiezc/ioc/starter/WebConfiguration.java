@@ -57,7 +57,13 @@ public class WebConfiguration implements WebServerBootstrap {
             b.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
                     .handler(new LoggingHandler(LogLevel.DEBUG))
-                    .childHandler(new NettyWebServerInitializer(sslCtx, dispatcherHandler, staticPath, websocketPath));
+                    .childHandler(new NettyWebServerInitializer(
+                            sslCtx
+                            , dispatcherHandler
+                            , staticPath
+                            , websocketPath
+                            , xWebProperties.getWebSocketFrameHandlerMap())
+                    );
 
             Channel ch = b.bind(port).sync().channel();
 

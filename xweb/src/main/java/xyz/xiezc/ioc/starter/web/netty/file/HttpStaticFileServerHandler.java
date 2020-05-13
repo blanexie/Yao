@@ -125,8 +125,10 @@ public class HttpStaticFileServerHandler extends SimpleChannelInboundHandler<Htt
         boolean keepAlive = httpRequest.isKeepAlive();
         //获取静态文件
         File file = getStaticFile(ctx, request, keepAlive);
-        if (file == null) return;
-
+        if (file == null) {
+            sendError(ctx, NOT_FOUND, keepAlive);
+            return;
+        }
         // 检查文件是否有修改，如果没有，直接返回前端
         if (checkCacheValidation(ctx, request, keepAlive, file)) return;
 

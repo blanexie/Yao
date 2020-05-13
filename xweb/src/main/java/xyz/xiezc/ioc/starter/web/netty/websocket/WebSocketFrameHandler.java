@@ -15,35 +15,57 @@
  */
 package xyz.xiezc.ioc.starter.web.netty.websocket;
 
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
-import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
-import io.netty.handler.codec.http.websocketx.WebSocketFrame;
-
-import java.util.Locale;
+import io.netty.handler.codec.http.websocketx.*;
 
 /**
  * Echoes uppercase content of text frames.
  */
-public class WebSocketFrameHandler extends SimpleChannelInboundHandler<WebSocketFrame> {
+public interface WebSocketFrameHandler {
 
-    @Override
-    protected void channelRead0(ChannelHandlerContext ctx, WebSocketFrame frame) throws Exception {
-        // ping and pong frames already handled
-        if (frame instanceof TextWebSocketFrame) {
-            // Send the uppercase string back.
-            String request = ((TextWebSocketFrame) frame).text();
-
-
-            ctx.channel().writeAndFlush(new TextWebSocketFrame(request.toUpperCase(Locale.US)));
-        } else if (frame instanceof BinaryWebSocketFrame) {
-            // Send the uppercase string back.
-            String request = ((TextWebSocketFrame) frame).text();
-            ctx.channel().writeAndFlush(new TextWebSocketFrame(request.toUpperCase(Locale.US)));
-        } else {
-            String message = "unsupported frame type: " + frame.getClass().getName();
-            throw new UnsupportedOperationException(message);
+    default WebSocketFrame handle(WebSocketFrame webSocketFrame) {
+        if (webSocketFrame instanceof PingWebSocketFrame) {
+            return this.handlePingWebSocketFrame((PingWebSocketFrame) webSocketFrame);
         }
+        if (webSocketFrame instanceof TextWebSocketFrame) {
+            return this.handleTextWebSocketFrame((TextWebSocketFrame) webSocketFrame);
+        }
+        if (webSocketFrame instanceof BinaryWebSocketFrame) {
+            return this.handleBinaryWebSocketFrame((BinaryWebSocketFrame) webSocketFrame);
+        }
+        if (webSocketFrame instanceof CloseWebSocketFrame) {
+            return this.handleCloseWebSocketFrame((CloseWebSocketFrame) webSocketFrame);
+        }
+        return null;
     }
+
+    /**
+     * @param closeWebSocketFrame
+     * @return
+     */
+    default WebSocketFrame handleCloseWebSocketFrame(CloseWebSocketFrame closeWebSocketFrame) {
+        return closeWebSocketFrame.retain();
+    }
+
+
+    /**
+     * @param pingWebSocketFrame
+     * @return
+     */
+    default WebSocketFrame handlePingWebSocketFrame(PingWebSocketFrame pingWebSocketFrame) {
+        return new PongWebSocketFrame(pingWebSocketFrame.content().retain());
+    }
+
+
+    /**
+     * @param textWebSocketFrame
+     * @return
+     */
+    WebSocketFrame handleTextWebSocketFrame(TextWebSocketFrame textWebSocketFrame);
+
+    /**
+     * @param binaryWebSocketFrame
+     * @return
+     */
+    WebSocketFrame handleBinaryWebSocketFrame(BinaryWebSocketFrame binaryWebSocketFrame);
+
 }

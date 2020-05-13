@@ -35,6 +35,9 @@ import xyz.xiezc.ioc.starter.web.DispatcherHandler;
 import xyz.xiezc.ioc.starter.web.netty.controller.HttpServerHandler;
 import xyz.xiezc.ioc.starter.web.netty.file.HttpStaticFileServerHandler;
 import xyz.xiezc.ioc.starter.web.netty.websocket.WebSocketFrameHandler;
+import xyz.xiezc.ioc.starter.web.netty.websocket.WebSocketServerHandler;
+
+import java.util.Map;
 
 @Data
 public class NettyWebServerInitializer extends ChannelInitializer<SocketChannel> {
@@ -43,16 +46,23 @@ public class NettyWebServerInitializer extends ChannelInitializer<SocketChannel>
 
     private SslContext sslCtx;
     private HttpServerHandler httpServerHandler;
-
     public HttpStaticFileServerHandler httpStaticFileServerHandler;
     public ParseRequestHandler parseRequestHandler;
 
-    public NettyWebServerInitializer(SslContext sslCtx, DispatcherHandler dispatcherHandler, String staticPath, String webSocketPath) {
+    Map<String, WebSocketFrameHandler> webSocketFrameHandlerMap;
+
+    public NettyWebServerInitializer(SslContext sslCtx,
+                                     DispatcherHandler dispatcherHandler,
+                                     String staticPath,
+                                     String webSocketPath,
+                                     Map<String, WebSocketFrameHandler> webSocketFrameHandlerMap
+    ) {
         this.sslCtx = sslCtx;
         this.httpServerHandler = new HttpServerHandler(dispatcherHandler);
         httpStaticFileServerHandler = new HttpStaticFileServerHandler(staticPath);
         parseRequestHandler = new ParseRequestHandler();
         WEBSOCKET_PATH = webSocketPath;
+        this.webSocketFrameHandlerMap = webSocketFrameHandlerMap;
     }
 
 
@@ -71,6 +81,9 @@ public class NettyWebServerInitializer extends ChannelInitializer<SocketChannel>
         pipeline.addLast(new HttpServerExpectContinueHandler());
         //拼装FullHttpRequest
         pipeline.addLast(new HttpObjectAggregator(Integer.MAX_VALUE));
+        //WebSocket
+        pipeline.addLast(new WebSocketServerHandler(webSocketFrameHandlerMap, sslCtx != null));
+
         //压缩
         pipeline.addLast(new HttpContentCompressor());
         //处理分块协议
@@ -78,10 +91,6 @@ public class NettyWebServerInitializer extends ChannelInitializer<SocketChannel>
         //防止cors
         pipeline.addLast(new CorsHandler(CorsConfigBuilder.forAnyOrigin().allowNullOrigin().allowCredentials().build()));
 
-        //WebSocket
-        pipeline.addLast(new WebSocketServerCompressionHandler());
-        pipeline.addLast(new WebSocketServerProtocolHandler(WEBSOCKET_PATH, null, true));
-        pipeline.addLast(new WebSocketFrameHandler());
 
         //解析FullRequest成HttpRequest
         pipeline.addLast(parseRequestHandler);
