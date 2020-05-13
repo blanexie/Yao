@@ -40,6 +40,8 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
     public void channelRead0(ChannelHandlerContext ctx, Object msg) {
         if (msg instanceof FullHttpRequest) {
             handleHttpRequest(ctx, (FullHttpRequest) msg);
+
+
         } else if (msg instanceof WebSocketFrame) {
             handleWebSocketFrame(ctx, (WebSocketFrame) msg);
         }
@@ -60,8 +62,8 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
 
         // Allow only GET methods.
         if (!GET.equals(req.method())) {
-            sendHttpResponse(ctx, req, new DefaultFullHttpResponse(req.protocolVersion(), FORBIDDEN,
-                                                                   ctx.alloc().buffer(0)));
+            ctx.fireChannelRead(req);
+           // sendHttpResponse(ctx, req, new DefaultFullHttpResponse(req.protocolVersion(), FORBIDDEN,ctx.alloc().buffer(0)));
             return;
         }
 
