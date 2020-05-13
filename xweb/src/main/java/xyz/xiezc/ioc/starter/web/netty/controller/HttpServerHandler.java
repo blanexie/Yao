@@ -15,8 +15,11 @@
  */
 package xyz.xiezc.ioc.starter.web.netty.controller;
 
+import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -26,6 +29,8 @@ import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import xyz.xiezc.ioc.starter.web.DispatcherHandler;
+import xyz.xiezc.ioc.starter.web.common.XWebException;
+import xyz.xiezc.ioc.starter.web.common.XWebUtil;
 import xyz.xiezc.ioc.starter.web.entity.HttpRequest;
 
 import java.util.Set;
@@ -72,7 +77,9 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<HttpRequest> 
                 FullHttpResponse fullHttpResponse = dispatcherHandler.doRequest(request);
                 writeResponse(ctx, future, fullHttpResponse);
             } catch (Exception e) {
-                this.handleException(e);
+                log.error(e.getMessage(), e);
+                FullHttpResponse errorResponse = XWebUtil.getErrorResponse(new XWebException(e), httpRequest);
+                writeResponse(ctx, future, errorResponse);
             }
         }, executor);
     }
@@ -82,13 +89,6 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<HttpRequest> 
         ctx.writeAndFlush(msg);
         future.complete(null);
     }
-
-    private FullHttpResponse handleException(Throwable e) {
-        log.error(e.getMessage(), e);
-        FullHttpResponse response = new DefaultFullHttpResponse(HTTP_1_1, HttpResponseStatus.valueOf(500));
-        return response;
-    }
-
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
@@ -109,8 +109,6 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<HttpRequest> 
         }
         return true;
     }
-
-
 
 
     boolean isResetByPeer(Throwable e) {

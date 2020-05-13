@@ -144,8 +144,6 @@ public class HttpStaticFileServerHandler extends SimpleChannelInboundHandler<Htt
     }
 
 
-
-
     private void writeFile(ChannelHandlerContext ctx, boolean keepAlive, RandomAccessFile raf) throws IOException {
         long fileLength = raf.length();
         ChannelFuture sendFileFuture;

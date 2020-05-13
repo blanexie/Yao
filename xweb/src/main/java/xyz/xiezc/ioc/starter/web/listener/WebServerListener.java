@@ -10,6 +10,7 @@ import xyz.xiezc.ioc.common.event.ApplicationEvent;
 import xyz.xiezc.ioc.common.event.ApplicationListener;
 import xyz.xiezc.ioc.enums.EventNameConstant;
 import xyz.xiezc.ioc.starter.web.WebServerBootstrap;
+import xyz.xiezc.ioc.starter.web.common.XWebProperties;
 
 @EventListener(eventName = {EventNameConstant.XiocEnd})
 public class WebServerListener implements ApplicationListener {
@@ -24,12 +25,8 @@ public class WebServerListener implements ApplicationListener {
     @Inject
     WebServerBootstrap webServerBootstrap;
 
-    @Value("xweb.server.ssl.enable")
-    boolean ssl = true;
-    @Value("xweb.server.port")
-    int port = 8443;
-    @Value("xweb.static.path")
-    String staticPath = "/static";
+    @Inject
+    XWebProperties xWebProperties;
 
     @Override
     public boolean getSync() {
@@ -45,7 +42,7 @@ public class WebServerListener implements ApplicationListener {
     @Override
     public void doExecute(ApplicationEvent applicationEvent) {
         log.info("正在启动web服务.........");
-        webServerBootstrap.startWebServer(ssl, port, staticPath);
+        webServerBootstrap.startWebServer(xWebProperties);
     }
 
 }

@@ -8,6 +8,7 @@ import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.http.*;
+import lombok.SneakyThrows;
 import xyz.xiezc.ioc.Xioc;
 import xyz.xiezc.ioc.annotation.Component;
 import xyz.xiezc.ioc.annotation.Init;
@@ -87,26 +88,20 @@ public class DispatcherHandler {
         return ReflectUtil.invoke(bean, methodDefinition.getMethod(), params);
     }
 
+    @SneakyThrows
     public FullHttpResponse doRequest(HttpRequest httpRequest) {
-        try {
-            //1. 找到对应的方法处理类
-            MethodDefinition methodDefinition = this.getMethodDefinition(httpRequest);
-            //2. 获取参数转换器
-            ContentType contentType = getContentType(httpRequest);
-            HttpMessageConverter httpMessageConverter = httpMessageConverterMap.get(contentType);
-            //3. 转换请求参数,
-            Object[] objects = httpMessageConverter.doRead(methodDefinition, contentType, httpRequest);
-            //4. 反射调用方法
-            Object result = getResult(methodDefinition, objects);
-            //5. 组装响应结果
-            FullHttpResponse response = getFullHttpResponse(result, httpRequest);
-            return response;
-        } catch (Exception e) {
-            log.error(e);
-            return XWebUtil.getErrorResponse(new XWebException(e));
-        }
-
-
+        //1. 找到对应的方法处理类
+        MethodDefinition methodDefinition = this.getMethodDefinition(httpRequest);
+        //2. 获取参数转换器
+        ContentType contentType = getContentType(httpRequest);
+        HttpMessageConverter httpMessageConverter = httpMessageConverterMap.get(contentType);
+        //3. 转换请求参数,
+        Object[] objects = httpMessageConverter.doRead(methodDefinition, contentType, httpRequest);
+        //4. 反射调用方法
+        Object result = getResult(methodDefinition, objects);
+        //5. 组装响应结果
+        FullHttpResponse response = getFullHttpResponse(result, httpRequest);
+        return response;
     }
 
 
