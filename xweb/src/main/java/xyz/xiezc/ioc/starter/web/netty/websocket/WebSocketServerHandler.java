@@ -16,6 +16,8 @@
 package xyz.xiezc.ioc.starter.web.netty.websocket;
 
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.log.Log;
+import cn.hutool.log.LogFactory;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -25,6 +27,7 @@ import io.netty.handler.codec.http.*;
 import io.netty.handler.codec.http.websocketx.*;
 import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
+import io.netty.util.ReferenceCountUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,6 +41,7 @@ import static io.netty.handler.codec.http.HttpResponseStatus.NOT_FOUND;
  */
 public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> {
 
+    Log log = LogFactory.get(WebSocketServerHandler.class);
     private Map<String, WebSocketFrameHandler> webSocketFrameHandlerMap;
 
     boolean isSsl;
@@ -55,19 +59,21 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
     @Override
     public void channelRead0(ChannelHandlerContext ctx, Object msg) {
         if (msg instanceof FullHttpRequest) {
+            log.info("进入HttpServerHandler：{}", ((FullHttpRequest) msg).uri());
             handleHttpRequest(ctx, (FullHttpRequest) msg);
         } else if (msg instanceof WebSocketFrame) {
+            log.info("进入HttpServerHandler1：{}");
             Attribute<WebSocketFrameHandler> attr = ctx.channel().attr(WebSocketFrameHandler_ATTR_KEY);
             WebSocketFrameHandler webSocketFrameHandler = attr.get();
             WebSocketFrame webSocketFrame = webSocketFrameHandler.handle((WebSocketFrame) msg);
             // Check for closing frame
             if (webSocketFrame instanceof CloseWebSocketFrame) {
                 Attribute<WebSocketServerHandshaker> attr1 = ctx.channel().attr(HANDSHAKER_ATTR_KEY);
-                attr1.get().close(ctx.channel(), (CloseWebSocketFrame) webSocketFrame.retain());
+                attr1.get().close(ctx.channel(), (CloseWebSocketFrame) webSocketFrame);
                 return;
             }
             //other frame
-            ctx.write(webSocketFrame.retain());
+            ctx.write(webSocketFrame);
             return;
         }
     }
@@ -87,6 +93,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
 
         // Allow only GET methods.
         if (!GET.equals(req.method())) {
+            ReferenceCountUtil.retain(req);
             ctx.fireChannelRead(req);
             return;
         }
@@ -117,6 +124,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
             }
         }
         //走到这里说明不是websocket协议
+        ReferenceCountUtil.retain(req);
         ctx.fireChannelRead(req);
     }
 

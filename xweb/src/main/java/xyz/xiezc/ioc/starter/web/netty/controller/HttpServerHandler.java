@@ -20,10 +20,7 @@ import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
-import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelHandler;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.*;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpMethod;
@@ -62,7 +59,8 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<HttpRequest> 
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, HttpRequest httpRequest) {
+    public void channelRead0(ChannelHandlerContext ctx, HttpRequest httpRequest) {
+        log.info("进入HttpServerHandler：{}", httpRequest.getPath());
         CompletableFuture<HttpRequest> future = CompletableFuture.completedFuture(httpRequest);
         Executor executor = ctx.executor();
         future.thenAcceptAsync(request -> {
@@ -92,8 +90,8 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<HttpRequest> 
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        log.error(cause.getMessage(), cause);
         if (!isResetByPeer(cause)) {
-            log.error(cause.getMessage(), cause);
             FullHttpResponse response = new DefaultFullHttpResponse(HTTP_1_1, HttpResponseStatus.valueOf(500));
             ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
         }

@@ -28,6 +28,7 @@ import io.netty.handler.codec.http.*;
 import io.netty.handler.codec.http.cookie.Cookie;
 import io.netty.handler.codec.http.cookie.ServerCookieDecoder;
 import io.netty.handler.codec.http.multipart.*;
+import io.netty.util.ReferenceCountUtil;
 import xyz.xiezc.ioc.starter.web.entity.FileItem;
 import xyz.xiezc.ioc.starter.web.entity.HttpRequest;
 
@@ -55,11 +56,12 @@ public class ParseRequestHandler extends SimpleChannelInboundHandler<FullHttpReq
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest msg) {
-        HttpRequest httpRequest = parseHttpRequest(ctx,msg);
+        log.info("进入ParseRequestHandler：{}",msg.uri());
+        HttpRequest httpRequest = parseHttpRequest(ctx, msg);
         ctx.fireChannelRead(httpRequest);
     }
 
-    private HttpRequest parseHttpRequest(ChannelHandlerContext ctx,FullHttpRequest fullHttpRequest) {
+    private HttpRequest parseHttpRequest(ChannelHandlerContext ctx, FullHttpRequest fullHttpRequest) {
         try {
             //构建我们自己的httpRequest
             HttpRequest httpRequest = new HttpRequest();
@@ -100,8 +102,8 @@ public class ParseRequestHandler extends SimpleChannelInboundHandler<FullHttpReq
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        log.error(cause.getMessage(), cause);
         if (!isResetByPeer(cause)) {
-            log.error(cause.getMessage(), cause);
             FullHttpResponse response = new DefaultFullHttpResponse(HTTP_1_1, HttpResponseStatus.valueOf(500));
             ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
         }

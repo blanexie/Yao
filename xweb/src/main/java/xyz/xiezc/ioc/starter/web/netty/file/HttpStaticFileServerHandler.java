@@ -93,6 +93,7 @@ import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 @ChannelHandler.Sharable
 public class HttpStaticFileServerHandler extends SimpleChannelInboundHandler<HttpRequest> {
 
+    Log log=LogFactory.get(HttpStaticFileServerHandler.class);
     public static final String HTTP_DATE_FORMAT = "EEE, dd MMM yyyy HH:mm:ss zzz";
     public static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(HTTP_DATE_FORMAT, Locale.US);
     public static final String HTTP_DATE_GMT_TIMEZONE = "GMT";
@@ -110,6 +111,7 @@ public class HttpStaticFileServerHandler extends SimpleChannelInboundHandler<Htt
 
     @Override
     public void channelRead0(ChannelHandlerContext ctx, HttpRequest request) throws Exception {
+        log.info("进入HttpServerHandler：{}",request.getPath());
         try {
             this.handle(ctx, request);
         } catch (Exception e) {

@@ -53,6 +53,7 @@ public class XWebUtil {
         }
         response.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/plain; charset=UTF-8")
                 .setInt(CONTENT_LENGTH, response.content().readableBytes());
+        response.retain();
         return response;
     }
 

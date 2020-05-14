@@ -81,16 +81,15 @@ public class NettyWebServerInitializer extends ChannelInitializer<SocketChannel>
         pipeline.addLast(new HttpServerExpectContinueHandler());
         //拼装FullHttpRequest
         pipeline.addLast(new HttpObjectAggregator(Integer.MAX_VALUE));
-        //WebSocket
-        pipeline.addLast(new WebSocketServerHandler(webSocketFrameHandlerMap, sslCtx != null));
-
         //压缩
-        pipeline.addLast(new HttpContentCompressor());
+     //   pipeline.addLast(new HttpContentCompressor());
         //处理分块协议
         pipeline.addLast(new ChunkedWriteHandler());
         //防止cors
         pipeline.addLast(new CorsHandler(CorsConfigBuilder.forAnyOrigin().allowNullOrigin().allowCredentials().build()));
 
+        //WebSocket
+        pipeline.addLast(new WebSocketServerHandler(webSocketFrameHandlerMap, sslCtx != null));
 
         //解析FullRequest成HttpRequest
         pipeline.addLast(parseRequestHandler);
