@@ -93,7 +93,7 @@ import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 @ChannelHandler.Sharable
 public class HttpStaticFileServerHandler extends SimpleChannelInboundHandler<HttpRequest> {
 
-    Log log=LogFactory.get(HttpStaticFileServerHandler.class);
+    Log log = LogFactory.get(HttpStaticFileServerHandler.class);
     public static final String HTTP_DATE_FORMAT = "EEE, dd MMM yyyy HH:mm:ss zzz";
     public static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(HTTP_DATE_FORMAT, Locale.US);
     public static final String HTTP_DATE_GMT_TIMEZONE = "GMT";
@@ -111,7 +111,7 @@ public class HttpStaticFileServerHandler extends SimpleChannelInboundHandler<Htt
 
     @Override
     public void channelRead0(ChannelHandlerContext ctx, HttpRequest request) throws Exception {
-        log.info("进入HttpServerHandler：{}",request.getPath());
+        log.info("进入HttpServerHandler：{}", request.getPath());
         try {
             this.handle(ctx, request);
         } catch (Exception e) {
@@ -147,31 +147,15 @@ public class HttpStaticFileServerHandler extends SimpleChannelInboundHandler<Htt
         }
     }
 
-
     private void writeFile(ChannelHandlerContext ctx, boolean keepAlive, RandomAccessFile raf) throws IOException {
         long fileLength = raf.length();
-        ChannelFuture sendFileFuture;
-        ChannelFuture lastContentFuture;
-        if (ctx.pipeline().get(SslHandler.class) == null) {
-            sendFileFuture = ctx.write(
-                    new DefaultFileRegion(raf.getChannel(), 0, fileLength),
-                    ctx.newProgressivePromise()
-            );
-            // Write the end marker.
-            lastContentFuture = ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);
-
-        } else {
-            sendFileFuture = ctx.writeAndFlush(
-                    new HttpChunkedInput(
-                            new ChunkedFile(raf, 0, fileLength, 8192)
-                    ),
-                    ctx.newProgressivePromise());
-            // HttpChunkedInput will write the end marker (LastHttpContent) for us.
-            lastContentFuture = sendFileFuture;
-        }
-        sendFileFuture.addListener(new ProgressiveFutureListener());
-
-        // Decide whether to close the connection or not.
+        ChannelFuture lastContentFuture = ctx.writeAndFlush(
+                new HttpChunkedInput(
+                        new ChunkedFile(raf, 0, fileLength, 8192)
+                ),
+                ctx.newProgressivePromise()
+        );
+        lastContentFuture.addListener(new ProgressiveFutureListener());
         if (!keepAlive) {
             lastContentFuture.addListener(ChannelFutureListener.CLOSE);
         }

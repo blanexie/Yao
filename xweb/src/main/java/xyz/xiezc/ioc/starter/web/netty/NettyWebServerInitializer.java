@@ -24,8 +24,6 @@ import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.HttpServerExpectContinueHandler;
 import io.netty.handler.codec.http.cors.CorsConfigBuilder;
 import io.netty.handler.codec.http.cors.CorsHandler;
-import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
-import io.netty.handler.codec.http.websocketx.extensions.compression.WebSocketServerCompressionHandler;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.ssl.SslContext;
@@ -82,7 +80,7 @@ public class NettyWebServerInitializer extends ChannelInitializer<SocketChannel>
         //拼装FullHttpRequest
         pipeline.addLast(new HttpObjectAggregator(Integer.MAX_VALUE));
         //压缩
-     //   pipeline.addLast(new HttpContentCompressor());
+        pipeline.addLast(new HttpContentCompressor());
         //处理分块协议
         pipeline.addLast(new ChunkedWriteHandler());
         //防止cors

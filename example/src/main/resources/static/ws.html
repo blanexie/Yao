@@ -7,29 +7,36 @@
 <body>
 <script type="text/javascript">
     var socket;
-    if (!window.WebSocket) {
-        window.WebSocket = window.MozWebSocket;
-    }
-    if (window.WebSocket) {
-        socket = new WebSocket("wss://127.0.0.1:8080/websocket");
-        socket.onmessage = function(event) {
-            var ta = document.getElementById('responseText');
-            ta.value = ta.value + '\n' + event.data
-        };
-        socket.onopen = function(event) {
-            var ta = document.getElementById('responseText');
-            ta.value = "Web Socket opened!";
-        };
-        socket.onclose = function(event) {
-            var ta = document.getElementById('responseText');
-            ta.value = ta.value + "Web Socket closed";
-        };
-    } else {
-        alert("Your browser does not support Web Socket.");
+
+    function connetion() {
+        if (!window.WebSocket) {
+            window.WebSocket = window.MozWebSocket;
+        }
+        if (window.WebSocket) {
+            socket = new WebSocket("ws://127.0.0.1:8443/websocket");
+            socket.onmessage = function (event) {
+                var ta = document.getElementById('responseText');
+                ta.value = ta.value + '\n' + event.data
+            };
+            socket.onopen = function (event) {
+                var ta = document.getElementById('responseText');
+                ta.value = "Web Socket opened!";
+            };
+            socket.onclose = function (event) {
+                var ta = document.getElementById('responseText');
+                ta.value = ta.value + "Web Socket closed";
+            };
+        } else {
+            alert("Your browser does not support Web Socket.");
+        }
     }
 
+    // connetion();
+
     function send(message) {
-        if (!window.WebSocket) { return; }
+        if (!window.WebSocket) {
+            return;
+        }
         if (socket.readyState == WebSocket.OPEN) {
             socket.send(message);
         } else {
@@ -37,9 +44,13 @@
         }
     }
 </script>
+
+
+<button onclick="connetion()">重连</button>
+
 <form onsubmit="return false;">
     <input type="text" name="message" value="Hello, World!"/><input type="button" value="Send Web Socket Data"
-                                                                    onclick="send(this.form.message.value)" />
+                                                                    onclick="send(this.form.message.value)"/>
     <h3>Output</h3>
     <textarea id="responseText" style="width:500px;height:300px;"></textarea>
 </form>
