@@ -25,7 +25,6 @@
 
     <modules>
         <module>xioc</module>
-        <module>starter</module>
         <module>example</module>
         <module>xweb</module>
         <module>xorm</module>
