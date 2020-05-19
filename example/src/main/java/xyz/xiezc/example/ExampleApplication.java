@@ -1,18 +1,15 @@
 package xyz.xiezc.example;
 
 
-import xyz.xiezc.example.web.TestController;
 import xyz.xiezc.ioc.Xioc;
-import xyz.xiezc.ioc.annotation.Component;
-import xyz.xiezc.ioc.definition.BeanDefinition;
+import xyz.xiezc.ioc.annotation.Configuration;
 import xyz.xiezc.ioc.starter.orm.annotation.MapperScan;
 
 @MapperScan("xyz.xiezc.example.web")
-@Component
+@Configuration
 public class ExampleApplication {
 
     public static void main(String[] args) {
-        Xioc xioc = Xioc.run(ExampleApplication.class);
-
+        Xioc.run(ExampleApplication.class);
     }
 }

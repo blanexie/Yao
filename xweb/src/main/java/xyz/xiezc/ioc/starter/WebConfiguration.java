@@ -32,7 +32,7 @@ public class WebConfiguration implements WebServerBootstrap {
 
     @Override
     public void startWebServer(XWebProperties xWebProperties) throws Exception {
-        log.info("配置信息：{}", JSONUtil.toJsonStr(xWebProperties));
+      //  log.info("配置信息：{}", JSONUtil.toJsonStr(xWebProperties));
         DispatcherHandler dispatcherHandler = xWebProperties.getDispatcherHandler();
         boolean ssl = xWebProperties.isSsl();
         int port = xWebProperties.getPort();

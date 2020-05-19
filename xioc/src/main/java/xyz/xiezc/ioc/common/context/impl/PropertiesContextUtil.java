@@ -19,6 +19,9 @@ public class PropertiesContextUtil implements PropertiesContext {
 
     @Override
     public Setting getSetting() {
+        if (this.setting == null) {
+            this.setting = new Setting();
+        }
         return setting;
     }
 }

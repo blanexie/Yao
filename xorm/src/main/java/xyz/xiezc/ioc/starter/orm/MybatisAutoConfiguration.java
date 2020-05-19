@@ -24,19 +24,19 @@ import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.db.ds.DSFactory;
 import cn.hutool.json.JSONUtil;
+import cn.hutool.log.Log;
+import cn.hutool.log.LogFactory;
 import com.mysql.cj.util.StringUtils;
 import lombok.Data;
 import lombok.SneakyThrows;
 import org.apache.ibatis.io.ResolverUtil;
-import org.apache.ibatis.logging.Log;
-import org.apache.ibatis.logging.LogFactory;
 import org.apache.ibatis.mapping.DatabaseIdProvider;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.SqlSessionFactory;
 import xyz.xiezc.ioc.ApplicationContextUtil;
 import xyz.xiezc.ioc.Xioc;
-import xyz.xiezc.ioc.annotation.*;
 import xyz.xiezc.ioc.annotation.EventListener;
+import xyz.xiezc.ioc.annotation.Init;
 import xyz.xiezc.ioc.common.event.ApplicationEvent;
 import xyz.xiezc.ioc.common.event.ApplicationListener;
 import xyz.xiezc.ioc.definition.BeanDefinition;
@@ -44,22 +44,19 @@ import xyz.xiezc.ioc.enums.BeanStatusEnum;
 import xyz.xiezc.ioc.enums.BeanTypeEnum;
 import xyz.xiezc.ioc.enums.EventNameConstant;
 import xyz.xiezc.ioc.starter.orm.annotation.MapperScan;
+import xyz.xiezc.ioc.starter.orm.bean.SqlSessionFactoryBean;
 import xyz.xiezc.ioc.starter.orm.common.BaseMapper;
 import xyz.xiezc.ioc.starter.orm.common.SpringBootVFS;
-import xyz.xiezc.ioc.starter.orm.bean.SqlSessionFactoryBean;
 import xyz.xiezc.ioc.starter.orm.xml.DocumentMapperDefine;
 import xyz.xiezc.ioc.starter.orm.xml.MapperDefine;
 
 import javax.sql.DataSource;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -77,7 +74,7 @@ import java.util.stream.Collectors;
 @EventListener(eventName = {EventNameConstant.loadEventListener})
 public class MybatisAutoConfiguration implements ApplicationListener {
 
-    private static Log log = LogFactory.getLog(MybatisAutoConfiguration.class);
+    private static Log log = LogFactory.get(MybatisAutoConfiguration.class);
 
     private MybatisProperties properties;
 
@@ -202,7 +199,7 @@ public class MybatisAutoConfiguration implements ApplicationListener {
             Set<Class<?>> classes = implementations.getClasses();
             classes.stream().map(MapperDefine::new)
                     .forEach(mapperDefine -> {
-                        log.debug("扫描到mapper接口，mapperInterface: " + mapperDefine.getMapperInterface()
+                        log.info("扫描到mapper接口，mapperInterface: " + mapperDefine.getMapperInterface()
                                 + ", 对应实体类：" + mapperDefine.getEntityClazz().getName()
                                 + ", 对应表信息：" + JSONUtil.toJsonStr(mapperDefine.getEntityTableDefine())
                         );

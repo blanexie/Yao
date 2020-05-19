@@ -38,7 +38,7 @@ import xyz.xiezc.ioc.annotation.Value;
 @Data
 public class MybatisProperties {
 
-    public static final String MYBATIS_PREFIX = "mybatis";
+    public static final String MYBATIS_PREFIX = "mybatis.";
 
     /**
      * Config file path.

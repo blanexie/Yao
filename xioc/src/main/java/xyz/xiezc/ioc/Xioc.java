@@ -1,9 +1,11 @@
 package xyz.xiezc.ioc;
 
+import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 import lombok.Data;
+import xyz.xiezc.ioc.annotation.Configuration;
 import xyz.xiezc.ioc.common.event.ApplicationEvent;
 import xyz.xiezc.ioc.common.event.ApplicationListener;
 import xyz.xiezc.ioc.enums.EventNameConstant;
@@ -34,9 +36,9 @@ public final class Xioc {
      */
     public final String starterPackage = "xyz.xiezc.ioc.starter";
 
-     static Xioc xioc;
+    static Xioc xioc;
 
-    public  static Class<?> bootClass;
+    public static Class<?> bootClass;
 
     /**
      * 启动方法,
@@ -46,6 +48,12 @@ public final class Xioc {
     public static Xioc run(Class<?> clazz) {
         xioc = new Xioc();
         bootClass = clazz;
+
+        //校验启动类上是否有@Configuration注解
+        if (AnnotationUtil.getAnnotation(clazz, Configuration.class) == null) {
+            throw new RuntimeException("请在启动类" + clazz.getName() + "上增加@Configuration注解");
+        }
+
         //开始启动框架
         BeanLoadUtil beanLoadUtil = xioc.applicationContextUtil.getBeanLoadUtil();
         xioc.applicationContextUtil.publisherEvent(new ApplicationEvent(EventNameConstant.XiocStart));

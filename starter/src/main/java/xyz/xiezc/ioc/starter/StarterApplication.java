@@ -1,20 +1,25 @@
 package xyz.xiezc.ioc.starter;
 
 
+import lombok.Data;
 import xyz.xiezc.ioc.Xioc;
-import xyz.xiezc.ioc.annotation.BeanScan;
 import xyz.xiezc.ioc.annotation.Configuration;
+import xyz.xiezc.ioc.annotation.Inject;
 import xyz.xiezc.ioc.definition.BeanDefinition;
-import xyz.xiezc.ioc.starter.web.listener.WebServerListener;
-import xyz.xiezc.ioc.starter.web.netty.NettyWebServerBootstrap;
-import xyz.xiezc.ioc.test.StarterC;
 
-@BeanScan(basePackageClasses = {StarterC.class})
+@Data
 @Configuration
 public class StarterApplication {
 
+    @Inject
+    StarterC starterC;
+
     public static void main(String[] args) {
         Xioc xioc = Xioc.run(StarterApplication.class);
+        BeanDefinition beanDefinition = xioc.getApplicationContextUtil().getBeanDefinition(StarterApplication.class);
+        StarterApplication starterApplication = beanDefinition.getBean();
+        StarterC starterC = starterApplication.getStarterC();
+        starterC.print();
     }
 
 }
