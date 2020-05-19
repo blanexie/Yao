@@ -6,7 +6,7 @@
     <groupId>xyz.xiezc</groupId>
     <artifactId>yao</artifactId>
     <packaging>pom</packaging>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0</version>
 
     <description>类似spring的依赖注入框架</description>
 
@@ -23,12 +23,15 @@
         <maven.compiler.compilerVersion>${java.version}</maven.compiler.compilerVersion>
     </properties>
 
+
     <modules>
         <module>xioc</module>
         <module>example</module>
         <module>xweb</module>
         <module>xorm</module>
     </modules>
+
+
     <dependencies>
 
         <dependency>
@@ -47,7 +50,17 @@
             <dependency>
                 <groupId>xyz.xiezc</groupId>
                 <artifactId>xweb</artifactId>
-                <version>0.0.1-SNAPSHOT</version>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>xyz.xiezc</groupId>
+                <artifactId>xioc</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>xyz.xiezc</groupId>
+                <artifactId>xorm</artifactId>
+                <version>${project.version}</version>
             </dependency>
 
             <dependency>
@@ -61,11 +74,7 @@
                 <version>1.18.12</version>
                 <scope>provided</scope>
             </dependency>
-            <dependency>
-                <groupId>xyz.xiezc</groupId>
-                <artifactId>xioc</artifactId>
-                <version>0.0.1-SNAPSHOT</version>
-            </dependency>
+
             <dependency>
                 <groupId>org.mybatis</groupId>
                 <artifactId>mybatis</artifactId>

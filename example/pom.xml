@@ -5,7 +5,7 @@
     <parent>
         <artifactId>yao</artifactId>
         <groupId>xyz.xiezc</groupId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>1.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -17,16 +17,17 @@
             <groupId>xyz.xiezc</groupId>
             <artifactId>xioc</artifactId>
         </dependency>
+
         <dependency>
             <groupId>xyz.xiezc</groupId>
             <artifactId>xorm</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
         </dependency>
+
         <dependency>
             <groupId>xyz.xiezc</groupId>
             <artifactId>xweb</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
         </dependency>
+
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
