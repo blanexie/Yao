@@ -8,6 +8,8 @@ import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.http.*;
+import io.netty.handler.codec.http.cookie.Cookie;
+import io.netty.util.concurrent.FastThreadLocal;
 import lombok.SneakyThrows;
 import xyz.xiezc.ioc.Xioc;
 import xyz.xiezc.ioc.annotation.Component;
@@ -19,6 +21,7 @@ import xyz.xiezc.ioc.starter.web.common.XWebException;
 import xyz.xiezc.ioc.starter.web.common.XWebUtil;
 import xyz.xiezc.ioc.starter.web.entity.HttpRequest;
 import xyz.xiezc.ioc.starter.web.converter.HttpMessageConverter;
+import xyz.xiezc.ioc.starter.web.entity.WebContext;
 
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
@@ -90,6 +93,8 @@ public class DispatcherHandler {
 
     @SneakyThrows
     public FullHttpResponse doRequest(HttpRequest httpRequest) {
+        WebContext build = WebContext.build(httpRequest);
+
         //1. 找到对应的方法处理类
         MethodDefinition methodDefinition = this.getMethodDefinition(httpRequest);
         //2. 获取参数转换器
@@ -101,6 +106,12 @@ public class DispatcherHandler {
         Object result = getResult(methodDefinition, objects);
         //5. 组装响应结果
         FullHttpResponse response = getFullHttpResponse(result, httpRequest);
+        StringBuilder stringBuilder = new StringBuilder();
+        for (Cookie respCookie : build.getRespCookies()) {
+            //Set-Cookie: _security_token=ai_e4sd1JQA_28073074481160195;Path=/;Domain=.dasouche.net;Max-Age=604800
+            stringBuilder.append(respCookie.toString()).append(";");
+        }
+        response.headers().set(SET_COOKIE, stringBuilder.toString());
         return response;
     }
 

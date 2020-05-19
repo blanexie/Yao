@@ -13,8 +13,6 @@ public class ExampleApplication {
 
     public static void main(String[] args) {
         Xioc xioc = Xioc.run(ExampleApplication.class);
-        BeanDefinition injectBeanDefinition = xioc.getApplicationContextUtil().getBeanDefinition(TestController.class);
-        TestController bean = injectBeanDefinition.getBean();
 
     }
 }

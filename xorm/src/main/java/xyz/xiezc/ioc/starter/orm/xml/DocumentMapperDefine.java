@@ -57,6 +57,7 @@ public class DocumentMapperDefine {
             inputSource.getCharacterStream().close();
         }
     }
+
     public DocumentMapperDefine(Path path) throws IOException {
         InputSource inputSource = new InputSource(Files.newBufferedReader(path));
         try {

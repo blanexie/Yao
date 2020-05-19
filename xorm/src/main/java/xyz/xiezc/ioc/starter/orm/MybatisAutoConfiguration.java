@@ -161,9 +161,9 @@ public class MybatisAutoConfiguration implements ApplicationListener {
             ret.addAll(files);
         }
         List<DocumentMapperDefine> documentPars = ret.stream()
-                .map(path -> {
+                .map(file -> {
                     try {
-                        return new DocumentMapperDefine(path);
+                        return new DocumentMapperDefine(file);
                     } catch (IOException e) {
                         return null;
                     }

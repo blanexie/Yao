@@ -91,6 +91,8 @@ public class NettyWebServerInitializer extends ChannelInitializer<SocketChannel>
 
         //解析FullRequest成HttpRequest
         pipeline.addLast(parseRequestHandler);
+
+
         //业务逻辑
         pipeline.addLast(httpServerHandler);
         //静态文件下载

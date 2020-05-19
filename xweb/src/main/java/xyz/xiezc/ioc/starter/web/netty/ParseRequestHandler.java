@@ -29,6 +29,7 @@ import io.netty.handler.codec.http.cookie.Cookie;
 import io.netty.handler.codec.http.cookie.ServerCookieDecoder;
 import io.netty.handler.codec.http.multipart.*;
 import io.netty.util.ReferenceCountUtil;
+import io.netty.util.concurrent.FastThreadLocal;
 import xyz.xiezc.ioc.starter.web.entity.FileItem;
 import xyz.xiezc.ioc.starter.web.entity.HttpRequest;
 
