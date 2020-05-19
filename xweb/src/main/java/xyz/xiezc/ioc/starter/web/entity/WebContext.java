@@ -43,7 +43,12 @@ public class WebContext {
             String name = cookie.name();
             String value = cookie.value();
             if (Objects.equals("session_id", name)) {
-                return sessionCache.get(cookie.domain() + value);
+                Map<String, Object> stringObjectMap = sessionCache.get(cookie.domain() + value);
+                if (stringObjectMap == null) {
+                    stringObjectMap = new HashMap<>();
+                    sessionCache.put(cookie.domain() + value, stringObjectMap);
+                }
+                return stringObjectMap;
             }
         }
         String host = httpRequest.getNettyHttpRequest().headers().get("host");

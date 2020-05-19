@@ -67,6 +67,8 @@ public class ParseRequestHandler extends SimpleChannelInboundHandler<FullHttpReq
             //构建我们自己的httpRequest
             HttpRequest httpRequest = new HttpRequest();
             httpRequest.setNettyHttpRequest(fullHttpRequest);
+            //解析cookie
+            parseCookies(httpRequest);
             //解析公共的部分
             QueryStringDecoder queryStringDecoder = new QueryStringDecoder(fullHttpRequest.uri());
             httpRequest.setQueryParamMap(queryStringDecoder.parameters());
@@ -91,7 +93,7 @@ public class ParseRequestHandler extends SimpleChannelInboundHandler<FullHttpReq
                 }
                 //multipart类型的应用
                 this.readHttpDataChunkByChunk(decoder, httpRequest);
-                parseCookies(httpRequest);
+
                 return httpRequest;
             }
             return httpRequest;
