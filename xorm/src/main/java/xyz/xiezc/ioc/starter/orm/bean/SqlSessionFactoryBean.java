@@ -25,6 +25,7 @@ import org.apache.ibatis.executor.ErrorContext;
 import org.apache.ibatis.io.VFS;
 import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;
+import org.apache.ibatis.logging.stdout.StdOutImpl;
 import org.apache.ibatis.mapping.DatabaseIdProvider;
 import org.apache.ibatis.mapping.Environment;
 import org.apache.ibatis.parsing.XPathParser;
@@ -449,6 +450,7 @@ public class SqlSessionFactoryBean implements FactoryBean<SqlSessionFactory> {
             }
         }
 
+
         if (hasLength(this.typeHandlersPackage)) {
             String[] typeHandlersPackageArray = tokenizeToStringArray(this.typeHandlersPackage,
                     CONFIG_LOCATION_DELIMITERS);
@@ -529,7 +531,8 @@ public class SqlSessionFactoryBean implements FactoryBean<SqlSessionFactory> {
                 LOGGER.debug("Property 'mapperLocations' was not specified or no matching resources found");
             }
         }
-
+         //TODO 打印日志的问题. 这个配置好像无效, 原因未知
+        configuration.setLogImpl(StdOutImpl.class);
         return this.sqlSessionFactoryBuilder.build(configuration);
     }
 

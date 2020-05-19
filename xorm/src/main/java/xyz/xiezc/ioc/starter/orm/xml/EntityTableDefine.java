@@ -4,7 +4,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import xyz.xiezc.ioc.starter.orm.common.Example;
+import xyz.xiezc.ioc.starter.orm.common.example.Example;
 
 import java.util.Set;
 

@@ -1,6 +1,7 @@
 package xyz.xiezc.ioc.starter.orm.common;
 
 import org.apache.ibatis.annotations.Param;
+import xyz.xiezc.ioc.starter.orm.common.example.Example;
 
 import java.util.List;
 
