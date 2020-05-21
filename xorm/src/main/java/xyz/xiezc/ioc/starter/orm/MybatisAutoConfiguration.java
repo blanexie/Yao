@@ -130,6 +130,8 @@ public class MybatisAutoConfiguration implements ApplicationListener {
     private SqlSessionFactory getSqlSessionFactory(ApplicationContextUtil applicationContext, List<DocumentMapperDefine> documentMapperDefines) {
         //1. 获取数据源
         DataSource ds = DSFactory.create(Xioc.getApplicationContext().getSetting()).getDataSource();
+
+
         //2. 根据数据源生成sqlSessionFactory
         SqlSessionFactory sqlSessionFactory = createSqlSessionFactory(ds, documentMapperDefines);
         //3.放入容器中
