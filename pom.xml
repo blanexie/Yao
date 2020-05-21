@@ -173,31 +173,33 @@
 
     <developers>
         <developer>
-            <name>blanxie</name>
+            <name>blanexie</name>
             <email>blanexie@qq.com</email>
         </developer>
     </developers>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>snapshot</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+        </snapshotRepository>
+        <repository>
+            <id>release</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
+
 
     <profiles>
         <profile>
             <id>release</id>
             <activation>
                 <jdk>11</jdk>
-                <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
                 <additionalparam>-Xdoclint:none</additionalparam>
             </properties>
-            <distributionManagement>
-                <snapshotRepository>
-                    <id>snapshot</id>
-                    <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-                </snapshotRepository>
-                <repository>
-                    <id>release</id>
-                    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-                </repository>
-            </distributionManagement>
+
             <build>
                 <plugins>
                     <!-- Source -->
@@ -251,21 +253,5 @@
             </build>
         </profile>
     </profiles>
-
-    <distributionManagement>
-        <!-- Publish the versioned releases here -->
-        <repository>
-            <id>sonatype</id>
-            <name>vineetmanohar nexus</name>
-            <url>http://localhost:8081/nexus/content/repositories/releases/</url>
-        </repository>
-
-        <!-- Publish the versioned releases here -->
-        <snapshotRepository>
-            <id>xxx-nexus</id>
-            <name>vineetmanohar nexus</name>
-            <url>http://localhost:8081/nexus/content/repositories/snapshots/</url>
-        </snapshotRepository>
-    </distributionManagement>
 
 </project>

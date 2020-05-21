@@ -3,6 +3,37 @@
 
 ##  使用示例
 > 说明除了下面示例的方式， 还可以使用FactoryBean接口和@Bean注解方法的方式将bean放入容器中
+
+#### 导入maven包
+```xml
+<!-- 依赖注入的核心包， 提供基本的依赖注入功能  -->
+<dependency>
+    <groupId>xyz.xiezc</groupId>
+    <artifactId>xioc</artifactId>
+    <version>1.0</version>
+</dependency>
+```
+
+```xml
+<!--  整合mybatis的包  -->
+<dependency>
+    <groupId>xyz.xiezc</groupId>
+    <artifactId>xorm</artifactId>
+    <version>1.0</version>
+</dependency>
+```
+
+
+```xml
+<!--  整合netty的包, 提供了基本的http能力和websocket支持  -->
+<dependency>
+    <groupId>xyz.xiezc</groupId>
+    <artifactId>xweb</artifactId>
+    <version>1.0</version>
+</dependency>
+
+```
+
 ##### 定义一个启动类
 ```java
 
@@ -116,13 +147,32 @@ public class WebSocketHandler implements WebSocketFrameHandler {
 }
 
 ```
+#### 配置文件
+```properties
 
+## 基本配置信息
+# JDBC URL，根据不同的数据库，使用相应的JDBC连接字符串
+url = jdbc:mysql://127.0.0.1:8306/daily
+# 用户名，此处也可以使用 user 代替
+username = root
+# 密码，此处也可以使用 pass 代替
+password = 123456
+# JDBC驱动名，可选（Hutool会自动识别）
+driver = com.mysql.cj.jdbc.Driver
+
+## 是否启用ssl
+xweb.server.ssl.enable = false
+### web服务的端口
+xweb.server.port=8443
+### 静态文件的目录
+xweb.static.path=/static
+
+
+
+```
 
 
 ![Xioc](./demo.png)
-
-
-
 
 
 
