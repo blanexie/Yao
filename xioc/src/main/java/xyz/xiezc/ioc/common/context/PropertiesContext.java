@@ -8,4 +8,10 @@ public interface PropertiesContext {
 
     Setting getSetting();
 
+    /**
+     * 加载默认的配置文件
+     *
+     * @return
+     */
+    void loadProperties();
 }

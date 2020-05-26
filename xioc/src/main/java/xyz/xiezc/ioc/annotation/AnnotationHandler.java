@@ -6,7 +6,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
-import lombok.Synchronized;
 import xyz.xiezc.ioc.ApplicationContextUtil;
 import xyz.xiezc.ioc.common.asm.AsmUtil;
 import xyz.xiezc.ioc.common.context.AnnotationContext;
@@ -120,10 +119,10 @@ public abstract class AnnotationHandler<T extends Annotation> extends Annotation
             if (fieldDefinition == null) {
                 continue;
             }
-            Set<FieldDefinition> injectFiledDefinitions = beanDefinition.getAnnotationFiledDefinitions();
+            Set<FieldDefinition> injectFiledDefinitions = beanDefinition.getFieldDefinitions();
             if (injectFiledDefinitions == null) {
                 injectFiledDefinitions = CollUtil.newHashSet();
-                beanDefinition.setAnnotationFiledDefinitions(injectFiledDefinitions);
+                beanDefinition.setFieldDefinitions(injectFiledDefinitions);
             }
             injectFiledDefinitions.add(fieldDefinition);
         }
@@ -135,10 +134,10 @@ public abstract class AnnotationHandler<T extends Annotation> extends Annotation
             if (methodDefinition == null) {
                 continue;
             }
-            Set<MethodDefinition> methodDefinitions = beanDefinition.getAnnotationMethodDefinitions();
+            Set<MethodDefinition> methodDefinitions = beanDefinition.getMethodDefinitions();
             if (methodDefinitions == null) {
                 methodDefinitions = CollUtil.newHashSet();
-                beanDefinition.setAnnotationMethodDefinitions(methodDefinitions);
+                beanDefinition.setMethodDefinitions(methodDefinitions);
             }
             methodDefinitions.add(methodDefinition);
         }

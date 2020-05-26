@@ -9,25 +9,34 @@ import xyz.xiezc.ioc.starter.web.entity.WebContext;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Controller("/")
 public class TestController {
 
     @Inject
     AlbumMapper albumMapper;
+    @Inject
+    TestA[] albumMappers;
+
+    @GetMapping("/get1.json")
+    public String get1() {
+        return  albumMappers.length+"";
+    }
+
 
     @GetMapping("/test.json")
     public String get(String param) {
         WebContext webContext = WebContext.get();
         //
         Example build = Example.of(Album.class)
-                .andEqualTo(Album::getId,3537) //支持类似mybatis-plus的lambda的使用方式
+                .andEqualTo(Album::getId, 3537) //支持类似mybatis-plus的lambda的使用方式
                 .build();
         List<Album> albums = albumMapper.selectByExample(build);
         //获取session信息
         Map<String, Object> session = webContext.getSession();
         session.put("param", param);
 
-        return JSONUtil.toJsonStr( albums);
+        return JSONUtil.toJsonStr(albums);
     }
 }

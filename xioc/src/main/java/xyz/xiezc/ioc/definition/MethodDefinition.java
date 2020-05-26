@@ -24,7 +24,7 @@ public class MethodDefinition {
     Class<?> returnType;
 
     /**
-     * 方法的名称
+     * 方法
      */
     Method method;
 

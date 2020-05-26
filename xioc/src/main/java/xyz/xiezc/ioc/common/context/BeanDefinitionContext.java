@@ -80,4 +80,8 @@ public interface BeanDefinitionContext {
      */
     List<BeanDefinition> getBeanDefinitions(Class<?> beanClass);
 
+
+
+
+
 }

@@ -1,6 +1,7 @@
 package xyz.xiezc.ioc.definition;
 
 import lombok.Data;
+import xyz.xiezc.ioc.enums.FieldOrParamTypeEnum;
 
 import java.lang.reflect.AnnotatedElement;
 import java.util.Objects;
@@ -8,10 +9,20 @@ import java.util.Objects;
 @Data
 public class FieldDefinition {
 
+    /**
+     * 这个字段所在的bean
+     */
     BeanDefinition beanDefinition;
 
     /**
-     * 字段的类型
+     * 1. 数组类型
+     * 2. 集合类型
+     * 其他. 正常类型
+     */
+    FieldOrParamTypeEnum fieldOrParamTypeEnum;
+
+    /**
+     * 字段的类型。 如果字段是array或者Collecter类型。 则这里表示的是真实的类型
      */
     Class<?> fieldType;
 
@@ -19,12 +30,6 @@ public class FieldDefinition {
      * 字段的名称
      */
     String fieldName;
-
-    /**
-     * 如果这个字段有值， 说明这个字段是需要从容器中获取注入的
-     * 如果这个字段是需要注入的字段，则这个就是需要注入beanName
-     */
-    String beanName;
 
     /**
      * 字段上的注解
@@ -36,14 +41,13 @@ public class FieldDefinition {
      */
     Object obj;
 
-
     @Override
     public String toString() {
         return "FieldDefinition{" +
                 "beanDefinition=" + beanDefinition +
                 ", fieldType=" + fieldType +
                 ", fieldName='" + fieldName + '\'' +
-                ", beanName='" + beanName + '\'' +
+
                 '}';
     }
 

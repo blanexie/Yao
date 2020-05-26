@@ -18,8 +18,10 @@ import xyz.xiezc.ioc.enums.BeanStatusEnum;
 import xyz.xiezc.ioc.enums.BeanTypeEnum;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class BeanCreateContextUtil implements BeanCreateContext {
 
@@ -113,12 +115,25 @@ public class BeanCreateContextUtil implements BeanCreateContext {
             String beanName = annotationFiledDefinition.getBeanName();
             Class<?> fieldType = annotationFiledDefinition.getFieldType();
             Inject annotation = AnnotationUtil.getAnnotation(annotationFiledDefinition.getAnnotatedElement(), Inject.class);
-            if (annotation != null && annotation.requrie()) {
-                BeanDefinition beanDefinition = beanDefinitionContext.getInjectBeanDefinition(beanName, fieldType);
-                annotationFiledDefinition.setObj(beanDefinition);
-            } else {
-                BeanDefinition beanDefinition = beanDefinitionContext.getBeanDefinition(beanName, fieldType);
-                annotationFiledDefinition.setObj(beanDefinition);
+            if (annotation != null) {
+                int collectorOrArray = annotationFiledDefinition.getFieldOrParamTypeEnum();
+                //判断是否是数组或者集合类型
+                if (collectorOrArray == 1) {
+                    List<BeanDefinition> beanDefinitions = beanDefinitionContext.getBeanDefinitions(fieldType);
+                    annotationFiledDefinition.setObj(beanDefinitions.toArray(new BeanDefinition[0]));
+                } else if (collectorOrArray == 2) { //如果是集合类型
+                    List<BeanDefinition> beanDefinitions = beanDefinitionContext.getBeanDefinitions(fieldType);
+                    annotationFiledDefinition.setObj(beanDefinitions);
+                    return;
+                }
+
+                if (annotation.requrie()) {
+                    BeanDefinition beanDefinition = beanDefinitionContext.getInjectBeanDefinition(beanName, fieldType);
+                    annotationFiledDefinition.setObj(beanDefinition);
+                } else {
+                    BeanDefinition beanDefinition = beanDefinitionContext.getBeanDefinition(beanName, fieldType);
+                    annotationFiledDefinition.setObj(beanDefinition);
+                }
             }
         }
     }
@@ -201,7 +216,7 @@ public class BeanCreateContextUtil implements BeanCreateContext {
     @Override
     public void injectFieldValue(BeanDefinition beanDefinition) {
         //设置字段的属性值
-        Set<FieldDefinition> annotationFiledDefinitions = beanDefinition.getAnnotationFiledDefinitions();
+        Set<FieldDefinition> annotationFiledDefinitions = beanDefinition.getFieldDefinitions();
         annotationFiledDefinitions = CollectionUtil.emptyIfNull(annotationFiledDefinitions);
         for (FieldDefinition fieldDefinition : annotationFiledDefinitions) {
             var obj = fieldDefinition.getObj();
@@ -214,6 +229,33 @@ public class BeanCreateContextUtil implements BeanCreateContext {
             if (obj instanceof NullObj) {
                 continue;
             }
+            //数组
+            if (fieldDefinition.getFieldOrParamTypeEnum() == 1) {
+                List<BeanDefinition> obj1 = (List<BeanDefinition>) fieldDefinition.getObj();
+                Object[] objects = obj1.stream().map(beanDefinition1 -> beanDefinition.getBean()).collect(Collectors.toList()).toArray();
+                if (beanDefinition.getBeanTypeEnum() == BeanTypeEnum.factoryBean) {
+                    ReflectUtil.setFieldValue(beanDefinition.getFactoryBean(), fieldDefinition.getFieldName(), objects);
+                } else {
+                    ReflectUtil.setFieldValue(beanDefinition.getBean(), fieldDefinition.getFieldName(), objects);
+                }
+                return;
+            }
+            //集合
+            if (fieldDefinition.getFieldOrParamTypeEnum() == 2) {
+                List<BeanDefinition> obj1 = (List<BeanDefinition>) fieldDefinition.getObj();
+                List<Object> collect = obj1.stream()
+                        .map(fieldBeanDefinition -> {
+                            Object bean = fieldBeanDefinition.getBean();
+                            return bean;
+                        }).collect(Collectors.toList());
+                if (beanDefinition.getBeanTypeEnum() == BeanTypeEnum.factoryBean) {
+                    ReflectUtil.setFieldValue(beanDefinition.getFactoryBean(), fieldDefinition.getFieldName(), collect);
+                } else {
+                    ReflectUtil.setFieldValue(beanDefinition.getBean(), fieldDefinition.getFieldName(), collect);
+                }
+                return;
+            }
+
             if (beanDefinition.getBeanTypeEnum() == BeanTypeEnum.factoryBean) {
                 ReflectUtil.setFieldValue(beanDefinition.getFactoryBean(), fieldDefinition.getFieldName(), obj);
             } else {

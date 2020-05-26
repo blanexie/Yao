@@ -54,13 +54,17 @@ public final class Xioc {
             throw new RuntimeException("请在启动类" + clazz.getName() + "上增加@Configuration注解");
         }
 
+        ApplicationContextUtil applicationContextUtil = xioc.applicationContextUtil;
+
         //开始启动框架
-        BeanLoadUtil beanLoadUtil = xioc.applicationContextUtil.getBeanLoadUtil();
+        BeanLoadUtil beanLoadUtil = applicationContextUtil.getBeanLoadUtil();
         xioc.applicationContextUtil.publisherEvent(new ApplicationEvent(EventNameConstant.XiocStart));
 
         //加载配置
-        beanLoadUtil.loadPropertie();
-        log.info("xioc配置加载完成");
+        applicationContextUtil.getPropertiesContext().loadProperties();
+        log.info("配置加载完成");
+
+
         //加载BeanDefinition， 主要加载框架中的，各个starter路径下的和传入的class路径下的BeanDefinition
         xioc.loadBeanDefinition(clazz, beanLoadUtil);
         //加载BeanFactoryUtil,并简单初始化bean创建器

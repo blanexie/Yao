@@ -1,5 +1,6 @@
 package xyz.xiezc.ioc.annotation.handler;
 
+import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.StrUtil;
 import xyz.xiezc.ioc.annotation.AnnotationHandler;
 import xyz.xiezc.ioc.annotation.Component;
@@ -8,6 +9,11 @@ import xyz.xiezc.ioc.ApplicationContextUtil;
 import xyz.xiezc.ioc.definition.BeanDefinition;
 import xyz.xiezc.ioc.definition.FieldDefinition;
 import xyz.xiezc.ioc.definition.MethodDefinition;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.Collection;
 
 
 @Component
@@ -47,6 +53,27 @@ public class InjectAnnotationHandler extends AnnotationHandler<Inject> {
         if (StrUtil.isBlank(beanName)) {
             beanName = fieldDefinition.getFieldName();
         }
+
+        Class<?> fieldType = fieldDefinition.getFieldType();
+        //如果是数组类型，则获取数组中的真实类型
+        if (fieldType.isArray()) {
+            Class<?> componentType = fieldType.getComponentType();
+            fieldDefinition.setFieldType(componentType);
+            fieldDefinition.setFieldOrParamTypeEnum(1);
+        }
+        //如果是集合类型， 就获取泛型值
+        if (ClassUtil.isAssignable(Collection.class, fieldType)) {
+            Field declaredField = ClassUtil.getDeclaredField(beanDefinition.getBeanClass(), fieldDefinition.getFieldName());
+            Type genericType = declaredField.getGenericType();
+            if (genericType != null && genericType instanceof ParameterizedType) {
+                ParameterizedType pt = (ParameterizedType) genericType;
+                //得到泛型里的class类型对象
+                Class<?> genericClazz = (Class<?>) pt.getActualTypeArguments()[0];
+                fieldDefinition.setFieldType(genericClazz);
+                fieldDefinition.setFieldOrParamTypeEnum(2);
+            }
+        }
+
         fieldDefinition.setBeanName(beanName);
     }
 }

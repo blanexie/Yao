@@ -1,14 +1,13 @@
 package xyz.xiezc.ioc.definition;
 
 import lombok.Data;
+import xyz.xiezc.ioc.enums.FieldOrParamTypeEnum;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
-import java.util.List;
 import java.util.Objects;
 
 @Data
-public class ParamDefinition<T extends Annotation> {
+public class ParamDefinition{
 
     /**
      * 参数所属的方法
@@ -16,14 +15,15 @@ public class ParamDefinition<T extends Annotation> {
     MethodDefinition methodDefinition;
 
     /**
+     * 如果这个字段有值， 说明这个字段是需要从容器中获取注入的
+     */
+    FieldOrParamTypeEnum fieldOrParamTypeEnum;
+
+    /**
      * 参数名称
      */
     String paramName;
 
-    /**
-     * 如果这个字段有值， 说明这个字段是需要从容器中获取注入的
-     */
-    String BeanName;
     /**
      * 参数类型
      */
@@ -43,7 +43,6 @@ public class ParamDefinition<T extends Annotation> {
         return "ParamDefinition{" +
                 "methodDefinition=" + methodDefinition +
                 ", paramName='" + paramName + '\'' +
-                ", BeanName='" + BeanName + '\'' +
                 ", paramType=" + paramType +
                 '}';
     }
@@ -53,7 +52,7 @@ public class ParamDefinition<T extends Annotation> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof ParamDefinition)) return false;
-        ParamDefinition<?> that = (ParamDefinition<?>) o;
+        ParamDefinition that = (ParamDefinition) o;
         return Objects.equals(getParamName(), that.getParamName()) &&
                 Objects.equals(getParamType(), that.getParamType());
     }

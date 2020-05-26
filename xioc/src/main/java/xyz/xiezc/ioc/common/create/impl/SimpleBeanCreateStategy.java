@@ -47,7 +47,7 @@ public class SimpleBeanCreateStategy implements BeanCreateStrategy {
         }
 
         //检查所有需要注入字段的依赖是否都存在
-        Set<FieldDefinition> annotationFiledDefinitions = beanDefinition.getAnnotationFiledDefinitions();
+        Set<FieldDefinition> annotationFiledDefinitions = beanDefinition.getFieldDefinitions();
         applicationContextUtil.checkFieldDefinitions(annotationFiledDefinitions);
         //检查init方法的参数是否都是空的， bean的init方法的参数必须是空的
         MethodDefinition initMethodDefinition = beanDefinition.getInitMethodDefinition();

@@ -1,6 +1,5 @@
 package xyz.xiezc.ioc.definition;
 
-import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
@@ -62,17 +61,16 @@ public class BeanDefinition {
     /**
      * 有自定义注解的字段
      */
-    private Set<FieldDefinition> annotationFiledDefinitions;
+    private Set<FieldDefinition> fieldDefinitions;
 
     /**
      * 有自定义注解的方法
      */
-    private Set<MethodDefinition> annotationMethodDefinitions;
+    private Set<MethodDefinition> methodDefinitions;
 
     /**
      * 需要在初始化完成后进行调用的方法
-     *
-     * @Init
+     * 一个bean 只能有一个@Init注解的方法
      */
     private MethodDefinition initMethodDefinition;
 
@@ -89,6 +87,14 @@ public class BeanDefinition {
     private Object bean;
 
 
+
+
+    /**
+     * FactoryBean 直接返回对应的对象， 并不是 真正的bean对象
+     *
+     * @param <T>
+     * @return
+     */
     public <T> T getFactoryBean() {
         if (getBeanTypeEnum() == BeanTypeEnum.factoryBean) {
             return (T) bean;
@@ -107,10 +113,15 @@ public class BeanDefinition {
             Xioc.getApplicationContext().createBean(this);
         }
         if (getBeanTypeEnum() == BeanTypeEnum.factoryBean) {
-            return (T) ((FactoryBean) this.bean).getObject();
+            return (T) ((FactoryBean) getFactoryBean()).getObject();
         }
         return (T) this.bean;
     }
+
+
+
+
+
 
     public boolean checkBean() {
         if (StrUtil.isBlank(this.getBeanName())) {
