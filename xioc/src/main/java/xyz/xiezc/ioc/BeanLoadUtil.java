@@ -47,20 +47,6 @@ public class BeanLoadUtil {
         this.applicationContextUtil = applicationContextUtil;
     }
 
-    /**
-     * 加载bean初始化类
-     */
-    public void loadBeanCreateStategy() {
-        List<BeanDefinition> beanDefinitions = applicationContextUtil.getBeanDefinitions(BeanCreateStrategy.class);
-        for (BeanDefinition beanDefinition : beanDefinitions) {
-            beanDefinition = applicationContextUtil.newInstance(beanDefinition);
-            BeanCreateStrategy bean = beanDefinition.getBean();
-            bean.setApplicationContext(applicationContextUtil);
-            applicationContextUtil.putBeanCreateStrategy(bean);
-        }
-        applicationContextUtil.publisherEvent(new ApplicationEvent(EventNameConstant.loadBeanCreateStategy));
-
-    }
 
 
     /**
