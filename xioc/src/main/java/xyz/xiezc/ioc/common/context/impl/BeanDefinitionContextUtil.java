@@ -4,12 +4,14 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
+import xyz.xiezc.ioc.annotation.Component;
 import xyz.xiezc.ioc.common.context.BeanDefinitionContext;
 import xyz.xiezc.ioc.definition.BeanDefinition;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Component
 public class BeanDefinitionContextUtil implements BeanDefinitionContext {
 
     Log log = LogFactory.get(BeanDefinitionContextUtil.class);

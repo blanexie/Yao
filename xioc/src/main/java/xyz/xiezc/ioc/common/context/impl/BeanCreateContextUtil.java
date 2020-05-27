@@ -4,6 +4,7 @@ import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
+import xyz.xiezc.ioc.annotation.Component;
 import xyz.xiezc.ioc.annotation.Inject;
 import xyz.xiezc.ioc.common.NullObj;
 import xyz.xiezc.ioc.common.context.BeanCreateContext;
@@ -22,14 +23,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-
+@Component
 public class BeanCreateContextUtil implements BeanCreateContext {
 
+
+    @Inject
     BeanDefinitionContext beanDefinitionContext;
 
-    public BeanCreateContextUtil(BeanDefinitionContext beanDefinitionContext) {
-        this.beanDefinitionContext = beanDefinitionContext;
-    }
 
     /**
      * 正在创建中的bean缓存，用来判断循环依赖的

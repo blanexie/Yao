@@ -3,11 +3,9 @@ package xyz.xiezc.ioc.annotation.handler;
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
-import xyz.xiezc.ioc.annotation.AnnotationHandler;
-import xyz.xiezc.ioc.annotation.Bean;
-import xyz.xiezc.ioc.annotation.Component;
+import xyz.xiezc.ioc.annotation.*;
 import xyz.xiezc.ioc.ApplicationContextUtil;
-import xyz.xiezc.ioc.annotation.Configuration;
+import xyz.xiezc.ioc.common.context.BeanDefinitionContext;
 import xyz.xiezc.ioc.definition.AnnotationAndHandler;
 import xyz.xiezc.ioc.definition.BeanDefinition;
 import xyz.xiezc.ioc.definition.FieldDefinition;
@@ -30,14 +28,20 @@ public class BeanAnnotationHandler extends AnnotationHandler<Bean> {
     }
 
     @Override
-    public void processClass(Bean annotation, Class clazz, ApplicationContextUtil contextUtil) {
+    public void processClass(Bean annotation, Class clazz) {
 
     }
 
+    @Inject
+    ApplicationContextUtil applicationContextUtil;
+
+    @Inject
+    BeanDefinitionContext beanDefinitionContext;
+
     @Override
-    public void processMethod(MethodDefinition methodDefinition, Bean annotation, BeanDefinition beanDefinition, ApplicationContextUtil contextUtil) {
+    public void processMethod(MethodDefinition methodDefinition, Bean annotation, BeanDefinition beanDefinition) {
         Class beanClass = methodDefinition.getReturnType();
-        BeanDefinition beanDefinitionMethod = dealBeanAnnotation(annotation, beanClass, contextUtil);
+        BeanDefinition beanDefinitionMethod = dealBeanAnnotation(annotation, beanClass, applicationContextUtil);
         beanDefinitionMethod.setBeanTypeEnum(BeanTypeEnum.methodBean);
         beanDefinitionMethod.setInvokeMethodBean(methodDefinition);
         //MethodBean的特殊性，所以beanName 和class重新设置下
@@ -47,11 +51,11 @@ public class BeanAnnotationHandler extends AnnotationHandler<Bean> {
         }
         beanDefinitionMethod.setBeanName(beanName);
         beanClass = getRealBeanClass(beanDefinitionMethod);
-        contextUtil.addBeanDefinition(beanDefinition.getBeanName(), beanClass, beanDefinitionMethod);
+        beanDefinitionContext.addBeanDefinition(beanDefinition.getBeanName(), beanClass, beanDefinitionMethod);
     }
 
     @Override
-    public void processField(FieldDefinition fieldDefinition, Bean annotation, BeanDefinition beanDefinition, ApplicationContextUtil contextUtil) {
+    public void processField(FieldDefinition fieldDefinition, Bean annotation, BeanDefinition beanDefinition) {
 
     }
 }

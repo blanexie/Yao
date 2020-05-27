@@ -6,7 +6,10 @@ import xyz.xiezc.ioc.ApplicationContextUtil;
 import xyz.xiezc.ioc.annotation.AnnotationHandler;
 import xyz.xiezc.ioc.annotation.Aop;
 import xyz.xiezc.ioc.annotation.Component;
+import xyz.xiezc.ioc.annotation.Inject;
 import xyz.xiezc.ioc.common.AopAspect;
+import xyz.xiezc.ioc.common.context.BeanCreateContext;
+import xyz.xiezc.ioc.common.context.BeanDefinitionContext;
 import xyz.xiezc.ioc.definition.BeanDefinition;
 import xyz.xiezc.ioc.definition.FieldDefinition;
 import xyz.xiezc.ioc.definition.MethodDefinition;
@@ -21,30 +24,36 @@ public class AopAnnotationHandler extends AnnotationHandler<Aop> {
         return Aop.class;
     }
 
+    @Inject
+    BeanCreateContext beanCreateContext;
+
+    @Inject
+    BeanDefinitionContext beanDefinitionContext;
+
     @Override
-    public void processClass(Aop annotation, Class clazz, ApplicationContextUtil contextUtil) {
+    public void processClass(Aop annotation, Class clazz) {
         //获取切面类
-        BeanDefinition AopAspectBeanDefinition = contextUtil.getBeanDefinition(annotation.value());
-        contextUtil.newInstance(AopAspectBeanDefinition);
-        AopAspect aspectBean = AopAspectBeanDefinition.getBean();
+        BeanDefinition aopAspectBeanDefinition = beanDefinitionContext.getBeanDefinition(annotation.value());
+        beanCreateContext.newInstance(aopAspectBeanDefinition);
+        AopAspect aspectBean = aopAspectBeanDefinition.getBean();
         //获取所有被切的方法
         Method[] publicMethods = ClassUtil.getPublicMethods(clazz);
         for (Method publicMethod : publicMethods) {
             aspectBean.addMethod(publicMethod);
         }
         //获取bean实例
-        BeanDefinition beanDefinition = contextUtil.getBeanDefinition(clazz);
-        contextUtil.newInstance(beanDefinition);
+        BeanDefinition beanDefinition = beanDefinitionContext.getBeanDefinition(clazz);
+        beanCreateContext.newInstance(aopAspectBeanDefinition);
         Object parentBean = beanDefinition.getBean();
         beanDefinition.setBean(ProxyUtil.proxy(parentBean, aspectBean));
     }
 
     @Override
-    public void processMethod(MethodDefinition methodDefinition, Aop annotation, BeanDefinition beanDefinition, ApplicationContextUtil contextUtil) {
+    public void processMethod(MethodDefinition methodDefinition, Aop annotation, BeanDefinition beanDefinition) {
         //获取切面类
-        BeanDefinition AopAspectBeanDefinition = contextUtil.getBeanDefinition(annotation.value());
-        contextUtil.newInstance(AopAspectBeanDefinition);
-        AopAspect aspectBean = AopAspectBeanDefinition.getBean();
+        BeanDefinition aopAspectBeanDefinition = beanDefinitionContext.getBeanDefinition(annotation.value());
+        beanCreateContext.newInstance(aopAspectBeanDefinition);
+        AopAspect aspectBean = aopAspectBeanDefinition.getBean();
         //获取被切方法
         Method method = methodDefinition.getMethod();
         if (ClassUtil.isPublic(method)) {
@@ -52,13 +61,13 @@ public class AopAnnotationHandler extends AnnotationHandler<Aop> {
         }
         //设置bean实例
         BeanDefinition parentBeanDefinition = methodDefinition.getBeanDefinition();
-        contextUtil.newInstance(parentBeanDefinition);
+        beanCreateContext.newInstance(aopAspectBeanDefinition);
         Object parentBean = parentBeanDefinition.getBean();
         beanDefinition.setBean(ProxyUtil.proxy(parentBean, aspectBean));
     }
 
     @Override
-    public void processField(FieldDefinition fieldDefinition, Aop annotation, BeanDefinition beanDefinition, ApplicationContextUtil contextUtil) {
+    public void processField(FieldDefinition fieldDefinition, Aop annotation, BeanDefinition beanDefinition) {
 
     }
 }

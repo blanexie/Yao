@@ -5,10 +5,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.util.ClassUtil;
 import xyz.xiezc.ioc.Xioc;
-import xyz.xiezc.ioc.annotation.AnnotationHandler;
-import xyz.xiezc.ioc.annotation.BeanScan;
-import xyz.xiezc.ioc.annotation.Component;
-import xyz.xiezc.ioc.annotation.Configuration;
+import xyz.xiezc.ioc.annotation.*;
 import xyz.xiezc.ioc.ApplicationContextUtil;
 import xyz.xiezc.ioc.definition.BeanDefinition;
 import xyz.xiezc.ioc.definition.FieldDefinition;
@@ -31,8 +28,11 @@ public class BeanScanAnnotationHandler extends AnnotationHandler<BeanScan> {
         return BeanScan.class;
     }
 
+    @Inject
+    ApplicationContextUtil applicationContextUtil;
+
     @Override
-    public void processClass(BeanScan annotation, Class clazz, ApplicationContextUtil contextUtil) {
+    public void processClass(BeanScan annotation, Class clazz) {
         //校验是否在@Configuration注解的bean内部
         if (AnnotationUtil.getAnnotation(clazz, Configuration.class) == null) {
             ExceptionUtil.wrapAndThrow(new RuntimeException("@BeanScan必须在@Configuration注解的类上使用，error class:" + clazz.getName()));
@@ -48,18 +48,18 @@ public class BeanScanAnnotationHandler extends AnnotationHandler<BeanScan> {
             packages.add(string);
         }
         for (String aPackage : packages) {
-            contextUtil.getBeanLoadUtil().loadBeanDefinition(aPackage);
+            applicationContextUtil.loadBeanDefinitions(aPackage);
         }
     }
 
 
     @Override
-    public void processMethod(MethodDefinition method, BeanScan annotation, BeanDefinition beanSignature, ApplicationContextUtil contextUtil) {
+    public void processMethod(MethodDefinition method, BeanScan annotation, BeanDefinition beanSignature) {
 
     }
 
     @Override
-    public void processField(FieldDefinition field, BeanScan annotation, BeanDefinition beanSignature, ApplicationContextUtil contextUtil) {
+    public void processField(FieldDefinition field, BeanScan annotation, BeanDefinition beanSignature) {
 
     }
 }

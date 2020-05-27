@@ -3,6 +3,7 @@ package xyz.xiezc.ioc.common.context.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.map.MapUtil;
+import xyz.xiezc.ioc.annotation.Component;
 import xyz.xiezc.ioc.common.context.EventPublisherContext;
 import xyz.xiezc.ioc.common.event.ApplicationEvent;
 import xyz.xiezc.ioc.common.event.ApplicationListener;
@@ -14,6 +15,7 @@ import java.util.stream.Collectors;
 /**
  * 事件监听处理的相关逻辑，
  */
+@Component
 public class EventPublisherContextUtil implements EventPublisherContext {
 
     Map<String, List<ApplicationListener>> listenersMap = new HashMap<>();

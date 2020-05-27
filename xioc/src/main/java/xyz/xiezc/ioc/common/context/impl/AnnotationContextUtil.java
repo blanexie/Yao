@@ -4,6 +4,7 @@ package xyz.xiezc.ioc.common.context.impl;
 import cn.hutool.core.annotation.AnnotationUtil;
 import lombok.Data;
 import xyz.xiezc.ioc.annotation.AnnotationHandler;
+import xyz.xiezc.ioc.annotation.Component;
 import xyz.xiezc.ioc.common.context.AnnotationContext;
 
 import java.lang.annotation.Annotation;
@@ -16,6 +17,7 @@ import java.util.Set;
 /**
  * 处理注解相关的工具类
  */
+@Component
 @Data
 public class AnnotationContextUtil implements AnnotationContext {
 

@@ -4,6 +4,7 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.setting.Setting;
+import xyz.xiezc.ioc.annotation.Component;
 import xyz.xiezc.ioc.common.context.PropertiesContext;
 import xyz.xiezc.ioc.common.event.ApplicationEvent;
 
@@ -11,7 +12,7 @@ import java.io.File;
 
 import static xyz.xiezc.ioc.enums.EventNameConstant.loadPropertie;
 
-
+@Component
 public class PropertiesContextUtil implements PropertiesContext {
 
     private Setting setting;

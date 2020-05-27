@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.SneakyThrows;
 import xyz.xiezc.ioc.ApplicationContextUtil;
 import xyz.xiezc.ioc.annotation.Component;
+import xyz.xiezc.ioc.common.context.BeanCreateContext;
 import xyz.xiezc.ioc.common.create.BeanCreateStrategy;
 import xyz.xiezc.ioc.definition.BeanDefinition;
 import xyz.xiezc.ioc.definition.FieldDefinition;
@@ -45,13 +46,13 @@ public class SimpleBeanCreateStategy implements BeanCreateStrategy {
             log.info("beanDefinition已经初始化了， BeanDefinition:{}", beanDefinition.toString());
             return;
         }
-
+        BeanCreateContext beanCreateContext = applicationContextUtil.getBeanCreateContext();
         //检查所有需要注入字段的依赖是否都存在
         Set<FieldDefinition> annotationFiledDefinitions = beanDefinition.getFieldDefinitions();
-        applicationContextUtil.checkFieldDefinitions(annotationFiledDefinitions);
+        beanCreateContext.checkFieldDefinitions(annotationFiledDefinitions);
         //检查init方法的参数是否都是空的， bean的init方法的参数必须是空的
         MethodDefinition initMethodDefinition = beanDefinition.getInitMethodDefinition();
-        applicationContextUtil.checkInitMethod(initMethodDefinition);
+        beanCreateContext.checkInitMethod(initMethodDefinition);
 
         if (beanDefinition.getBeanStatus() == BeanStatusEnum.Original) {
             Class<?> beanClass = beanDefinition.getBeanClass();
@@ -63,13 +64,13 @@ public class SimpleBeanCreateStategy implements BeanCreateStrategy {
         //注入字段
         if (beanDefinition.getBeanStatus() == BeanStatusEnum.HalfCooked) {
             //设置字段的属性值
-            applicationContextUtil.injectFieldValue(beanDefinition);
+            beanCreateContext.injectFieldValue(beanDefinition);
             beanDefinition.setBeanStatus(BeanStatusEnum.injectField);
         }
 
         //调用init方法
         if (beanDefinition.getBeanStatus() == BeanStatusEnum.injectField) {
-            applicationContextUtil.doInitMethod(beanDefinition);
+            beanCreateContext.doInitMethod(beanDefinition);
             //bean 所有对象设置完整
             beanDefinition.setBeanStatus(BeanStatusEnum.Completed);
         }

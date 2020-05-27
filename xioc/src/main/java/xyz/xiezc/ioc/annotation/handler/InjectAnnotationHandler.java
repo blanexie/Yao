@@ -9,6 +9,7 @@ import xyz.xiezc.ioc.ApplicationContextUtil;
 import xyz.xiezc.ioc.definition.BeanDefinition;
 import xyz.xiezc.ioc.definition.FieldDefinition;
 import xyz.xiezc.ioc.definition.MethodDefinition;
+import xyz.xiezc.ioc.enums.FieldOrParamTypeEnum;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -30,12 +31,12 @@ public class InjectAnnotationHandler extends AnnotationHandler<Inject> {
     }
 
     @Override
-    public void processClass(Inject annotation, Class clazz, ApplicationContextUtil contextUtil) {
+    public void processClass(Inject annotation, Class clazz) {
 
     }
 
     @Override
-    public void processMethod(MethodDefinition methodDefinition, Inject annotation, BeanDefinition beanDefinition, ApplicationContextUtil contextUtil) {
+    public void processMethod(MethodDefinition methodDefinition, Inject annotation, BeanDefinition beanDefinition) {
 
     }
 
@@ -45,10 +46,9 @@ public class InjectAnnotationHandler extends AnnotationHandler<Inject> {
      * @param fieldDefinition 被注解的字段
      * @param annotation      这个类上的所有注解
      * @param beanDefinition  被注解的类
-     * @param contextUtil     容器中已有的所有bean信息
      */
     @Override
-    public void processField(FieldDefinition fieldDefinition, Inject annotation, BeanDefinition beanDefinition, ApplicationContextUtil contextUtil) {
+    public void processField(FieldDefinition fieldDefinition, Inject annotation, BeanDefinition beanDefinition) {
         String beanName = annotation.value();
         if (StrUtil.isBlank(beanName)) {
             beanName = fieldDefinition.getFieldName();
@@ -59,7 +59,7 @@ public class InjectAnnotationHandler extends AnnotationHandler<Inject> {
         if (fieldType.isArray()) {
             Class<?> componentType = fieldType.getComponentType();
             fieldDefinition.setFieldType(componentType);
-            fieldDefinition.setFieldOrParamTypeEnum(1);
+            fieldDefinition.setFieldOrParamTypeEnum(FieldOrParamTypeEnum.Array);
         }
         //如果是集合类型， 就获取泛型值
         if (ClassUtil.isAssignable(Collection.class, fieldType)) {
@@ -70,10 +70,8 @@ public class InjectAnnotationHandler extends AnnotationHandler<Inject> {
                 //得到泛型里的class类型对象
                 Class<?> genericClazz = (Class<?>) pt.getActualTypeArguments()[0];
                 fieldDefinition.setFieldType(genericClazz);
-                fieldDefinition.setFieldOrParamTypeEnum(2);
+                fieldDefinition.setFieldOrParamTypeEnum(FieldOrParamTypeEnum.Collection);
             }
         }
-
-        fieldDefinition.setBeanName(beanName);
     }
 }

@@ -9,6 +9,7 @@ import cn.hutool.core.util.StrUtil;
 import xyz.xiezc.ioc.ApplicationContextUtil;
 import xyz.xiezc.ioc.common.asm.AsmUtil;
 import xyz.xiezc.ioc.common.context.AnnotationContext;
+import xyz.xiezc.ioc.common.context.BeanDefinitionContext;
 import xyz.xiezc.ioc.definition.*;
 import xyz.xiezc.ioc.enums.BeanTypeEnum;
 
@@ -33,9 +34,8 @@ public abstract class AnnotationHandler<T extends Annotation> extends Annotation
      *
      * @param clazz       被注解类的基本信息
      * @param annotation  这个类上的所有注解
-     * @param contextUtil 容器
      */
-    public abstract void processClass(T annotation, Class clazz, ApplicationContextUtil contextUtil);
+    public abstract void processClass(T annotation, Class clazz);
 
     /**
      * 如果是方法注解，则会调用这个方法来处理
@@ -43,9 +43,8 @@ public abstract class AnnotationHandler<T extends Annotation> extends Annotation
      * @param beanDefinition   被注解的类
      * @param methodDefinition 被注解的方法
      * @param annotation       这个类上的所有注解
-     * @param contextUtil      容器中已有的所有bean信息
      */
-    public abstract void processMethod(MethodDefinition methodDefinition, T annotation, BeanDefinition beanDefinition, ApplicationContextUtil contextUtil);
+    public abstract void processMethod(MethodDefinition methodDefinition, T annotation, BeanDefinition beanDefinition);
 
     /**
      * 如果是字段注解，则会调用这个方法来处理
@@ -53,9 +52,8 @@ public abstract class AnnotationHandler<T extends Annotation> extends Annotation
      * @param beanDefinition  被注解的类
      * @param fieldDefinition 被注解的字段
      * @param annotation      这个类上的所有注解
-     * @param contextUtil     容器中已有的所有bean信息
      */
-    public abstract void processField(FieldDefinition fieldDefinition, T annotation, BeanDefinition beanDefinition, ApplicationContextUtil contextUtil);
+    public abstract void processField(FieldDefinition fieldDefinition, T annotation, BeanDefinition beanDefinition);
 
     /**
      * 获取BeanDefinition的真实类型， 因为有些Bean是通过FactoryBean创建的
@@ -94,8 +92,9 @@ public abstract class AnnotationHandler<T extends Annotation> extends Annotation
 
     public static BeanDefinition dealBeanAnnotation(String beanName, Class clazz, ApplicationContextUtil applicationContextUtil) {
         Class<?> beanClass = clazz;
+        BeanDefinitionContext beanDefinitionContext = applicationContextUtil.getBeanDefinitionContext();
         //获取容器中是否存在这个bean
-        BeanDefinition beanDefinition = applicationContextUtil.getBeanDefinition(beanName, beanClass);
+        BeanDefinition beanDefinition = beanDefinitionContext.getBeanDefinition(beanName, beanClass);
         //如果容器中不存在 这个bean。 就要放入
         if (beanDefinition == null) {
             beanDefinition = new BeanDefinition();
@@ -115,7 +114,7 @@ public abstract class AnnotationHandler<T extends Annotation> extends Annotation
         Field[] fields = ReflectUtil.getFields(beanClass);
         //获取这个bean的所有待注入的信息
         for (Field field : fields) {
-            FieldDefinition fieldDefinition = dealFieldDefinition(field, beanDefinition, applicationContextUtil);
+            FieldDefinition fieldDefinition = dealFieldDefinition(field, beanDefinition, applicationContextUtil.getAnnotationContext());
             if (fieldDefinition == null) {
                 continue;
             }
@@ -130,7 +129,7 @@ public abstract class AnnotationHandler<T extends Annotation> extends Annotation
         //获取这个bean中的所有方法
         Method[] methods = ReflectUtil.getMethods(beanClass);
         for (Method method : methods) {
-            MethodDefinition methodDefinition = dealMethodDefinition(method, beanDefinition, applicationContextUtil);
+            MethodDefinition methodDefinition = dealMethodDefinition(method, beanDefinition, applicationContextUtil.getAnnotationContext());
             if (methodDefinition == null) {
                 continue;
             }

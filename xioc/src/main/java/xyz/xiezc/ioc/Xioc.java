@@ -90,36 +90,5 @@ public final class Xioc {
     }
 
 
-    /**
-     * 扫描容器中的所有BeanDefinition的注解信息， 并处理
-     *
-     * @param beanLoadUtil
-     */
-    private void scanBeanDefinition(BeanLoadUtil beanLoadUtil) {
-        //扫描容器中的bean， 处理所有在bean类上的注解
-        beanLoadUtil.scanBeanDefinitionClass();
-    }
-
-    /**
-     * 三个加载逻辑放在一起
-     *
-     * @param clazz
-     * @param beanLoadUtil
-     */
-    private void loadBeanDefinition(Class<?> clazz, BeanLoadUtil beanLoadUtil) {
-        //加载框架中的bean
-        beanLoadUtil.loadBeanDefinition(ClassUtil.getPackage(Xioc.class));
-        //加载starter中的bean
-        beanLoadUtil.loadBeanDefinition(starterPackage);
-        //加载bean信息， 加载用户传入的地址的bean
-        String packagePath = ClassUtil.getPackage(clazz);
-        beanLoadUtil.loadBeanDefinition(packagePath);
-        applicationContextUtil.publisherEvent(new ApplicationEvent(loadBeanDefinition));
-    }
-
-    public Xioc addApplicationListener(String eventName, ApplicationListener applicationListener) {
-        applicationContextUtil.addApplicationListener(eventName, applicationListener);
-        return this;
-    }
 
 }

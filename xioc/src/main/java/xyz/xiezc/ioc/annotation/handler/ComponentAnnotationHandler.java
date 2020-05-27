@@ -1,20 +1,14 @@
 package xyz.xiezc.ioc.annotation.handler;
 
 
-import cn.hutool.core.annotation.AnnotationUtil;
-import cn.hutool.core.collection.CollUtil;
+import xyz.xiezc.ioc.ApplicationContextUtil;
 import xyz.xiezc.ioc.annotation.AnnotationHandler;
 import xyz.xiezc.ioc.annotation.Component;
-import xyz.xiezc.ioc.ApplicationContextUtil;
-import xyz.xiezc.ioc.annotation.Configuration;
-import xyz.xiezc.ioc.definition.*;
-
-import java.lang.annotation.Annotation;
-import java.lang.reflect.AnnotatedElement;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
+import xyz.xiezc.ioc.annotation.Inject;
+import xyz.xiezc.ioc.common.context.BeanDefinitionContext;
+import xyz.xiezc.ioc.definition.BeanDefinition;
+import xyz.xiezc.ioc.definition.FieldDefinition;
+import xyz.xiezc.ioc.definition.MethodDefinition;
 
 @Component
 public class ComponentAnnotationHandler extends AnnotationHandler<Component> {
@@ -24,18 +18,24 @@ public class ComponentAnnotationHandler extends AnnotationHandler<Component> {
         return Component.class;
     }
 
+
+    @Inject
+    BeanDefinitionContext beanDefinitionContext;
+
+    @Inject
+    ApplicationContextUtil applicationContextUtil;
+
     /**
      * 这个注解的左右就是把bean放入容器中
      *
      * @param clazz       被注解的类
      * @param annotation  注解
-     * @param contextUtil 容器中已有的所有bean信息
      */
     @Override
-    public void processClass(Component annotation, Class clazz, ApplicationContextUtil contextUtil) {
-        BeanDefinition beanDefinition =dealBeanAnnotation(annotation, clazz, contextUtil);
+    public void processClass(Component annotation, Class clazz) {
+        BeanDefinition beanDefinition =dealBeanAnnotation(annotation, clazz, applicationContextUtil);
         Class<?> beanClass =getRealBeanClass(beanDefinition);
-        contextUtil.addBeanDefinition(beanDefinition.getBeanName(), beanClass, beanDefinition);
+        beanDefinitionContext.addBeanDefinition(beanDefinition.getBeanName(), beanClass, beanDefinition);
     }
 
     /**
@@ -44,15 +44,14 @@ public class ComponentAnnotationHandler extends AnnotationHandler<Component> {
      * @param methodDefinition 被注解的方法
      * @param annotation       这个类上的所有注解
      * @param beanSignature    被注解的类
-     * @param contextUtil      容器中已有的所有bean信息
      */
     @Override
-    public void processMethod(MethodDefinition methodDefinition, Component annotation, BeanDefinition beanSignature, ApplicationContextUtil contextUtil) {
+    public void processMethod(MethodDefinition methodDefinition, Component annotation, BeanDefinition beanSignature) {
 
     }
 
     @Override
-    public void processField(FieldDefinition fieldDefinition, Component annotation, BeanDefinition beanSignature, ApplicationContextUtil contextUtil) {
+    public void processField(FieldDefinition fieldDefinition, Component annotation, BeanDefinition beanSignature) {
 
     }
 
