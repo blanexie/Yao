@@ -44,9 +44,9 @@
 ### 定义一个启动类
 ```java
 
-import xyz.xiezc.ioc.Xioc;
-import xyz.xiezc.ioc.annotation.Configuration;
-import xyz.xiezc.ioc.starter.orm.annotation.MapperScan;
+import Xioc;
+import Configuration;
+import MapperScan;
 
 @MapperScan("xyz.xiezc.example.web")
 @Configuration
@@ -60,11 +60,11 @@ public class ExampleApplication {
 ###  定义一个Controller放入容器中
 ```java
 import cn.hutool.json.JSONUtil;
-import xyz.xiezc.ioc.annotation.Inject;
-import xyz.xiezc.ioc.starter.orm.common.example.Example;
-import xyz.xiezc.ioc.starter.web.annotation.Controller;
-import xyz.xiezc.ioc.starter.web.annotation.GetMapping;
-import xyz.xiezc.ioc.starter.web.entity.WebContext;
+import Inject;
+import Example;
+import Controller;
+import GetMapping;
+import WebContext;
 
 import java.util.List;
 import java.util.Map;
@@ -95,9 +95,9 @@ public class TestController {
 ```java
 
 import lombok.Data;
-import xyz.xiezc.ioc.starter.orm.annotation.Column;
-import xyz.xiezc.ioc.starter.orm.annotation.Id;
-import xyz.xiezc.ioc.starter.orm.annotation.Table;
+import Column;
+import Id;
+import Table;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -123,7 +123,7 @@ public class Album implements Serializable {
 ```
 ### 定义一个Mapper接口
 ```java
-import xyz.xiezc.ioc.starter.orm.common.BaseMapper;
+import BaseMapper;
 
 public interface AlbumMapper extends BaseMapper<Album> {
 }
@@ -134,8 +134,8 @@ public interface AlbumMapper extends BaseMapper<Album> {
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
-import xyz.xiezc.ioc.starter.web.annotation.WebSockerController;
-import xyz.xiezc.ioc.starter.web.netty.websocket.WebSocketFrameHandler;
+import WebSockerController;
+import WebSocketFrameHandler;
 
 @WebSockerController("/websocket")
 public class WebSocketHandler implements WebSocketFrameHandler {

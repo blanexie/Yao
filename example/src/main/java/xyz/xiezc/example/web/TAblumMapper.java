@@ -1,6 +1,6 @@
 package xyz.xiezc.example.web;
 
-import xyz.xiezc.ioc.annotation.Component;
+import xyz.xiezc.ioc.system.annotation.Component;
 
 @Component
 public class TAblumMapper implements TestA {

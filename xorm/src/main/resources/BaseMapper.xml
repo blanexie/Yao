@@ -60,7 +60,7 @@
         </where>
     </sql>
     <sql id="XZCBase_Column_List">id,create_time,type,publish_time,cover_id,see,title</sql>
-    <select id="selectByExample" parameterType="xyz.xiezc.ioc.starter.orm.common.example.Example" resultMap="XZCBaseResultMap">
+    <select id="selectByExample" parameterType="xyz.xiezc.ioc.starter.starter.orm.common.example.Example" resultMap="XZCBaseResultMap">
         select
         <if test="distinct">distinct</if>
         <include refid="XZCBase_Column_List"/>
@@ -80,7 +80,7 @@
         from t_album whereid = #{id}
     </select>
     <select id="deleteByPrimaryKey" parameterType="java.lang.Integer">delete from t_albumwhere id= #{id}</select>
-    <select id="deleteByExample" parameterType="xyz.xiezc.ioc.starter.orm.common.example.Example">
+    <select id="deleteByExample" parameterType="xyz.xiezc.ioc.starter.starter.orm.common.example.Example">
         delete from t_album
         <if test="_parameter != null">
             <include refid="XZCExample_Where_Clause"/>
@@ -110,7 +110,7 @@
             <if test="title != null">#{title},</if>
         </trim>
     </insert>
-    <select id="countByExample" parameterType="xyz.xiezc.ioc.starter.orm.common.example.Example" resultType="java.lang.Long">
+    <select id="countByExample" parameterType="xyz.xiezc.ioc.starter.starter.orm.common.example.Example" resultType="java.lang.Long">
         select count(*) from t_album
         <if test="_parameter != null">
             <include refid="Example_Where_Clause"/>
