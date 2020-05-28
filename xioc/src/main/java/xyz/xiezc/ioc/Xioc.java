@@ -2,12 +2,18 @@ package xyz.xiezc.ioc;
 
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.util.ClassUtil;
+import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 import lombok.Data;
 import xyz.xiezc.ioc.annotation.Configuration;
+import xyz.xiezc.ioc.common.context.BeanDefinitionContext;
+import xyz.xiezc.ioc.common.context.impl.BeanDefinitionContextUtil;
 import xyz.xiezc.ioc.common.event.ApplicationEvent;
 import xyz.xiezc.ioc.common.event.ApplicationListener;
+import xyz.xiezc.ioc.definition.BeanDefinition;
+import xyz.xiezc.ioc.enums.BeanStatusEnum;
+import xyz.xiezc.ioc.enums.BeanTypeEnum;
 import xyz.xiezc.ioc.enums.EventNameConstant;
 
 import static xyz.xiezc.ioc.enums.EventNameConstant.loadBeanDefinition;
@@ -64,6 +70,25 @@ public final class Xioc {
         applicationContextUtil.getPropertiesContext().loadProperties();
         log.info("配置加载完成");
 
+        //框架特殊类想加入容器中， 并且初始化。
+        // 1. 一些content基本类
+        // 2. ComponentAnnotationHandler   和 ConfigurationAnnotationHandler
+
+
+
+        //扫描所有的bean。 同时要注意configuration中配置的Bean注解和BeanScan注解
+
+
+        //执行这里的扩展方法
+
+        //开始初始化
+        //1. 先特殊初始化类创建器
+        //2. 初始化 事件处理器
+        //3. 初始化普通类
+        //4. 遍历容器中，重复1到3过程，直到所有bean都处理完成
+
+        //执行结束后的扩展点
+
 
         //加载BeanDefinition， 主要加载框架中的，各个starter路径下的和传入的class路径下的BeanDefinition
         xioc.loadBeanDefinition(clazz, beanLoadUtil);
@@ -90,5 +115,17 @@ public final class Xioc {
     }
 
 
+    /**
+     *
+     */
+    public static BeanDefinition newInstance(Class<?> clazz) {
+        BeanDefinition beanDefinition = new BeanDefinition();
+        beanDefinition.setBeanTypeEnum(BeanTypeEnum.bean);
+        beanDefinition.setBeanStatus(BeanStatusEnum.Completed);
+        beanDefinition.setBeanClass(clazz);
+        beanDefinition.setBeanName(clazz.getName());
+        beanDefinition.setBean(ReflectUtil.newInstanceIfPossible(clazz));
+        return beanDefinition;
+    }
 
 }

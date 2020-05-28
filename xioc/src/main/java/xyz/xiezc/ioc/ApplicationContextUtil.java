@@ -9,10 +9,7 @@ import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 import cn.hutool.setting.Setting;
 import lombok.Data;
-import xyz.xiezc.ioc.annotation.AnnotationHandler;
-import xyz.xiezc.ioc.annotation.Component;
-import xyz.xiezc.ioc.annotation.Configuration;
-import xyz.xiezc.ioc.annotation.EventListener;
+import xyz.xiezc.ioc.annotation.*;
 import xyz.xiezc.ioc.common.context.*;
 import xyz.xiezc.ioc.common.context.impl.*;
 import xyz.xiezc.ioc.common.create.BeanCreateStrategy;
@@ -49,15 +46,15 @@ public class ApplicationContextUtil {
      */
     public static ExecutorService executorService = ThreadUtil.newExecutor(1, 100);
 
-    private BeanDefinitionContext beanDefinitionContext;
+    private BeanDefinitionContext beanDefinitionContext = new BeanDefinitionContextUtil();
+    private AnnotationContext annotationContext = new AnnotationContextUtil();
+    private PropertiesContext propertiesContext = new PropertiesContextUtil();
+    private EventPublisherContext eventPublisherContext = new EventPublisherContextUtil();
 
-    private AnnotationContext annotationContext;
-
-    private BeanCreateContext beanCreateContext;
-
-    private PropertiesContext propertiesContext;
-
-    private EventPublisherContext eventPublisherContext;
+    /**
+     *
+     */
+    private BeanCreateContext beanCreateContext = new BeanCreateContextUtil(beanDefinitionContext, propertiesContext);
 
     /**
      * 加载其他starter需要扫描的package路径
@@ -84,7 +81,6 @@ public class ApplicationContextUtil {
         for (BeanDefinition beanDefinition : beanDefinitions) {
             beanDefinition = beanCreateContext.newInstance(beanDefinition);
             BeanCreateStrategy bean = beanDefinition.getBean();
-            bean.setApplicationContext(this);
             beanCreateContext.putBeanCreateStrategy(bean);
         }
     }
@@ -154,7 +150,7 @@ public class ApplicationContextUtil {
         for (AnnotationAndHandler annotationAndHandler : collect) {
             AnnotationHandler annotationHandler = annotationAndHandler.getAnnotationHandler();
             Annotation annotation = annotationAndHandler.getAnnotation();
-            annotationHandler.processClass(annotation, cla, this);
+            annotationHandler.processClass(annotation, cla);
         }
     }
 
@@ -189,7 +185,7 @@ public class ApplicationContextUtil {
             for (AnnotationAndHandler annotationAndHandler : collect) {
                 AnnotationHandler annotationHandler = annotationAndHandler.getAnnotationHandler();//processField()
                 Annotation annotation = annotationAndHandler.getAnnotation();
-                annotationHandler.processField(fieldDefinition, annotation, beanDefinition, this);
+                annotationHandler.processField(fieldDefinition, annotation, beanDefinition);
             }
         }
     }
@@ -225,7 +221,7 @@ public class ApplicationContextUtil {
             for (AnnotationAndHandler annotationAndHandler : collect) {
                 AnnotationHandler annotationHandler = annotationAndHandler.getAnnotationHandler();
                 Annotation annotation = annotationAndHandler.getAnnotation();
-                annotationHandler.processMethod(methodDefinition, annotation, beanDefinition, this);
+                annotationHandler.processMethod(methodDefinition, annotation, beanDefinition);
             }
         }
     }
@@ -262,6 +258,7 @@ public class ApplicationContextUtil {
      * 加载某个具体的类BeanDefinition到容器中， 前提是这个类必须被@Component 和 Configuration注解
      */
     private void loadBeanDefinition(Class clazz) {
+
         //获取上面的component 注解
         Component component = AnnotationUtil.getAnnotation(clazz, Component.class);
         if (component != null) {

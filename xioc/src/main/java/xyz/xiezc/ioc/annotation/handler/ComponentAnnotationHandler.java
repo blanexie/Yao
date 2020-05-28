@@ -18,7 +18,6 @@ public class ComponentAnnotationHandler extends AnnotationHandler<Component> {
         return Component.class;
     }
 
-
     @Inject
     BeanDefinitionContext beanDefinitionContext;
 

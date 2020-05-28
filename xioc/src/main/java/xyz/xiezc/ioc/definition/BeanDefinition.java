@@ -9,7 +9,6 @@ import xyz.xiezc.ioc.Xioc;
 import xyz.xiezc.ioc.enums.BeanStatusEnum;
 import xyz.xiezc.ioc.enums.BeanTypeEnum;
 
-import java.lang.reflect.AnnotatedElement;
 import java.util.Objects;
 import java.util.Set;
 
@@ -24,11 +23,15 @@ import java.util.Set;
 public class BeanDefinition {
 
     Log log = LogFactory.get(BeanDefinition.class);
+    /**
+     * bean的class
+     */
+    private Class<?> beanClass;
 
     /**
-     * 这个bean上面的所有注解
+     * bean paramName
      */
-    AnnotatedElement annotatedElement;
+    private String beanName;
 
     /**
      * 默认都是单例的
@@ -49,24 +52,9 @@ public class BeanDefinition {
     private BeanStatusEnum beanStatus = BeanStatusEnum.Original;
 
     /**
-     * bean paramName
-     */
-    private String beanName;
-
-    /**
-     * bean的class
-     */
-    private Class<?> beanClass;
-
-    /**
-     * 有自定义注解的字段
+     * 有inject和value注解的才会放入这里
      */
     private Set<FieldDefinition> fieldDefinitions;
-
-    /**
-     * 有自定义注解的方法
-     */
-    private Set<MethodDefinition> methodDefinitions;
 
     /**
      * 需要在初始化完成后进行调用的方法
@@ -85,9 +73,6 @@ public class BeanDefinition {
      * 具体的实例, 当beanScopeEnum为methodBean的时候，要注意下这个值是方法的返回值
      */
     private Object bean;
-
-
-
 
     /**
      * FactoryBean 直接返回对应的对象， 并不是 真正的bean对象
@@ -109,18 +94,11 @@ public class BeanDefinition {
      * @return
      */
     public <T> T getBean() {
-        if (bean == null) {
-            Xioc.getApplicationContext().createBean(this);
-        }
         if (getBeanTypeEnum() == BeanTypeEnum.factoryBean) {
             return (T) ((FactoryBean) getFactoryBean()).getObject();
         }
         return (T) this.bean;
     }
-
-
-
-
 
 
     public boolean checkBean() {

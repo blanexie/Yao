@@ -24,11 +24,11 @@ public class BeanDefinitionContextUtil implements BeanDefinitionContext {
     /**
      * bean的class与Beandefinition的映射关系
      */
-    Map<Class<?>, BeanDefinition> classaAndBeanDefinitionMap = new HashMap<>();
+    Map<Class<?>, BeanDefinition> classAndBeanDefinitionMap = new HashMap<>();
 
     @Override
     public List<BeanDefinition> getAllBeanDefintion() {
-        Collection<BeanDefinition> values = classaAndBeanDefinitionMap.values();
+        Collection<BeanDefinition> values = classAndBeanDefinitionMap.values();
         return CollectionUtil.newArrayList(values);
     }
 
@@ -44,7 +44,7 @@ public class BeanDefinitionContextUtil implements BeanDefinitionContext {
             throw new RuntimeException("请注入正确的bean到容器中, bean: " + beanDefinition.toString());
         }
         nameAndClassMap.put(beanName, beanClass);
-        classaAndBeanDefinitionMap.put(beanClass, beanDefinition);
+        classAndBeanDefinitionMap.put(beanClass, beanDefinition);
     }
 
     /**
@@ -61,7 +61,7 @@ public class BeanDefinitionContextUtil implements BeanDefinitionContext {
             return null;
         }
         if (ClassUtil.isAssignable(beanClass, aClass)) {
-            return classaAndBeanDefinitionMap.get(beanClass);
+            return classAndBeanDefinitionMap.get(beanClass);
         }
         return null;
     }
@@ -97,7 +97,7 @@ public class BeanDefinitionContextUtil implements BeanDefinitionContext {
             // 5. name 不存在，  class有子bean ： 选择第一个子bean注入
             return beanDefinitions.get(0);
         } else {
-            BeanDefinition beanDefinition = classaAndBeanDefinitionMap.get(beanClass);
+            BeanDefinition beanDefinition = classAndBeanDefinitionMap.get(beanClass);
             if (beanDefinition != null) {
                 // 1. name存在， class 一样 ：  注入
                 return beanDefinition;
@@ -130,7 +130,7 @@ public class BeanDefinitionContextUtil implements BeanDefinitionContext {
         if (aClass == null) {
             return null;
         }
-        BeanDefinition beanDefinition = classaAndBeanDefinitionMap.get(aClass);
+        BeanDefinition beanDefinition = classAndBeanDefinitionMap.get(aClass);
         return beanDefinition;
     }
 
@@ -159,7 +159,7 @@ public class BeanDefinitionContextUtil implements BeanDefinitionContext {
     @Override
     public BeanDefinition getBeanDefinition(Class<?> beanClass) {
         //先获取最契合的
-        BeanDefinition beanDefinition = classaAndBeanDefinitionMap.get(beanClass);
+        BeanDefinition beanDefinition = classAndBeanDefinitionMap.get(beanClass);
         if (beanDefinition != null) {
             return beanDefinition;
         }
@@ -174,10 +174,10 @@ public class BeanDefinitionContextUtil implements BeanDefinitionContext {
      */
     @Override
     public List<BeanDefinition> getBeanDefinitions(Class<?> beanClass) {
-        Set<Class<?>> classes = classaAndBeanDefinitionMap.keySet();
+        Set<Class<?>> classes = classAndBeanDefinitionMap.keySet();
         List<BeanDefinition> collect = classes.stream()
                 .filter(clazz -> ClassUtil.isAssignable(beanClass, clazz))
-                .map(classaAndBeanDefinitionMap::get)
+                .map(classAndBeanDefinitionMap::get)
                 .collect(Collectors.toList());
         return collect;
     }

@@ -1,22 +1,17 @@
 package xyz.xiezc.ioc.annotation.handler;
 
-import cn.hutool.Hutool;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONNull;
 import xyz.xiezc.ioc.annotation.AnnotationHandler;
 import xyz.xiezc.ioc.annotation.Component;
 import xyz.xiezc.ioc.annotation.Inject;
 import xyz.xiezc.ioc.annotation.Value;
 import xyz.xiezc.ioc.ApplicationContextUtil;
 import xyz.xiezc.ioc.common.NullObj;
-import xyz.xiezc.ioc.common.context.PropertiesContext;
 import xyz.xiezc.ioc.common.context.impl.PropertiesContextUtil;
 import xyz.xiezc.ioc.definition.BeanDefinition;
 import xyz.xiezc.ioc.definition.FieldDefinition;
 import xyz.xiezc.ioc.definition.MethodDefinition;
 import xyz.xiezc.ioc.enums.FieldOrParamTypeEnum;
-
-import javax.lang.model.type.NullType;
 
 @Component
 public class ValueAnnotationHandler extends AnnotationHandler<Value> {
@@ -50,9 +45,9 @@ public class ValueAnnotationHandler extends AnnotationHandler<Value> {
         fieldDefinition.setFieldOrParamTypeEnum(FieldOrParamTypeEnum.Properties);
         String str = propertiesContextUtil.getSetting().getStr(value);
         if (StrUtil.isBlank(str)) {
-            fieldDefinition.setObj(NullObj.NULL);
+            fieldDefinition.setFieldValue(NullObj.NULL);
         } else {
-            fieldDefinition.setObj(str);
+            fieldDefinition.setFieldValue(str);
         }
     }
 }

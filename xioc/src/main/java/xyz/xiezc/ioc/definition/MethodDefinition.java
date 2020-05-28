@@ -11,8 +11,6 @@ import java.util.Objects;
 @Data
 public class MethodDefinition {
 
-    AnnotatedElement annotatedElement;
-
     /**
      * 方法所在的bean
      */
@@ -27,6 +25,11 @@ public class MethodDefinition {
      * 方法
      */
     Method method;
+
+    /**
+     * 方法名
+     */
+    String methodName;
 
     /**
      * 方法的参数

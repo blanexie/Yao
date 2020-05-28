@@ -4,6 +4,7 @@ import lombok.Data;
 import xyz.xiezc.ioc.enums.FieldOrParamTypeEnum;
 
 import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Field;
 import java.util.Objects;
 
 @Data
@@ -13,6 +14,20 @@ public class FieldDefinition {
      * 这个字段所在的bean
      */
     BeanDefinition beanDefinition;
+    /**
+     * 字段的类型。 如果字段是array或者Collecter类型。 则这里表示的是真实的类型
+     */
+    Class<?> fieldType;
+
+    /**
+     * 字段
+     */
+    Field field;
+
+    /**
+     * 字段的名称
+     */
+    String fieldName;
 
     /**
      * 1. 数组类型
@@ -22,24 +37,10 @@ public class FieldDefinition {
     FieldOrParamTypeEnum fieldOrParamTypeEnum;
 
     /**
-     * 字段的类型。 如果字段是array或者Collecter类型。 则这里表示的是真实的类型
-     */
-    Class<?> fieldType;
-
-    /**
-     * 字段的名称
-     */
-    String fieldName;
-
-    /**
-     * 字段上的注解
-     */
-    AnnotatedElement annotatedElement;
-
-    /**
      * 字段值
      */
-    Object obj;
+    Object fieldValue;
+
 
     @Override
     public String toString() {

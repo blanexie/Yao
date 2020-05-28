@@ -81,7 +81,7 @@ public abstract class AnnotationHandler<T extends Annotation> extends Annotation
     }
 
 
-    public static BeanDefinition dealBeanAnnotation(Annotation annotation, Class clazz, ApplicationContextUtil applicationContextUtil) {
+    protected  BeanDefinition dealBeanAnnotation(Annotation annotation, Class clazz, ApplicationContextUtil applicationContextUtil) {
         String beanName = AnnotationUtil.getAnnotationValue(clazz, annotation.annotationType(), "value");
         if (StrUtil.isBlank(beanName)) {
             beanName = clazz.getTypeName();
@@ -90,7 +90,7 @@ public abstract class AnnotationHandler<T extends Annotation> extends Annotation
     }
 
 
-    public static BeanDefinition dealBeanAnnotation(String beanName, Class clazz, ApplicationContextUtil applicationContextUtil) {
+    protected BeanDefinition dealBeanAnnotation(String beanName, Class clazz, ApplicationContextUtil applicationContextUtil) {
         Class<?> beanClass = clazz;
         BeanDefinitionContext beanDefinitionContext = applicationContextUtil.getBeanDefinitionContext();
         //获取容器中是否存在这个bean
@@ -102,8 +102,6 @@ public abstract class AnnotationHandler<T extends Annotation> extends Annotation
             beanDefinition.setBeanName(beanName);
         }
         //获取这个容器中的注解
-        AnnotatedElement annotatedElement = new CombinationAnnotationElement(beanClass);
-        beanDefinition.setAnnotatedElement(annotatedElement);
         if (ClassUtil.isAssignable(FactoryBean.class, beanClass)) {
             beanDefinition.setBeanTypeEnum(BeanTypeEnum.factoryBean);
         } else {
@@ -145,7 +143,7 @@ public abstract class AnnotationHandler<T extends Annotation> extends Annotation
     }
 
 
-    private static FieldDefinition dealFieldDefinition(Field field, BeanDefinition beanDefinition, AnnotationContext annotationContext) {
+    protected FieldDefinition dealFieldDefinition(Field field, BeanDefinition beanDefinition, AnnotationContext annotationContext) {
         //获取字段上的所有注解
         Annotation[] annotations = AnnotationUtil.getAnnotations(field, true);
         //校验排除一些注解
@@ -160,14 +158,13 @@ public abstract class AnnotationHandler<T extends Annotation> extends Annotation
             fieldDefinition.setBeanDefinition(beanDefinition);
             fieldDefinition.setFieldName(field.getName());
             fieldDefinition.setFieldType(field.getType());
-            fieldDefinition.setAnnotatedElement(new CombinationAnnotationElement(field));
             return fieldDefinition;
         }
         return null;
     }
 
 
-    private static MethodDefinition dealMethodDefinition(Method method, BeanDefinition beanDefinition, AnnotationContext annotationContext) {
+    protected MethodDefinition dealMethodDefinition(Method method, BeanDefinition beanDefinition, AnnotationContext annotationContext) {
         //获取字段上的所有注解
         Annotation[] annotations = cn.hutool.core.annotation.AnnotationUtil.getAnnotations(method, true);
         //校验排除一些注解
@@ -185,7 +182,6 @@ public abstract class AnnotationHandler<T extends Annotation> extends Annotation
             methodDefinition.setReturnType(method.getReturnType());
             ParamDefinition[] methodParamsAndAnnotaton = AsmUtil.getMethodParamsAndAnnotaton(method);
             methodDefinition.setParamDefinitions(methodParamsAndAnnotaton);
-            methodDefinition.setAnnotatedElement(new CombinationAnnotationElement(method));
             return methodDefinition;
         }
         return null;

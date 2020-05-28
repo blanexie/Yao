@@ -28,15 +28,12 @@ public class ParamDefinition{
      * 参数类型
      */
     Class<?> paramType;
-    /**
-     * 参数的注解
-     */
-    AnnotatedElement annotatedElement;
 
     /**
      * 具体的参数值
      */
     Object param;
+
 
     @Override
     public String toString() {

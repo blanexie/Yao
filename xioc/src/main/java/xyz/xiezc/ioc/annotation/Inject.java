@@ -28,6 +28,4 @@ public @interface Inject {
      */
     String value() default "";
 
-    boolean requrie() default true;
-
 }
