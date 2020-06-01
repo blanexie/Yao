@@ -1,6 +1,7 @@
 package xyz.xiezc.ioc.system.annotation.handler;
 
 
+import lombok.Data;
 import xyz.xiezc.ioc.system.ApplicationContextUtil;
 import xyz.xiezc.ioc.starter.annotation.AnnotationHandler;
 import xyz.xiezc.ioc.system.annotation.Component;
@@ -10,6 +11,7 @@ import xyz.xiezc.ioc.system.common.definition.BeanDefinition;
 import xyz.xiezc.ioc.system.common.definition.FieldDefinition;
 import xyz.xiezc.ioc.system.common.definition.MethodDefinition;
 
+@Data
 public class ComponentAnnotationHandler extends AnnotationHandler<Component> {
 
     @Override
@@ -17,7 +19,6 @@ public class ComponentAnnotationHandler extends AnnotationHandler<Component> {
         return Component.class;
     }
 
-    BeanDefinitionContext beanDefinitionContext;
 
     ApplicationContextUtil applicationContextUtil;
 
@@ -31,7 +32,7 @@ public class ComponentAnnotationHandler extends AnnotationHandler<Component> {
     public void processClass(Component annotation, Class clazz) {
         BeanDefinition beanDefinition =dealBeanAnnotation(annotation, clazz, applicationContextUtil);
         Class<?> beanClass =getRealBeanClass(beanDefinition);
-        beanDefinitionContext.addBeanDefinition(beanDefinition.getBeanName(), beanClass, beanDefinition);
+        applicationContextUtil.getBeanDefinitionContext().addBeanDefinition(beanDefinition.getBeanName(), beanClass, beanDefinition);
     }
 
     /**

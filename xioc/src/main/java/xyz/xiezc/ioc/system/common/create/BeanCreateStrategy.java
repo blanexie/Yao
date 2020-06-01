@@ -37,13 +37,9 @@ public abstract class BeanCreateStrategy {
 
     protected PropertiesContext propertiesContext;
 
-    /**
-     * 校验循环依赖的set集合
-     */
-    static Set<BeanDefinition> creatingBeanDefinitions = new HashSet<>();
 
     /**
-     * 创建bean
+
      *
      * @param beanDefinition
      */
@@ -56,18 +52,7 @@ public abstract class BeanCreateStrategy {
      */
     protected abstract BeanTypeEnum getBeanTypeEnum();
 
-    /**
-     * 移除正在创建中的bean
-     *
-     * @param beanDefinition
-     */
-    public void removeCreatingBeanDefinition(BeanDefinition beanDefinition) {
-        creatingBeanDefinitions.remove(beanDefinition.getBeanName());
-    }
 
-    public boolean isCircularDependenceBeanDefinition(BeanDefinition beanDefinition) {
-        return !creatingBeanDefinitions.add(beanDefinition);
-    }
 
     protected void doInitMethod(BeanDefinition beanDefinition) {
         //调用对应bean的init方法

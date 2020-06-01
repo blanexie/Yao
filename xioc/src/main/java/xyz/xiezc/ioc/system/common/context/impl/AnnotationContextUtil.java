@@ -111,7 +111,7 @@ public class AnnotationContextUtil implements AnnotationContext {
     }
 
     @Override
-    public <T extends Annotation> AnnotationHandler<T> getAnnotationAnnotationHandler(Class<T> clazz) {
+    public <T extends Annotation> AnnotationHandler<T> getAnnotationAnnotationHandler(Class<?> clazz) {
         return annoAndHandlerMap.get(clazz);
     }
 

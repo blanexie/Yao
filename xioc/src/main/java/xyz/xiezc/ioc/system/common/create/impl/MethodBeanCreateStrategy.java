@@ -41,11 +41,6 @@ public class MethodBeanCreateStrategy extends BeanCreateStrategy {
             log.info("beanDefinition已经初始化了， BeanDefinition:{}", beanDefinition.toString());
             return beanDefinition;
         }
-        //判断循环依赖， 同时把BeanDefinition 放路创建中的缓存map中
-        if (isCircularDependenceBeanDefinition(beanDefinition)) {
-            throw new CircularDependenceException(beanDefinition.toString());
-        }
-
         //检查所有需要注入字段的依赖是否都存在
         Set<FieldDefinition> annotationFiledDefinitions = beanDefinition.getFieldDefinitions();
         this.checkFieldDefinitions(annotationFiledDefinitions);
@@ -101,7 +96,6 @@ public class MethodBeanCreateStrategy extends BeanCreateStrategy {
             beanDefinition.setBeanStatus(BeanStatusEnum.Completed);
         }
 
-        removeCreatingBeanDefinition(beanDefinition);
         return beanDefinition;
     }
 

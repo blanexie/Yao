@@ -9,7 +9,6 @@ import xyz.xiezc.ioc.system.ApplicationContextUtil;
 import xyz.xiezc.ioc.system.common.asm.AsmUtil;
 import xyz.xiezc.ioc.system.common.context.AnnotationContext;
 import xyz.xiezc.ioc.system.common.context.BeanDefinitionContext;
-import xyz.xiezc.ioc.definition.*;
 import xyz.xiezc.ioc.system.common.enums.BeanTypeEnum;
 import xyz.xiezc.ioc.system.common.definition.*;
 

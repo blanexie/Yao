@@ -1,21 +1,20 @@
 package xyz.xiezc.ioc.system.annotation.handler;
 
+import cn.hutool.core.util.StrUtil;
+import lombok.Data;
 import xyz.xiezc.ioc.starter.annotation.AnnotationHandler;
-import xyz.xiezc.ioc.system.annotation.Component;
-import xyz.xiezc.ioc.system.annotation.Configuration;
 import xyz.xiezc.ioc.system.ApplicationContextUtil;
-import xyz.xiezc.ioc.starter.annotation.Inject;
-import xyz.xiezc.ioc.system.common.context.BeanDefinitionContext;
-import xyz.xiezc.ioc.definition.*;
+import xyz.xiezc.ioc.system.annotation.Configuration;
 import xyz.xiezc.ioc.system.common.definition.BeanDefinition;
 import xyz.xiezc.ioc.system.common.definition.FieldDefinition;
 import xyz.xiezc.ioc.system.common.definition.MethodDefinition;
+import xyz.xiezc.ioc.system.common.enums.BeanTypeEnum;
 
 
 /**
  * 被configuration 注解的方法的处理逻辑
  */
-@Component
+@Data
 public class ConfigurationAnnotationHandler extends AnnotationHandler<Configuration> {
 
     @Override
@@ -23,16 +22,14 @@ public class ConfigurationAnnotationHandler extends AnnotationHandler<Configurat
         return Configuration.class;
     }
 
-    @Inject
     ApplicationContextUtil applicationContextUtil;
-    @Inject
-    BeanDefinitionContext beanDefinitionContext;
+
 
     @Override
     public void processClass(Configuration annotation, Class clazz) {
         BeanDefinition beanDefinition = dealBeanAnnotation(annotation, clazz, applicationContextUtil);
         Class<?> beanClass = getRealBeanClass(beanDefinition);
-        beanDefinitionContext.addBeanDefinition(beanDefinition.getBeanName(), beanClass, beanDefinition);
+        applicationContextUtil.getBeanDefinitionContext().addBeanDefinition(beanDefinition.getBeanName(), beanClass, beanDefinition);
         //处理@Bean和@BeanScan注解
 
 
@@ -40,6 +37,18 @@ public class ConfigurationAnnotationHandler extends AnnotationHandler<Configurat
 
 
 
+        Class beanClass = methodDefinition.getReturnType();
+        BeanDefinition beanDefinitionMethod = dealBeanAnnotation(annotation, beanClass, applicationContextUtil);
+        beanDefinitionMethod.setBeanTypeEnum(BeanTypeEnum.methodBean);
+        beanDefinitionMethod.setInvokeMethodBean(methodDefinition);
+        //MethodBean的特殊性，所以beanName 和class重新设置下
+        String beanName = annotation.value();
+        if (StrUtil.isBlank(beanName)) {
+            beanName = methodDefinition.getMethod().getName();
+        }
+        beanDefinitionMethod.setBeanName(beanName);
+        beanClass = getRealBeanClass(beanDefinitionMethod);
+        beanDefinitionContext.addBeanDefinition(beanDefinition.getBeanName(), beanClass, beanDefinitionMethod);
 
     }
 

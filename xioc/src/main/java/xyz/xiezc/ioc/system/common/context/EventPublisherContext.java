@@ -3,16 +3,25 @@ package xyz.xiezc.ioc.system.common.context;
 import xyz.xiezc.ioc.system.event.ApplicationEvent;
 import xyz.xiezc.ioc.system.event.ApplicationListener;
 
+import java.util.List;
+
 /**
  * 事件监听器接口 管理类
  */
 public interface EventPublisherContext {
 
+    /**
+     * Add a listener to be notified of all events.
+     *
+     * @param eventName the listener to add
+     */
+    List<ApplicationListener> getApplicationListener(String eventName);
 
     /**
      * Add a listener to be notified of all events.
      *
-     * @param listener the listener to add
+     * @param listener  the listener to add
+     * @param eventName the listener to add
      */
     void addApplicationListener(String eventName, ApplicationListener listener);
 
@@ -36,5 +45,5 @@ public interface EventPublisherContext {
      *
      * @param event the event to multicast
      */
-     void publisherEvent(ApplicationEvent event);
+    void publisherEvent(ApplicationEvent event);
 }

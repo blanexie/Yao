@@ -33,11 +33,6 @@ public class FactoryBeanCreateStrategy extends BeanCreateStrategy {
             return beanDefinition;
         }
 
-        //判断循环依赖， 同时把BeanDefinition 放路创建中的缓存map中
-        if (isCircularDependenceBeanDefinition(beanDefinition)) {
-            throw new CircularDependenceException(beanDefinition.toString());
-        }
-
         //检查所有需要注入字段的依赖是否都存在
         Set<FieldDefinition> fieldDefinitions = beanDefinition.getFieldDefinitions();
         this.checkFieldDefinitions(fieldDefinitions);
@@ -64,8 +59,6 @@ public class FactoryBeanCreateStrategy extends BeanCreateStrategy {
             //bean 所有对象设置完整
             beanDefinition.setBeanStatus(BeanStatusEnum.Completed);
         }
-
-        removeCreatingBeanDefinition(beanDefinition);
         return beanDefinition;
     }
 

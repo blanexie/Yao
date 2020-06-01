@@ -22,8 +22,6 @@ public class ApplicationEvent {
         return this.timestamp;
     }
 
-
     private Dict dict;
-
 
 }

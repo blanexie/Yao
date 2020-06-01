@@ -60,11 +60,11 @@ public interface AnnotationContext {
      * 获取一个注解上面的注解处理器
      * 注解的注解的处理器
      *
-     * @param clazz
      * @param <T>
+     * @param clazz
      * @return
      */
-    <T extends Annotation> AnnotationHandler<T> getAnnotationAnnotationHandler(Class<T> clazz);
+    <T extends Annotation> AnnotationHandler<T> getAnnotationAnnotationHandler(Class<?> clazz);
 
     /**
      * 获取一个方法参数 parameter上面的注解处理器

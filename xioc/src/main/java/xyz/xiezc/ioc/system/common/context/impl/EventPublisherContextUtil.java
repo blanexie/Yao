@@ -20,6 +20,12 @@ public class EventPublisherContextUtil implements EventPublisherContext {
 
 
     @Override
+    public List<ApplicationListener> getApplicationListener(String eventName) {
+        List<ApplicationListener> applicationListeners = listenersMap.get(eventName);
+        return applicationListeners;
+    }
+
+    @Override
     public void addApplicationListener(String eventName, ApplicationListener listener) {
         List<ApplicationListener> applicationListeners = listenersMap.get(eventName);
         if (CollUtil.isEmpty(applicationListeners)) {

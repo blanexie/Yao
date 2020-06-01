@@ -27,7 +27,11 @@ public class SimpleBeanCreateStategy extends BeanCreateStrategy {
         return BeanTypeEnum.bean;
     }
 
-
+    /**
+      *
+     * @param beanDefinition
+     * @return
+     */
     @SneakyThrows
     @Override
     public BeanDefinition createBean(BeanDefinition beanDefinition) {
@@ -37,10 +41,6 @@ public class SimpleBeanCreateStategy extends BeanCreateStrategy {
             return beanDefinition;
         }
 
-        //判断循环依赖， 同时把BeanDefinition 放路创建中的缓存map中
-        if (isCircularDependenceBeanDefinition(beanDefinition)) {
-            throw new CircularDependenceException(beanDefinition.toString());
-        }
 
         //检查所有需要注入字段的依赖是否都存在
         Set<FieldDefinition> fieldDefinitions = beanDefinition.getFieldDefinitions();
@@ -70,8 +70,7 @@ public class SimpleBeanCreateStategy extends BeanCreateStrategy {
             beanDefinition.setBeanStatus(BeanStatusEnum.Completed);
         }
 
-        //移除创建中的
-        removeCreatingBeanDefinition(beanDefinition);
+
         return beanDefinition;
     }
 

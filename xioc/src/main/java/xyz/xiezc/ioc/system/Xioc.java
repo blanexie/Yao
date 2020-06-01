@@ -5,12 +5,27 @@ import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 import lombok.Data;
+import xyz.xiezc.ioc.starter.annotation.AnnotationHandler;
+import xyz.xiezc.ioc.starter.annotation.EventListener;
+import xyz.xiezc.ioc.starter.annotation.handler.*;
 import xyz.xiezc.ioc.system.annotation.Configuration;
+import xyz.xiezc.ioc.system.annotation.handler.ComponentAnnotationHandler;
+import xyz.xiezc.ioc.system.annotation.handler.ConfigurationAnnotationHandler;
+import xyz.xiezc.ioc.system.common.context.AnnotationContext;
+import xyz.xiezc.ioc.system.common.context.BeanCreateContext;
+import xyz.xiezc.ioc.system.common.context.BeanDefinitionContext;
+import xyz.xiezc.ioc.system.common.context.EventPublisherContext;
 import xyz.xiezc.ioc.system.event.ApplicationEvent;
 import xyz.xiezc.ioc.system.common.definition.BeanDefinition;
 import xyz.xiezc.ioc.system.common.enums.BeanStatusEnum;
 import xyz.xiezc.ioc.system.common.enums.BeanTypeEnum;
 import xyz.xiezc.ioc.system.common.enums.EventNameConstant;
+import xyz.xiezc.ioc.system.event.ApplicationListener;
+
+import java.lang.annotation.Annotation;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * 超级简单的依赖注入小框架
@@ -24,21 +39,19 @@ import xyz.xiezc.ioc.system.common.enums.EventNameConstant;
 @Data
 public final class Xioc {
 
-    static Log log = LogFactory.get(Xioc.class);
+    private static Log log = LogFactory.get(Xioc.class);
 
     /**
      * 装载依赖的容器. 当依赖全部注入完成的时候,这个集合会清空
      */
-    private final ApplicationContextUtil applicationContextUtil = new ApplicationContextUtil();
+    private ApplicationContextUtil applicationContextUtil;
 
     /**
      * 加载其他starter需要扫描的package路径
      */
     public final String starterPackage = "xyz.xiezc.ioc.starter";
 
-    static Xioc xioc;
-
-    public static Class<?> bootClass;
+    private static Xioc xioc;
 
     /**
      * 启动方法,
@@ -47,63 +60,146 @@ public final class Xioc {
      */
     public static ApplicationContextUtil run(Class<?> clazz) {
         xioc = new Xioc();
-        bootClass = clazz;
-
         //校验启动类上是否有@Configuration注解
         if (AnnotationUtil.getAnnotation(clazz, Configuration.class) == null) {
             throw new RuntimeException("请在启动类" + clazz.getName() + "上增加@Configuration注解");
         }
-
-        ApplicationContextUtil applicationContextUtil = xioc.applicationContextUtil;
-
-        //加载配置
+        //new创建ApplicationContextUtil类， beanDefinitionContext，annotationContext，propertiesContext，eventPublisherContext 等实现类
+        ApplicationContextUtil applicationContextUtil = new ApplicationContextUtil();
+        xioc.applicationContextUtil = applicationContextUtil;
+        log.info("ApplicationContextUtil加载完成.............");
+        //## 调用propertiesContext的loadProperties方法，先加载配置文件到容器中。
         applicationContextUtil.getPropertiesContext().loadProperties();
-        log.info("配置加载完成");
+        log.info("PropertiesContext加载完成..................");
 
+        //## 先初始化系统中的annotationHandler类，并将注解处理器全部放入annotationContext中.
+        loadAnnotationHandler(applicationContextUtil);
+        log.info("加载注解初始化类完成........................");
 
-        //先扫描一次bean
-        applicationContextUtil.scanBeanDefinitionClass();
-        //框架特殊类想加入容器中， 并且初始化。
-        // 1. 一些content基本类
-        // 2. ComponentAnnotationHandler   和 ConfigurationAnnotationHandler
+        //## 扫描路径下的所有的需要需要注入容器中的类， 主要是Component和Configuration两个注解注释的类
+        applicationContextUtil.loadBeanDefinitions(clazz);
+        log.info("加载注解初始化类完成........................");
 
+        //## 遍历所有的beanDefinition，优先初始化用户自定义的annotationHandler类和ApplicationListener类。
+        AnnotationContext annotationContext = applicationContextUtil.getAnnotationContext();
+        BeanCreateContext beanCreateContext = applicationContextUtil.getBeanCreateContext();
+        BeanDefinitionContext beanDefinitionContext = applicationContextUtil.getBeanDefinitionContext();
+        EventPublisherContext eventPublisherContext = applicationContextUtil.getEventPublisherContext();
+        loadAnnotationHandlerAndApplicationListener(annotationContext, beanCreateContext, beanDefinitionContext, eventPublisherContext);
 
+        //## 遍历剩下的的beanDefinition，并且初始化
+        Collection<BeanDefinition> allBeanDefintion = beanDefinitionContext.getAllBeanDefintion();
+        CopyOnWriteArrayList<BeanDefinition> copyOnWriteArrayList = new CopyOnWriteArrayList<>(allBeanDefintion);
+        for (BeanDefinition beanDefinition : copyOnWriteArrayList) {
+            beanCreateContext.createBean(beanDefinition);
+        }
+        log.info("初始化所有类完成..........................");
+        ApplicationEvent applicationEvent3 = new ApplicationEvent("createBean");
+        eventPublisherContext.publisherEvent(applicationEvent3);
 
+        return xioc.getApplicationContextUtil();
+    }
 
+    /**
+     * 初始化加载AnnotationHandler和ApplicationListener
+     *
+     * @param annotationContext
+     * @param beanCreateContext
+     * @param beanDefinitionContext
+     * @param eventPublisherContext
+     */
+    private static void loadAnnotationHandlerAndApplicationListener(AnnotationContext annotationContext, BeanCreateContext beanCreateContext, BeanDefinitionContext beanDefinitionContext, EventPublisherContext eventPublisherContext) {
+        //1. 先初始化注解处理器
+        List<BeanDefinition> beanDefinitions = beanDefinitionContext.getBeanDefinitions(AnnotationHandler.class);
+        for (BeanDefinition beanDefinition : beanDefinitions) {
+            Class<?> beanClass = beanDefinition.getBeanClass();
+            AnnotationHandler<Annotation> annotationAnnotationHandler = annotationContext.getAnnotationAnnotationHandler(beanClass);
+            if (annotationAnnotationHandler == null) {
+                //初始化注解处理器
+                BeanDefinition bean = beanCreateContext.createBean(beanDefinition);
+                annotationContext.addAnnotationHandler(bean.getBean());
+            }
+        }
+        log.info("加载所有的注解处理器类.....................");
+        ApplicationEvent applicationEvent1 = new ApplicationEvent("annotationHandler");
+        eventPublisherContext.publisherEvent(applicationEvent1);
 
+        //2. 初始化相关的ApplicationListener
+        List<BeanDefinition> beanDefinitionList = beanDefinitionContext.getBeanDefinitions(ApplicationListener.class);
+        for (BeanDefinition beanDefinition : beanDefinitionList) {
+            BeanDefinition bean = beanCreateContext.createBean(beanDefinition);
+            ApplicationListener applicationListener = bean.getBean();
 
-        //扫描所有的bean。 同时要注意configuration中配置的Bean注解和BeanScan注解
+            Class<?> beanClass = beanDefinition.getBeanClass();
+            EventListener eventListener = AnnotationUtil.getAnnotation(beanClass, EventListener.class);
+            String[] eventNames = eventListener.eventName();
+            for (String eventName : eventNames) {
+                eventPublisherContext.addApplicationListener(eventName, applicationListener);
+            }
+        }
+        log.info("加载所有的事件处理器类.....................");
+        ApplicationEvent applicationEvent2 = new ApplicationEvent("applicationListener");
+        eventPublisherContext.publisherEvent(applicationEvent2);
+    }
 
+    /**
+     * 先初始化系统中的annotationHandler类，并将注解处理器全部放入annotationContext中.
+     *
+     * @param applicationContextUtil
+     */
+    private static void loadAnnotationHandler(ApplicationContextUtil applicationContextUtil) {
+        BeanDefinitionContext beanDefinitionContext = applicationContextUtil.getBeanDefinitionContext();
+        AnnotationContext annotationContext = applicationContextUtil.getAnnotationContext();
 
-        //执行这里的扩展方法
+        //Component注解
+        ComponentAnnotationHandler componentAnnotationHandler = ReflectUtil.newInstanceIfPossible(ComponentAnnotationHandler.class);
+        componentAnnotationHandler.setApplicationContextUtil(applicationContextUtil);
+        BeanDefinition beanDefinition = newInstance(ComponentAnnotationHandler.class, componentAnnotationHandler);
+        beanDefinitionContext.addBeanDefinition(beanDefinition.getBeanName(), beanDefinition.getBeanClass(), beanDefinition);
+        annotationContext.addAnnotationHandler(componentAnnotationHandler);
 
-        //开始初始化
-        //1. 先特殊初始化类创建器
-        //2. 初始化 事件处理器
-        //3. 初始化普通类
-        //4. 遍历容器中，重复1到3过程，直到所有bean都处理完成
+        //Configuration注解
+        ConfigurationAnnotationHandler configurationAnnotationHandler = ReflectUtil.newInstanceIfPossible(ConfigurationAnnotationHandler.class);
+        configurationAnnotationHandler.setApplicationContextUtil(applicationContextUtil);
+        BeanDefinition beanDefinition2 = newInstance(ConfigurationAnnotationHandler.class, configurationAnnotationHandler);
+        beanDefinitionContext.addBeanDefinition(beanDefinition2.getBeanName(), beanDefinition2.getBeanClass(), beanDefinition2);
+        annotationContext.addAnnotationHandler(configurationAnnotationHandler);
 
-        //执行结束后的扩展点
+        //InjectAnnotationHandler注解
+        InjectAnnotationHandler injectAnnotationHandler = ReflectUtil.newInstanceIfPossible(InjectAnnotationHandler.class);
+        BeanDefinition beanDefinition3 = newInstance(InjectAnnotationHandler.class, injectAnnotationHandler);
+        beanDefinitionContext.addBeanDefinition(beanDefinition3.getBeanName(), beanDefinition3.getBeanClass(), beanDefinition3);
+        annotationContext.addAnnotationHandler(injectAnnotationHandler);
 
+        //ValueAnnotationHandler注解
+        ValueAnnotationHandler valueAnnotationHandler = ReflectUtil.newInstanceIfPossible(ValueAnnotationHandler.class);
+        BeanDefinition beanDefinition4 = newInstance(ValueAnnotationHandler.class, valueAnnotationHandler);
+        beanDefinitionContext.addBeanDefinition(beanDefinition4.getBeanName(), beanDefinition4.getBeanClass(), beanDefinition4);
+        annotationContext.addAnnotationHandler(valueAnnotationHandler);
 
-        //加载BeanDefinition， 主要加载框架中的，各个starter路径下的和传入的class路径下的BeanDefinition
-        xioc.loadBeanDefinition(clazz, beanLoadUtil);
-        //加载BeanFactoryUtil,并简单初始化bean创建器
-        beanLoadUtil.loadBeanCreateStategy();
-        //加载注解处理器
-        beanLoadUtil.loadAnnotationHandler();
-        //加载容器中的事件处理相关的bean
-        beanLoadUtil.loadEventListener();
-        log.info("xioc的事件处理器加载完成");
-        xioc.scanBeanDefinition(beanLoadUtil);
-        log.info("xioc的BeanDefinition加载完成");
+        //InitAnnotationHandler注解
+        InitAnnotationHandler initAnnotationHandler = ReflectUtil.newInstanceIfPossible(InitAnnotationHandler.class);
+        BeanDefinition beanDefinition5 = newInstance(InitAnnotationHandler.class, initAnnotationHandler);
+        beanDefinitionContext.addBeanDefinition(beanDefinition5.getBeanName(), beanDefinition5.getBeanClass(), beanDefinition5);
+        annotationContext.addAnnotationHandler(initAnnotationHandler);
 
-        //注入依赖和初始化
-        beanLoadUtil.initAndInjectBeans();
-        log.info("xioc的bean初始化完成");
-        xioc.applicationContextUtil.publisherEvent(new ApplicationEvent(EventNameConstant.XiocEnd));
-        log.info("xioc 容器加载完成");
-        return xioc;
+        //BeanScanAnnotationHandler注解
+        BeanScanAnnotationHandler beanScanAnnotationHandler = ReflectUtil.newInstanceIfPossible(BeanScanAnnotationHandler.class);
+        BeanDefinition beanDefinition6 = newInstance(BeanScanAnnotationHandler.class, beanScanAnnotationHandler);
+        beanDefinitionContext.addBeanDefinition(beanDefinition6.getBeanName(), beanDefinition6.getBeanClass(), beanDefinition6);
+        annotationContext.addAnnotationHandler(beanScanAnnotationHandler);
+
+        //BeanAnnotationHandler注解
+        BeanAnnotationHandler beanAnnotationHandler = ReflectUtil.newInstanceIfPossible(BeanAnnotationHandler.class);
+        BeanDefinition beanDefinition7 = newInstance(BeanAnnotationHandler.class, beanAnnotationHandler);
+        beanDefinitionContext.addBeanDefinition(beanDefinition7.getBeanName(), beanDefinition7.getBeanClass(), beanDefinition7);
+        annotationContext.addAnnotationHandler(beanAnnotationHandler);
+
+        //AopAnnotationHandler注解
+        AopAnnotationHandler aopAnnotationHandler = ReflectUtil.newInstanceIfPossible(AopAnnotationHandler.class);
+        BeanDefinition beanDefinition8 = newInstance(AopAnnotationHandler.class, aopAnnotationHandler);
+        beanDefinitionContext.addBeanDefinition(beanDefinition8.getBeanName(), beanDefinition8.getBeanClass(), beanDefinition8);
+        annotationContext.addAnnotationHandler(aopAnnotationHandler);
     }
 
     public static ApplicationContextUtil getApplicationContext() {
@@ -114,13 +210,13 @@ public final class Xioc {
     /**
      *
      */
-    public static BeanDefinition newInstance(Class<?> clazz) {
+    public static <T> BeanDefinition newInstance(Class<T> clazz, T t) {
         BeanDefinition beanDefinition = new BeanDefinition();
         beanDefinition.setBeanTypeEnum(BeanTypeEnum.bean);
         beanDefinition.setBeanStatus(BeanStatusEnum.Completed);
         beanDefinition.setBeanClass(clazz);
         beanDefinition.setBeanName(clazz.getName());
-        beanDefinition.setBean(ReflectUtil.newInstanceIfPossible(clazz));
+        beanDefinition.setBean(t);
         return beanDefinition;
     }
 
