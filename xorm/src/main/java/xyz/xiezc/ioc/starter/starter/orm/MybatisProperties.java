@@ -25,7 +25,7 @@ import lombok.Data;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.ExecutorType;
 import xyz.xiezc.ioc.system.annotation.Component;
-import xyz.xiezc.ioc.starter.annotation.Value;
+import xyz.xiezc.ioc.system.annotation.Value;
 
 /**
  * Configuration properties for Mybatis.

@@ -28,8 +28,8 @@ public class FactoryBeanCreateStrategy extends BeanCreateStrategy {
     @Override
     public BeanDefinition createBean(BeanDefinition beanDefinition) {
         BeanStatusEnum beanStatus = beanDefinition.getBeanStatus();
-        if (beanStatus == BeanStatusEnum.Completed) {
-            log.info("beanDefinition已经初始化了， BeanDefinition:{}", beanDefinition.toString());
+        if (beanStatus == BeanStatusEnum.Original) {
+            log.info("beanDefinition已经产生了， BeanDefinition:{}", beanDefinition.toString());
             return beanDefinition;
         }
 
@@ -47,18 +47,7 @@ public class FactoryBeanCreateStrategy extends BeanCreateStrategy {
             beanDefinition.setBean(bean);
             beanDefinition.setBeanStatus(BeanStatusEnum.HalfCooked);
         }
-        //注入字段
-        if (beanDefinition.getBeanStatus() == BeanStatusEnum.HalfCooked) {
-            //设置字段的属性值
-            this.injectFieldValue(beanDefinition);
-            beanDefinition.setBeanStatus(BeanStatusEnum.injectField);
-        }
-        //调用init方法
-        if (beanDefinition.getBeanStatus() == BeanStatusEnum.injectField) {
-            this.doInitMethod(beanDefinition);
-            //bean 所有对象设置完整
-            beanDefinition.setBeanStatus(BeanStatusEnum.Completed);
-        }
+
         return beanDefinition;
     }
 

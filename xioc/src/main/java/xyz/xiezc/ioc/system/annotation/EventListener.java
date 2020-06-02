@@ -1,4 +1,4 @@
-package xyz.xiezc.ioc.starter.annotation;
+package xyz.xiezc.ioc.system.annotation;
 
 
 import xyz.xiezc.ioc.system.annotation.Component;

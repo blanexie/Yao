@@ -8,6 +8,7 @@ import lombok.Setter;
 import xyz.xiezc.ioc.system.common.enums.BeanStatusEnum;
 import xyz.xiezc.ioc.system.common.enums.BeanTypeEnum;
 
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -51,14 +52,14 @@ public class BeanDefinition {
     private BeanStatusEnum beanStatus = BeanStatusEnum.Original;
 
     /**
-     * 有inject和value注解的才会放入这里
+     * 有自定义注解的字段
      */
-    private Set<FieldDefinition> fieldDefinitions;
+    private Set<FieldDefinition> fieldDefinitions = new HashSet<>();
 
     /**
-     * 有inject和value注解的才会放入这里
+     * 有自定义注解的方法
      */
-    private Set<MethodDefinition> methodDefinitions;
+    private Set<MethodDefinition> methodDefinitions = new HashSet<>();
 
     /**
      * 需要在初始化完成后进行调用的方法

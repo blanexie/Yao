@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 /**
  * 事件监听处理的相关逻辑，
  */
-@Component
 public class EventPublisherContextUtil implements EventPublisherContext {
 
     Map<String, List<ApplicationListener>> listenersMap = new HashMap<>();

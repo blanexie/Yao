@@ -1,6 +1,5 @@
 package xyz.xiezc.ioc.system.annotation;
 
-import xyz.xiezc.ioc.starter.annotation.AnnotationHandler;
 import xyz.xiezc.ioc.system.annotation.handler.ConfigurationAnnotationHandler;
 
 import java.lang.annotation.ElementType;

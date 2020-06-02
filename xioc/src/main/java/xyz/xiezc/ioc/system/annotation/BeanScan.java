@@ -1,6 +1,4 @@
-package xyz.xiezc.ioc.starter.annotation;
-
-import xyz.xiezc.ioc.starter.annotation.handler.BeanScanAnnotationHandler;
+package xyz.xiezc.ioc.system.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -33,9 +31,5 @@ public @interface BeanScan {
      * that serves no purpose other than being referenced by this attribute.
      */
     Class<?>[] basePackageClasses() default {};
-
-
-    Class<? extends AnnotationHandler> annotationHandler () default BeanScanAnnotationHandler.class;
-
 
 }

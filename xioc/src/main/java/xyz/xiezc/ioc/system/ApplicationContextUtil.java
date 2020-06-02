@@ -6,7 +6,7 @@ import cn.hutool.core.util.ClassUtil;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 import lombok.Data;
-import xyz.xiezc.ioc.starter.annotation.AnnotationHandler;
+import xyz.xiezc.ioc.system.annotation.AnnotationHandler;
 import xyz.xiezc.ioc.system.annotation.Component;
 import xyz.xiezc.ioc.system.annotation.Configuration;
 import xyz.xiezc.ioc.system.annotation.handler.ComponentAnnotationHandler;
@@ -39,7 +39,7 @@ public class ApplicationContextUtil {
     /**
      *
      */
-    private BeanCreateContext beanCreateContext = new BeanCreateContextUtil(beanDefinitionContext, propertiesContext);
+    private BeanCreateContext beanCreateContext = new BeanCreateContextUtil(this);
 
     /**
      * 加载其他starter需要扫描的package路径
@@ -76,14 +76,14 @@ public class ApplicationContextUtil {
         if (component != null) {
             BeanDefinition beanDefinition = beanDefinitionContext.getBeanDefinition(ComponentAnnotationHandler.class);
             AnnotationHandler annotationHandler = beanDefinition.getBean();
-            annotationHandler.processClass(component, clazz);
+            annotationHandler.processClass(component, clazz, null);
         }
 
         Configuration configuration = AnnotationUtil.getAnnotation(clazz, Configuration.class);
         if (configuration != null) {
             BeanDefinition beanDefinition = beanDefinitionContext.getBeanDefinition(ConfigurationAnnotationHandler.class);
             AnnotationHandler annotationHandler = beanDefinition.getBean();
-            annotationHandler.processClass(configuration, clazz);
+            annotationHandler.processClass(configuration, clazz, null);
         }
     }
 

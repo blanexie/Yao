@@ -11,7 +11,6 @@ import xyz.xiezc.ioc.system.common.definition.BeanDefinition;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Component
 public class BeanDefinitionContextUtil implements BeanDefinitionContext {
 
     Log log = LogFactory.get(BeanDefinitionContextUtil.class);

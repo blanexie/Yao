@@ -6,7 +6,7 @@ import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.Data;
-import xyz.xiezc.ioc.starter.annotation.Value;
+import xyz.xiezc.ioc.system.annotation.Value;
 import xyz.xiezc.ioc.system.common.NullObj;
 import xyz.xiezc.ioc.system.common.context.BeanCreateContext;
 import xyz.xiezc.ioc.system.common.context.BeanDefinitionContext;
@@ -20,7 +20,6 @@ import xyz.xiezc.ioc.system.common.enums.FieldOrParamTypeEnum;
 
 import java.lang.reflect.Method;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -54,14 +53,6 @@ public abstract class BeanCreateStrategy {
 
 
 
-    protected void doInitMethod(BeanDefinition beanDefinition) {
-        //调用对应bean的init方法
-        MethodDefinition initMethodDefinition = beanDefinition.getInitMethodDefinition();
-        if (initMethodDefinition != null) {
-            Object bean = beanDefinition.getBean();
-            ReflectUtil.invoke(bean, initMethodDefinition.getMethod());
-        }
-    }
 
     /**
      * 设置bean的字段属性值
@@ -183,7 +174,7 @@ public abstract class BeanCreateStrategy {
                 }
                 boolean b = propertiesContext.getSetting().containsKey(fieldName);
                 if (b) {
-                    throw new RuntimeException("要注入的字段不存在p配置文件中， fieldDefinition:" + fieldDefinition.toString());
+                    throw new RuntimeException("要注入的字段不存在p配置文件中，fieldDefinition:" + fieldDefinition.toString());
                 }
             }
         }

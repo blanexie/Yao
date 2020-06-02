@@ -69,7 +69,7 @@ public class AsmUtil {
 
         Parameter[] parameters = method.getParameters();
         for (int i = 0; i < parameters.length; i++) {
-            paramNames[i].setAnnotatedElement(new CombinationAnnotationElement(parameters[i]));
+            paramNames[i].setParameter(parameters[i]);
         }
 
         return paramNames;

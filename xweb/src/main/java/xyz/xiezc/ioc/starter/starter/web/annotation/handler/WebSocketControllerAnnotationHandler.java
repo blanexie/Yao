@@ -1,7 +1,7 @@
 package xyz.xiezc.ioc.starter.starter.web.annotation.handler;
 
 import xyz.xiezc.ioc.system.ApplicationContextUtil;
-import xyz.xiezc.ioc.starter.annotation.AnnotationHandler;
+import xyz.xiezc.ioc.system.annotation.AnnotationHandler;
 import xyz.xiezc.ioc.system.annotation.Component;
 import xyz.xiezc.ioc.system.common.definition.BeanDefinition;
 import xyz.xiezc.ioc.system.common.definition.FieldDefinition;

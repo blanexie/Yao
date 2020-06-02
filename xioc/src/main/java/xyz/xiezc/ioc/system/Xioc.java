@@ -5,12 +5,10 @@ import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 import lombok.Data;
-import xyz.xiezc.ioc.starter.annotation.AnnotationHandler;
-import xyz.xiezc.ioc.starter.annotation.EventListener;
-import xyz.xiezc.ioc.starter.annotation.handler.*;
+import xyz.xiezc.ioc.system.annotation.AnnotationHandler;
+import xyz.xiezc.ioc.system.annotation.EventListener;
 import xyz.xiezc.ioc.system.annotation.Configuration;
-import xyz.xiezc.ioc.system.annotation.handler.ComponentAnnotationHandler;
-import xyz.xiezc.ioc.system.annotation.handler.ConfigurationAnnotationHandler;
+import xyz.xiezc.ioc.system.annotation.handler.*;
 import xyz.xiezc.ioc.system.common.context.AnnotationContext;
 import xyz.xiezc.ioc.system.common.context.BeanCreateContext;
 import xyz.xiezc.ioc.system.common.context.BeanDefinitionContext;
@@ -19,7 +17,6 @@ import xyz.xiezc.ioc.system.event.ApplicationEvent;
 import xyz.xiezc.ioc.system.common.definition.BeanDefinition;
 import xyz.xiezc.ioc.system.common.enums.BeanStatusEnum;
 import xyz.xiezc.ioc.system.common.enums.BeanTypeEnum;
-import xyz.xiezc.ioc.system.common.enums.EventNameConstant;
 import xyz.xiezc.ioc.system.event.ApplicationListener;
 
 import java.lang.annotation.Annotation;
@@ -167,12 +164,14 @@ public final class Xioc {
 
         //InjectAnnotationHandler注解
         InjectAnnotationHandler injectAnnotationHandler = ReflectUtil.newInstanceIfPossible(InjectAnnotationHandler.class);
+        injectAnnotationHandler.setApplicationContextUtil(applicationContextUtil);
         BeanDefinition beanDefinition3 = newInstance(InjectAnnotationHandler.class, injectAnnotationHandler);
         beanDefinitionContext.addBeanDefinition(beanDefinition3.getBeanName(), beanDefinition3.getBeanClass(), beanDefinition3);
         annotationContext.addAnnotationHandler(injectAnnotationHandler);
 
         //ValueAnnotationHandler注解
         ValueAnnotationHandler valueAnnotationHandler = ReflectUtil.newInstanceIfPossible(ValueAnnotationHandler.class);
+        valueAnnotationHandler.setPropertiesContext(applicationContextUtil.getPropertiesContext());
         BeanDefinition beanDefinition4 = newInstance(ValueAnnotationHandler.class, valueAnnotationHandler);
         beanDefinitionContext.addBeanDefinition(beanDefinition4.getBeanName(), beanDefinition4.getBeanClass(), beanDefinition4);
         annotationContext.addAnnotationHandler(valueAnnotationHandler);
@@ -183,20 +182,10 @@ public final class Xioc {
         beanDefinitionContext.addBeanDefinition(beanDefinition5.getBeanName(), beanDefinition5.getBeanClass(), beanDefinition5);
         annotationContext.addAnnotationHandler(initAnnotationHandler);
 
-        //BeanScanAnnotationHandler注解
-        BeanScanAnnotationHandler beanScanAnnotationHandler = ReflectUtil.newInstanceIfPossible(BeanScanAnnotationHandler.class);
-        BeanDefinition beanDefinition6 = newInstance(BeanScanAnnotationHandler.class, beanScanAnnotationHandler);
-        beanDefinitionContext.addBeanDefinition(beanDefinition6.getBeanName(), beanDefinition6.getBeanClass(), beanDefinition6);
-        annotationContext.addAnnotationHandler(beanScanAnnotationHandler);
-
-        //BeanAnnotationHandler注解
-        BeanAnnotationHandler beanAnnotationHandler = ReflectUtil.newInstanceIfPossible(BeanAnnotationHandler.class);
-        BeanDefinition beanDefinition7 = newInstance(BeanAnnotationHandler.class, beanAnnotationHandler);
-        beanDefinitionContext.addBeanDefinition(beanDefinition7.getBeanName(), beanDefinition7.getBeanClass(), beanDefinition7);
-        annotationContext.addAnnotationHandler(beanAnnotationHandler);
-
         //AopAnnotationHandler注解
         AopAnnotationHandler aopAnnotationHandler = ReflectUtil.newInstanceIfPossible(AopAnnotationHandler.class);
+        aopAnnotationHandler.setBeanCreateContext(applicationContextUtil.getBeanCreateContext());
+        aopAnnotationHandler.setBeanDefinitionContext(applicationContextUtil.getBeanDefinitionContext());
         BeanDefinition beanDefinition8 = newInstance(AopAnnotationHandler.class, aopAnnotationHandler);
         beanDefinitionContext.addBeanDefinition(beanDefinition8.getBeanName(), beanDefinition8.getBeanClass(), beanDefinition8);
         annotationContext.addAnnotationHandler(aopAnnotationHandler);
@@ -210,7 +199,7 @@ public final class Xioc {
     /**
      *
      */
-    public static <T> BeanDefinition newInstance(Class<T> clazz, T t) {
+    private static <T> BeanDefinition newInstance(Class<T> clazz, T t) {
         BeanDefinition beanDefinition = new BeanDefinition();
         beanDefinition.setBeanTypeEnum(BeanTypeEnum.bean);
         beanDefinition.setBeanStatus(BeanStatusEnum.Completed);

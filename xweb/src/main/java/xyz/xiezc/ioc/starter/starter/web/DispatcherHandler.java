@@ -12,7 +12,7 @@ import io.netty.handler.codec.http.cookie.Cookie;
 import lombok.SneakyThrows;
 import xyz.xiezc.ioc.system.Xioc;
 import xyz.xiezc.ioc.system.annotation.Component;
-import xyz.xiezc.ioc.starter.annotation.Init;
+import xyz.xiezc.ioc.system.annotation.Init;
 import xyz.xiezc.ioc.system.common.definition.BeanDefinition;
 import xyz.xiezc.ioc.system.common.definition.MethodDefinition;
 import xyz.xiezc.ioc.starter.starter.web.common.ContentType;

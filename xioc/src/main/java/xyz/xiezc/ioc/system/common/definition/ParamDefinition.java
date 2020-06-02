@@ -3,6 +3,7 @@ package xyz.xiezc.ioc.system.common.definition;
 import lombok.Data;
 import xyz.xiezc.ioc.system.common.enums.FieldOrParamTypeEnum;
 
+import java.lang.reflect.Parameter;
 import java.util.Objects;
 
 @Data
@@ -18,6 +19,10 @@ public class ParamDefinition{
      */
     FieldOrParamTypeEnum fieldOrParamTypeEnum;
 
+    /**
+     * 参数
+     */
+    Parameter parameter;
     /**
      * 参数名称
      */

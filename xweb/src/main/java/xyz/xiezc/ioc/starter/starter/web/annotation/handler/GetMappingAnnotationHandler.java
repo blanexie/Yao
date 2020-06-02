@@ -4,7 +4,7 @@ import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import xyz.xiezc.ioc.system.ApplicationContextUtil;
-import xyz.xiezc.ioc.starter.annotation.AnnotationHandler;
+import xyz.xiezc.ioc.system.annotation.AnnotationHandler;
 import xyz.xiezc.ioc.system.annotation.Component;
 import xyz.xiezc.ioc.system.common.definition.BeanDefinition;
 import xyz.xiezc.ioc.system.common.definition.FieldDefinition;

@@ -1,8 +1,7 @@
-package xyz.xiezc.ioc.starter.annotation;
+package xyz.xiezc.ioc.system.annotation;
 
-import xyz.xiezc.ioc.starter.annotation.handler.AopAnnotationHandler;
+import xyz.xiezc.ioc.system.annotation.handler.AopAnnotationHandler;
 import xyz.xiezc.ioc.system.common.AopAspect;
-import xyz.xiezc.ioc.system.annotation.Component;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -21,9 +20,5 @@ public @interface Aop {
      */
     Class<? extends AopAspect> value();
 
-    /**
-     * 注解处理器
-     */
-    Class<? extends AnnotationHandler> annotatonHandler() default AopAnnotationHandler.class;
 
 }

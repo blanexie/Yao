@@ -3,7 +3,7 @@ package xyz.xiezc.ioc.system.common.context.impl;
 
 import cn.hutool.core.annotation.AnnotationUtil;
 import lombok.Data;
-import xyz.xiezc.ioc.starter.annotation.AnnotationHandler;
+import xyz.xiezc.ioc.system.annotation.AnnotationHandler;
 import xyz.xiezc.ioc.system.annotation.Component;
 import xyz.xiezc.ioc.system.common.context.AnnotationContext;
 
@@ -17,7 +17,7 @@ import java.util.Set;
 /**
  * 处理注解相关的工具类
  */
-@Component
+
 @Data
 public class AnnotationContextUtil implements AnnotationContext {
 

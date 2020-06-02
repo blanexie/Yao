@@ -13,7 +13,7 @@ import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.SelfSignedCertificate;
-import xyz.xiezc.ioc.starter.annotation.BeanScan;
+import xyz.xiezc.ioc.system.annotation.BeanScan;
 import xyz.xiezc.ioc.system.annotation.Configuration;
 import xyz.xiezc.ioc.starter.starter.web.DispatcherHandler;
 import xyz.xiezc.ioc.starter.starter.web.WebServerBootstrap;

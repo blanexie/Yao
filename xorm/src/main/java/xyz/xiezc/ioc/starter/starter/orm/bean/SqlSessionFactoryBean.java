@@ -38,7 +38,7 @@ import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.apache.ibatis.transaction.TransactionFactory;
 import org.apache.ibatis.type.TypeHandler;
 import org.w3c.dom.Document;
-import xyz.xiezc.ioc.starter.annotation.Init;
+import xyz.xiezc.ioc.system.annotation.Init;
 import xyz.xiezc.ioc.system.common.definition.FactoryBean;
 import xyz.xiezc.ioc.starter.starter.orm.common.YaoManagedTransactionFactory;
 import xyz.xiezc.ioc.starter.starter.orm.common.YaoMybatisException;

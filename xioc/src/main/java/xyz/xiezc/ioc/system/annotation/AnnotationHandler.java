@@ -1,4 +1,4 @@
-package xyz.xiezc.ioc.starter.annotation;
+package xyz.xiezc.ioc.system.annotation;
 
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.collection.CollUtil;
@@ -31,10 +31,10 @@ public abstract class AnnotationHandler<T extends Annotation> extends Annotation
     /**
      * 如果是在类注解， 则会调用这个方法处理
      *
-     * @param clazz      被注解类的基本信息
      * @param annotation 这个类上的所有注解
+     * @param clazz      被注解类的基本信息
      */
-    public abstract void processClass(T annotation, Class clazz);
+    public abstract void processClass(Annotation annotation, Class clazz, BeanDefinition beanDefinition);
 
     /**
      * 如果是方法注解，则会调用这个方法来处理
@@ -43,7 +43,8 @@ public abstract class AnnotationHandler<T extends Annotation> extends Annotation
      * @param methodDefinition 被注解的方法
      * @param annotation       这个类上的所有注解
      */
-    public abstract void processMethod(MethodDefinition methodDefinition, T annotation, BeanDefinition beanDefinition);
+    public abstract void processMethod(MethodDefinition methodDefinition, Annotation annotation, BeanDefinition beanDefinition);
+
 
     /**
      * 如果是字段注解，则会调用这个方法来处理
@@ -52,7 +53,7 @@ public abstract class AnnotationHandler<T extends Annotation> extends Annotation
      * @param fieldDefinition 被注解的字段
      * @param annotation      这个类上的所有注解
      */
-    public abstract void processField(FieldDefinition fieldDefinition, T annotation, BeanDefinition beanDefinition);
+    public abstract void processField(FieldDefinition fieldDefinition, Annotation annotation, BeanDefinition beanDefinition);
 
     /**
      * 获取BeanDefinition的真实类型， 因为有些Bean是通过FactoryBean创建的
@@ -65,6 +66,9 @@ public abstract class AnnotationHandler<T extends Annotation> extends Annotation
             Class<?> beanClass = beanDefinition.getBeanClass();
             //对应的beanClass需要重新设置
             Type[] genericInterfaces = beanClass.getGenericInterfaces();
+            if (genericInterfaces == null) {
+                throw new RuntimeException("factoryBean接口必须显示指定泛型");
+            }
             for (Type genericInterface : genericInterfaces) {
                 //如果得到的泛型类型是 ParameterizedType（参数化类型）类型的话
                 if (ClassUtil.isAssignable(ParameterizedType.class, genericInterface.getClass())) {
@@ -152,7 +156,7 @@ public abstract class AnnotationHandler<T extends Annotation> extends Annotation
         List<Annotation> collect = CollUtil.newArrayList(annotations)
                 .stream()
                 .filter(annotation -> !annotationContext.isNotHandleAnnotation(annotation.annotationType()))
-                //.filter(annotation -> annotationContext.getFieldAnnotationHandler(annotation.annotationType()) != null)
+                .filter(annotation -> annotationContext.getFieldAnnotationHandler(annotation.annotationType()) != null)
                 .collect(Collectors.toList());
 
         if (CollUtil.isNotEmpty(collect)) {
@@ -174,7 +178,7 @@ public abstract class AnnotationHandler<T extends Annotation> extends Annotation
                 .stream()
                 .filter(annotation ->
                         !annotationContext.isNotHandleAnnotation(annotation.annotationType())
-                )
+                ).filter(annotation -> annotationContext.getMethodAnnotationHandler(annotation.annotationType()) != null)
                 .collect(Collectors.toList());
 
         if (CollUtil.isNotEmpty(collect)) {

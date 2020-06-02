@@ -9,7 +9,6 @@ import xyz.xiezc.ioc.system.common.context.PropertiesContext;
 
 import java.io.File;
 
-@Component
 public class PropertiesContextUtil implements PropertiesContext {
 
     private Setting setting;

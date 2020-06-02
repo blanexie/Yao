@@ -1,4 +1,4 @@
-package xyz.xiezc.ioc.starter.annotation;
+package xyz.xiezc.ioc.system.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

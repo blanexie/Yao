@@ -1,7 +1,7 @@
 package xyz.xiezc.example.web;
 
 import cn.hutool.json.JSONUtil;
-import xyz.xiezc.ioc.starter.annotation.Inject;
+import xyz.xiezc.ioc.system.annotation.Inject;
 import xyz.xiezc.ioc.starter.starter.orm.common.example.Example;
 import xyz.xiezc.ioc.starter.starter.web.annotation.Controller;
 import xyz.xiezc.ioc.starter.starter.web.annotation.GetMapping;
