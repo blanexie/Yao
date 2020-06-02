@@ -3,7 +3,7 @@ package xyz.xiezc.example;
 
 import xyz.xiezc.ioc.system.Xioc;
 import xyz.xiezc.ioc.system.annotation.Configuration;
-import xyz.xiezc.ioc.starter.starter.orm.annotation.MapperScan;
+import xyz.xiezc.ioc.starter.orm.annotation.MapperScan;
 
 @MapperScan({"xyz.xiezc.example.web"})
 @Configuration

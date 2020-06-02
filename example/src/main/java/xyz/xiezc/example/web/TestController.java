@@ -2,7 +2,7 @@ package xyz.xiezc.example.web;
 
 import cn.hutool.json.JSONUtil;
 import xyz.xiezc.ioc.system.annotation.Inject;
-import xyz.xiezc.ioc.starter.starter.orm.common.example.Example;
+import xyz.xiezc.ioc.starter.orm.common.example.Example;
 import xyz.xiezc.ioc.starter.starter.web.annotation.Controller;
 import xyz.xiezc.ioc.starter.starter.web.annotation.GetMapping;
 import xyz.xiezc.ioc.starter.starter.web.entity.WebContext;
@@ -18,7 +18,7 @@ public class TestController {
     @Inject
     TestA[] albumMappers;
 
-    @GetMapping("/get1.json")
+    @GetMapping("/get.json")
     public String get1() {
         return  albumMappers.length+"";
     }

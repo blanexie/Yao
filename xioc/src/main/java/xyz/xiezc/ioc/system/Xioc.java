@@ -13,6 +13,7 @@ import xyz.xiezc.ioc.system.common.context.AnnotationContext;
 import xyz.xiezc.ioc.system.common.context.BeanCreateContext;
 import xyz.xiezc.ioc.system.common.context.BeanDefinitionContext;
 import xyz.xiezc.ioc.system.common.context.EventPublisherContext;
+import xyz.xiezc.ioc.system.common.enums.EventNameConstant;
 import xyz.xiezc.ioc.system.event.ApplicationEvent;
 import xyz.xiezc.ioc.system.common.definition.BeanDefinition;
 import xyz.xiezc.ioc.system.common.enums.BeanStatusEnum;
@@ -23,6 +24,8 @@ import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import static xyz.xiezc.ioc.system.common.enums.EventNameConstant.XiocEnd;
 
 /**
  * 超级简单的依赖注入小框架
@@ -67,6 +70,7 @@ public final class Xioc {
         ApplicationContextUtil applicationContextUtil = new ApplicationContextUtil();
         xioc.applicationContextUtil = applicationContextUtil;
         log.info("ApplicationContextUtil加载完成.............");
+
         //## 调用propertiesContext的loadProperties方法，先加载配置文件到容器中。
         applicationContextUtil.getPropertiesContext().loadProperties();
         log.info("PropertiesContext加载完成..................");
@@ -79,12 +83,14 @@ public final class Xioc {
         applicationContextUtil.loadBeanDefinitions(clazz);
         log.info("加载注解初始化类完成........................");
 
+
         //## 遍历所有的beanDefinition，优先初始化用户自定义的annotationHandler类和ApplicationListener类。
         AnnotationContext annotationContext = applicationContextUtil.getAnnotationContext();
         BeanCreateContext beanCreateContext = applicationContextUtil.getBeanCreateContext();
         BeanDefinitionContext beanDefinitionContext = applicationContextUtil.getBeanDefinitionContext();
         EventPublisherContext eventPublisherContext = applicationContextUtil.getEventPublisherContext();
         loadAnnotationHandlerAndApplicationListener(annotationContext, beanCreateContext, beanDefinitionContext, eventPublisherContext);
+        eventPublisherContext.publisherEvent(new ApplicationEvent(EventNameConstant.loadEventListener));
 
         //## 遍历剩下的的beanDefinition，并且初始化
         Collection<BeanDefinition> allBeanDefintion = beanDefinitionContext.getAllBeanDefintion();
@@ -92,9 +98,9 @@ public final class Xioc {
         for (BeanDefinition beanDefinition : copyOnWriteArrayList) {
             beanCreateContext.createBean(beanDefinition);
         }
+
         log.info("初始化所有类完成..........................");
-        ApplicationEvent applicationEvent3 = new ApplicationEvent("createBean");
-        eventPublisherContext.publisherEvent(applicationEvent3);
+        eventPublisherContext.publisherEvent(new ApplicationEvent(EventNameConstant.XiocEnd));
 
         return xioc.getApplicationContextUtil();
     }

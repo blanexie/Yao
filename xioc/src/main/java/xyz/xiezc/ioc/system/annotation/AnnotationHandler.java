@@ -165,6 +165,7 @@ public abstract class AnnotationHandler<T extends Annotation> extends Annotation
             fieldDefinition.setBeanDefinition(beanDefinition);
             fieldDefinition.setFieldName(field.getName());
             fieldDefinition.setFieldType(field.getType());
+            fieldDefinition.setField(field);
             return fieldDefinition;
         }
         return null;
