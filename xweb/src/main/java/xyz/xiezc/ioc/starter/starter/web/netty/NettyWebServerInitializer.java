@@ -47,20 +47,17 @@ public class NettyWebServerInitializer extends ChannelInitializer<SocketChannel>
     public HttpStaticFileServerHandler httpStaticFileServerHandler;
     public ParseRequestHandler parseRequestHandler;
 
-    Map<String, WebSocketFrameHandler> webSocketFrameHandlerMap;
 
     public NettyWebServerInitializer(SslContext sslCtx,
                                      DispatcherHandler dispatcherHandler,
                                      String staticPath,
-                                     String webSocketPath,
-                                     Map<String, WebSocketFrameHandler> webSocketFrameHandlerMap
+                                     String webSocketPath
     ) {
         this.sslCtx = sslCtx;
         this.httpServerHandler = new HttpServerHandler(dispatcherHandler);
         httpStaticFileServerHandler = new HttpStaticFileServerHandler(staticPath);
         parseRequestHandler = new ParseRequestHandler();
         WEBSOCKET_PATH = webSocketPath;
-        this.webSocketFrameHandlerMap = webSocketFrameHandlerMap;
     }
 
 
@@ -87,7 +84,7 @@ public class NettyWebServerInitializer extends ChannelInitializer<SocketChannel>
         pipeline.addLast(new CorsHandler(CorsConfigBuilder.forAnyOrigin().allowNullOrigin().allowCredentials().build()));
 
         //WebSocket
-        pipeline.addLast(new WebSocketServerHandler(webSocketFrameHandlerMap, sslCtx != null));
+        pipeline.addLast(new WebSocketServerHandler(DispatcherHandler.webSocketFrameHandlerMap, sslCtx != null));
 
         //解析FullRequest成HttpRequest
         pipeline.addLast(parseRequestHandler);

@@ -13,6 +13,7 @@ import xyz.xiezc.ioc.starter.starter.web.DispatcherHandler;
 import xyz.xiezc.ioc.starter.starter.web.annotation.Controller;
 import xyz.xiezc.ioc.starter.starter.web.annotation.GetMapping;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 
 @Component
@@ -24,30 +25,23 @@ public class GetMappingAnnotationHandler extends AnnotationHandler<GetMapping> {
     }
 
     @Override
-    public void processClass(GetMapping annotation, Class clazz, ApplicationContextUtil contextUtil) {
-
-        
-
+    public void processClass(Annotation annotation, Class clazz, BeanDefinition beanDefinition) {
 
     }
 
     @Override
-    public void processMethod(MethodDefinition methodDefinition, GetMapping annotation, BeanDefinition beanDefinition, ApplicationContextUtil contextUtil) {
+    public void processMethod(MethodDefinition methodDefinition, Annotation annotation, BeanDefinition beanDefinition) {
         //获取controller配置的路径
-        AnnotatedElement annotatedElement = beanDefinition.getAnnotatedElement();
-        Controller controller = AnnotationUtil.getAnnotation(annotatedElement, Controller.class);
+        Controller controller = AnnotationUtil.getAnnotation(beanDefinition.getBeanClass(), Controller.class);
         String controllerMapping = controller.value();
-        String methodReqMapping = annotation.value();
+        String methodReqMapping = ((GetMapping) annotation).value();
         String path = StrUtil.join("/", controllerMapping, methodReqMapping);
         path = "/" + path;
         DispatcherHandler.getMethods.put(FileUtil.normalize(path), methodDefinition);
-
-
-
     }
 
     @Override
-    public void processField(FieldDefinition fieldDefinition, GetMapping annotation, BeanDefinition beanDefinition, ApplicationContextUtil contextUtil) {
+    public void processField(FieldDefinition fieldDefinition, Annotation annotation, BeanDefinition beanDefinition) {
 
     }
 }

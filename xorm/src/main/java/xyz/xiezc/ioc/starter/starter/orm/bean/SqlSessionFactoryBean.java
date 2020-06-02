@@ -531,7 +531,7 @@ public class SqlSessionFactoryBean implements FactoryBean<SqlSessionFactory> {
                 LOGGER.debug("Property 'mapperLocations' was not specified or no matching resources found");
             }
         }
-         //TODO 打印日志的问题. 这个配置好像无效, 原因未知
+        //TODO 打印日志的问题. 这个配置好像无效, 原因未知
         configuration.setLogImpl(StdOutImpl.class);
         return this.sqlSessionFactoryBuilder.build(configuration);
     }
@@ -551,7 +551,8 @@ public class SqlSessionFactoryBean implements FactoryBean<SqlSessionFactory> {
     /**
      * {@inheritDoc}
      */
-    public Class<? extends SqlSessionFactory> getObjectType() {
+    @Override
+    public Class getObjectType() {
         return this.sqlSessionFactory == null ? SqlSessionFactory.class : this.sqlSessionFactory.getClass();
     }
 

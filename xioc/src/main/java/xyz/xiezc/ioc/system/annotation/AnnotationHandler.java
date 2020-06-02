@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
  */
 public abstract class AnnotationHandler<T extends Annotation> extends AnnotationOrder {
 
+    @Override
     public abstract Class<T> getAnnotationType();
 
     /**

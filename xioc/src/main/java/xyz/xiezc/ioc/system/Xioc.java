@@ -49,6 +49,7 @@ public final class Xioc {
     public final String starterPackage = "xyz.xiezc.ioc.starter";
 
     private static Xioc xioc;
+    public static Class bootClass;
 
     /**
      * 启动方法,
@@ -57,6 +58,7 @@ public final class Xioc {
      */
     public static ApplicationContextUtil run(Class<?> clazz) {
         xioc = new Xioc();
+        bootClass = clazz;
         //校验启动类上是否有@Configuration注解
         if (AnnotationUtil.getAnnotation(clazz, Configuration.class) == null) {
             throw new RuntimeException("请在启动类" + clazz.getName() + "上增加@Configuration注解");

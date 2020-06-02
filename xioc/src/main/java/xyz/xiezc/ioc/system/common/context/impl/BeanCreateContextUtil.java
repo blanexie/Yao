@@ -156,6 +156,9 @@ public class BeanCreateContextUtil implements BeanCreateContext {
             Field field = fieldDefinition.getField();
             //获取各个字段上的注解
             Annotation[] annotations1 = AnnotationUtil.getAnnotations(field, true);
+            if (annotations1 == null) {
+                continue;
+            }
             for (Annotation annotation : annotations1) {
                 //每个注解都检查下有无处理器来处理
                 Class<? extends Annotation> aClass = annotation.annotationType();
@@ -172,6 +175,9 @@ public class BeanCreateContextUtil implements BeanCreateContext {
             Method method = methodDefinition.getMethod();
             //获取各个字段上的注解
             Annotation[] annotations1 = AnnotationUtil.getAnnotations(method, true);
+            if (annotations1 == null) {
+                continue;
+            }
             for (Annotation annotation : annotations1) {
                 //每个注解都检查下有无处理器来处理
                 Class<? extends Annotation> aClass = annotation.annotationType();

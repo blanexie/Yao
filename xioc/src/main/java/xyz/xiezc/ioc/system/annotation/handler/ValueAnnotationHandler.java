@@ -39,7 +39,7 @@ public class ValueAnnotationHandler extends AnnotationHandler<Value> {
     @Override
     public void processField(FieldDefinition fieldDefinition, Annotation annotation, BeanDefinition beanDefinition) {
         Object bean = beanDefinition.getBean();
-        String value = AnnotationUtil.getAnnotationValue((AnnotatedElement) annotation, annotation.annotationType());
+        String value = ((Value) annotation).value();
         if (StrUtil.isBlank(value)) {
             value = fieldDefinition.getFieldName();
         }

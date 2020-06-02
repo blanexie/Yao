@@ -8,6 +8,7 @@ import cn.hutool.core.util.StrUtil;
 import lombok.Data;
 import xyz.xiezc.ioc.system.ApplicationContextUtil;
 import xyz.xiezc.ioc.system.annotation.AnnotationHandler;
+import xyz.xiezc.ioc.system.annotation.Aop;
 import xyz.xiezc.ioc.system.annotation.Inject;
 import xyz.xiezc.ioc.system.common.context.BeanCreateContext;
 import xyz.xiezc.ioc.system.common.context.BeanDefinitionContext;
@@ -64,8 +65,7 @@ public class InjectAnnotationHandler extends AnnotationHandler<Inject> {
     public void processField(FieldDefinition fieldDefinition, Annotation annotation, BeanDefinition beanDefinition) {
         BeanDefinitionContext beanDefinitionContext = applicationContextUtil.getBeanDefinitionContext();
         BeanCreateContext beanCreateContext = applicationContextUtil.getBeanCreateContext();
-
-        String beanName = AnnotationUtil.getAnnotationValue((AnnotatedElement) annotation, annotation.annotationType());
+        String beanName = ((Inject) annotation).value();
         if (StrUtil.isBlank(beanName)) {
             beanName = fieldDefinition.getFieldName();
         }

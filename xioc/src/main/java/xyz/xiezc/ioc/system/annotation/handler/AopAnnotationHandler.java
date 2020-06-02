@@ -22,6 +22,7 @@ import java.lang.reflect.Method;
 @Data
 public class AopAnnotationHandler extends AnnotationHandler<Aop> {
 
+    @Override
     public Class<Aop> getAnnotationType() {
         return Aop.class;
     }
@@ -32,7 +33,7 @@ public class AopAnnotationHandler extends AnnotationHandler<Aop> {
 
     @Override
     public void processClass(Annotation annotation, Class clazz,BeanDefinition beanDefinition1) {
-        Class<?> aopClass = AnnotationUtil.getAnnotationValue((AnnotatedElement) annotation, annotation.annotationType());
+        Class<?> aopClass =((Aop)annotation).value();// AnnotationUtil.getAnnotationValue((AnnotatedElement) annotation, annotation.annotationType());
         //获取切面类
         BeanDefinition aopAspectBeanDefinition = beanDefinitionContext.getBeanDefinition(aopClass);
         beanCreateContext.createBean(aopAspectBeanDefinition);
@@ -53,7 +54,7 @@ public class AopAnnotationHandler extends AnnotationHandler<Aop> {
     @Override
     public void processMethod(MethodDefinition methodDefinition, Annotation annotation, BeanDefinition beanDefinition) {
         //获取切面类
-        Class<?> aopClass = AnnotationUtil.getAnnotationValue((AnnotatedElement) annotation, annotation.annotationType());
+        Class<?> aopClass = ((Aop)annotation).value();
         BeanDefinition aopAspectBeanDefinition = beanDefinitionContext.getBeanDefinition(aopClass);
         beanCreateContext.createBean(aopAspectBeanDefinition);
         AopAspect aspectBean = aopAspectBeanDefinition.getBean();

@@ -10,9 +10,11 @@ import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.http.*;
 import io.netty.handler.codec.http.cookie.Cookie;
 import lombok.SneakyThrows;
+import xyz.xiezc.ioc.starter.starter.web.netty.websocket.WebSocketFrameHandler;
 import xyz.xiezc.ioc.system.Xioc;
 import xyz.xiezc.ioc.system.annotation.Component;
 import xyz.xiezc.ioc.system.annotation.Init;
+import xyz.xiezc.ioc.system.annotation.Inject;
 import xyz.xiezc.ioc.system.common.definition.BeanDefinition;
 import xyz.xiezc.ioc.system.common.definition.MethodDefinition;
 import xyz.xiezc.ioc.starter.starter.web.common.ContentType;
@@ -37,15 +39,16 @@ public class DispatcherHandler {
 
     public static Map<String, MethodDefinition> getMethods = new HashMap<>();
     public static Map<String, MethodDefinition> postMethods = new HashMap<>();
-
+    public static Map<String, WebSocketFrameHandler> webSocketFrameHandlerMap = new HashMap<>();
     public static Map<ContentType, HttpMessageConverter> httpMessageConverterMap = new HashMap<>();
+
+    @Inject
+    List<HttpMessageConverter> httpMessageConverters;
 
 
     @Init
     public void init() {
-        List<BeanDefinition> beanDefinitions = Xioc.getApplicationContext().getBeanDefinitions(HttpMessageConverter.class);
-        for (BeanDefinition beanDefinition : beanDefinitions) {
-            HttpMessageConverter bean = beanDefinition.getBean();
+        for (HttpMessageConverter bean : httpMessageConverters) {
             List<ContentType> supportContentType = bean.getSupportContentType();
             supportContentType.forEach(contentType -> {
                 httpMessageConverterMap.put(contentType, bean);

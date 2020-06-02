@@ -37,6 +37,8 @@ import xyz.xiezc.ioc.system.ApplicationContextUtil;
 import xyz.xiezc.ioc.system.Xioc;
 import xyz.xiezc.ioc.system.annotation.EventListener;
 import xyz.xiezc.ioc.system.annotation.Init;
+import xyz.xiezc.ioc.system.annotation.Inject;
+import xyz.xiezc.ioc.system.common.context.BeanDefinitionContext;
 import xyz.xiezc.ioc.system.event.ApplicationEvent;
 import xyz.xiezc.ioc.system.event.ApplicationListener;
 import xyz.xiezc.ioc.system.common.definition.BeanDefinition;
@@ -76,29 +78,20 @@ public class MybatisAutoConfiguration implements ApplicationListener {
 
     private static Log log = LogFactory.get(MybatisAutoConfiguration.class);
 
+    @Inject
     private MybatisProperties properties;
 
     private Interceptor[] interceptors;
 
     private DatabaseIdProvider databaseIdProvider;
 
-    @Init
-    public void checkConfigFileExists() {
-        if (this.properties.isCheckConfigLocation() && StrUtil.isNotBlank(this.properties.getConfigLocation())) {
-            Assert.state(FileUtil.exist(this.properties.getConfigLocation()), "Cannot find config location: "
-                    + " (please add config file or check your Mybatis " + "configuration)");
-        }
-    }
 
     @SneakyThrows
     @Override
     public void doExecute(ApplicationEvent applicationEvent) {
         ApplicationContextUtil applicationContext = Xioc.getApplicationContext();
-
-        BeanDefinition injectBeanDefinition = applicationContext.getInjectBeanDefinition(MybatisProperties.class.getName(), MybatisProperties.class);
-        properties = injectBeanDefinition.getBean();
-
-        List<BeanDefinition> beanDefinitions = applicationContext.getBeanDefinitions(Interceptor.class);
+        BeanDefinitionContext beanDefinitionContext = applicationContext.getBeanDefinitionContext();
+        List<BeanDefinition> beanDefinitions = beanDefinitionContext.getBeanDefinitions(Interceptor.class);
         List<Interceptor> collect = beanDefinitions.stream().map(beanDefinition -> (Interceptor) beanDefinition.getBean()).collect(Collectors.toList());
         interceptors = ArrayUtil.toArray(collect, Interceptor.class);
 
@@ -114,6 +107,7 @@ public class MybatisAutoConfiguration implements ApplicationListener {
     }
 
     private void createMapperBean(ApplicationContextUtil applicationContext, List<MapperDefine> mapperDefines, SqlSessionFactory sqlSessionFactory) {
+        BeanDefinitionContext beanDefinitionContext = applicationContext.getBeanDefinitionContext();
         for (MapperDefine mapperDefine : mapperDefines) {
             Class<?> mapperInterface = mapperDefine.getMapperInterface();
             Object mapper = sqlSessionFactory.openSession(true).getMapper(mapperInterface);
@@ -123,14 +117,13 @@ public class MybatisAutoConfiguration implements ApplicationListener {
             beanDefinition.setBeanStatus(BeanStatusEnum.Completed);
             beanDefinition.setBeanTypeEnum(BeanTypeEnum.bean);
             beanDefinition.setBean(mapper);
-            applicationContext.addBeanDefinition(beanDefinition.getBeanName(), beanDefinition.getBeanClass(), beanDefinition);
+            beanDefinitionContext.addBeanDefinition(beanDefinition.getBeanName(), beanDefinition.getBeanClass(), beanDefinition);
         }
     }
 
     private SqlSessionFactory getSqlSessionFactory(ApplicationContextUtil applicationContext, List<DocumentMapperDefine> documentMapperDefines) {
         //1. 获取数据源
-        DataSource ds = DSFactory.create(Xioc.getApplicationContext().getSetting()).getDataSource();
-
+        DataSource ds = DSFactory.create(applicationContext.getPropertiesContext().getSetting()).getDataSource();
 
         //2. 根据数据源生成sqlSessionFactory
         SqlSessionFactory sqlSessionFactory = createSqlSessionFactory(ds, documentMapperDefines);
@@ -141,7 +134,7 @@ public class MybatisAutoConfiguration implements ApplicationListener {
         beanDefinition.setBeanStatus(BeanStatusEnum.Completed);
         beanDefinition.setBeanTypeEnum(BeanTypeEnum.bean);
         beanDefinition.setBean(sqlSessionFactory);
-        applicationContext.addBeanDefinition(beanDefinition.getBeanName(), beanDefinition.getBeanClass(), beanDefinition);
+        applicationContext.getBeanDefinitionContext().addBeanDefinition(beanDefinition.getBeanName(), beanDefinition.getBeanClass(), beanDefinition);
         return sqlSessionFactory;
     }
 

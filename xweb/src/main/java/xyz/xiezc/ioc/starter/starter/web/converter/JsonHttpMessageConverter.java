@@ -45,7 +45,7 @@ public class JsonHttpMessageConverter implements HttpMessageConverter {
         //如果存在多个参数， 找到有RequestBody注解的参数
         Optional<ParamDefinition> first = Stream.of(paramDefinitions)
                 .filter(paramDefinition -> {
-                    RequestBody annotation = AnnotationUtil.getAnnotation(paramDefinition.getAnnotatedElement(), RequestBody.class);
+                    RequestBody annotation = AnnotationUtil.getAnnotation(paramDefinition.getParameter(), RequestBody.class);
                     return annotation != null;
                 }).findFirst();
         if (first.isPresent()) {
@@ -56,7 +56,7 @@ public class JsonHttpMessageConverter implements HttpMessageConverter {
     }
 
     private Object[] getInvokeParams(HttpRequest request, ParamDefinition paramDefinition) {
-        RequestBody requestBody = AnnotationUtil.getAnnotation(paramDefinition.getAnnotatedElement(), RequestBody.class);
+        RequestBody requestBody = AnnotationUtil.getAnnotation(paramDefinition.getParameter(), RequestBody.class);
         if (requestBody == null) {
             throw new XWebException("Application/json类型的请求需要配置@RequestBody注解");
         }

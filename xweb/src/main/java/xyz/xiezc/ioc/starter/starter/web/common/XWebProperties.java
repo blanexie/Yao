@@ -27,18 +27,4 @@ public class XWebProperties {
     @Value("xweb.websocket.path")
     String websocketPath = "/websocket";
 
-    @Inject
-    DispatcherHandler dispatcherHandler;
-
-    Map<String, WebSocketFrameHandler> webSocketFrameHandlerMap;
-    @Init
-    public void init() {
-        List<BeanDefinition> beanDefinitions =
-                Xioc.getApplicationContext().getBeanDefinitionContext().getBeanDefinitions(WebSocketFrameHandler.class);
-        webSocketFrameHandlerMap = new HashMap<>();
-        for (BeanDefinition beanDefinition : beanDefinitions) {
-            webSocketFrameHandlerMap.put(beanDefinition.getBeanName(), beanDefinition.getBean());
-        }
-    }
-
 }

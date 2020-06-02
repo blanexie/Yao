@@ -13,7 +13,10 @@ import xyz.xiezc.ioc.starter.starter.web.DispatcherHandler;
 import xyz.xiezc.ioc.starter.starter.web.annotation.Controller;
 import xyz.xiezc.ioc.starter.starter.web.annotation.PostMapping;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
+
+
 @Component
 public class PostMappingAnnotationHandler extends AnnotationHandler<PostMapping> {
 
@@ -23,23 +26,22 @@ public class PostMappingAnnotationHandler extends AnnotationHandler<PostMapping>
     }
 
     @Override
-    public void processClass(PostMapping annotation, Class clazz, ApplicationContextUtil contextUtil) {
+    public void processClass(Annotation annotation, Class clazz, BeanDefinition beanDefinition) {
 
     }
 
     @Override
-    public void processMethod(MethodDefinition methodDefinition, PostMapping annotation, BeanDefinition beanDefinition, ApplicationContextUtil contextUtil) {
+    public void processMethod(MethodDefinition methodDefinition, Annotation annotation, BeanDefinition beanDefinition) {
         //获取controller配置的路径
-        AnnotatedElement annotatedElement = beanDefinition.getAnnotatedElement();
-        Controller controller = AnnotationUtil.getAnnotation(annotatedElement, Controller.class);
+        Controller controller = AnnotationUtil.getAnnotation(beanDefinition.getBeanClass(), Controller.class);
         String controllerMapping = controller.value();
-        String methodReqMapping = annotation.value();
+        String methodReqMapping = ((PostMapping) annotation).value();
         String path = StrUtil.join("/", controllerMapping, methodReqMapping);
-        DispatcherHandler.postMethods.put(FileUtil.normalize("/"+path), methodDefinition);
+        DispatcherHandler.postMethods.put(FileUtil.normalize("/" + path), methodDefinition);
     }
 
     @Override
-    public void processField(FieldDefinition fieldDefinition, PostMapping annotation, BeanDefinition beanDefinition, ApplicationContextUtil contextUtil) {
+    public void processField(FieldDefinition fieldDefinition, Annotation annotation, BeanDefinition beanDefinition) {
 
     }
 }

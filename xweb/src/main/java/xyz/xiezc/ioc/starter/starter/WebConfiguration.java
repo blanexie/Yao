@@ -19,6 +19,7 @@ import xyz.xiezc.ioc.starter.starter.web.DispatcherHandler;
 import xyz.xiezc.ioc.starter.starter.web.WebServerBootstrap;
 import xyz.xiezc.ioc.starter.starter.web.common.XWebProperties;
 import xyz.xiezc.ioc.starter.starter.web.netty.NettyWebServerInitializer;
+import xyz.xiezc.ioc.system.annotation.Inject;
 
 @Configuration
 @BeanScan(basePackages = {"xyz.xiezc.ioc.starter.web"})
@@ -26,10 +27,12 @@ public class WebConfiguration implements WebServerBootstrap {
 
     Log log = LogFactory.get(WebConfiguration.class);
 
+    @Inject
+    DispatcherHandler dispatcherHandler;
+
+
     @Override
     public void startWebServer(XWebProperties xWebProperties) throws Exception {
-      //  log.info("配置信息：{}", JSONUtil.toJsonStr(xWebProperties));
-        DispatcherHandler dispatcherHandler = xWebProperties.getDispatcherHandler();
         boolean ssl = xWebProperties.isSsl();
         int port = xWebProperties.getPort();
         String staticPath = xWebProperties.getStaticPath();
@@ -53,13 +56,7 @@ public class WebConfiguration implements WebServerBootstrap {
             b.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
                     .handler(new LoggingHandler(LogLevel.DEBUG))
-                    .childHandler(new NettyWebServerInitializer(
-                            sslCtx
-                            , dispatcherHandler
-                            , staticPath
-                            , websocketPath
-                            , xWebProperties.getWebSocketFrameHandlerMap())
-                    );
+                    .childHandler(new NettyWebServerInitializer(sslCtx, dispatcherHandler, staticPath, websocketPath));
 
             Channel ch = b.bind(port).sync().channel();
 
