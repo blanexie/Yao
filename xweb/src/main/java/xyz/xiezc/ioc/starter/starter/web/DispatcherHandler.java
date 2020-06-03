@@ -109,7 +109,6 @@ public class DispatcherHandler {
         FullHttpResponse response = getFullHttpResponse(result, httpRequest);
         StringBuilder stringBuilder = new StringBuilder();
         for (Cookie respCookie : build.getRespCookies()) {
-            //Set-Cookie: _security_token=ai_e4sd1JQA_28073074481160195;Path=/;Domain=.dasouche.net;Max-Age=604800
             stringBuilder.append(respCookie.toString()).append(";");
         }
         response.headers().set(SET_COOKIE, stringBuilder.toString());
