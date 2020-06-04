@@ -1,5 +1,6 @@
 package xyz.xiezc.ioc.starter.orm.xml;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;
 import lombok.Data;
 import org.apache.ibatis.builder.BuilderException;
@@ -12,10 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Data
 public class DocumentMapperDefine {
@@ -46,6 +44,7 @@ public class DocumentMapperDefine {
             inputSource.getCharacterStream().close();
         }
     }
+
     public DocumentMapperDefine(File path) throws IOException {
         InputSource inputSource = new InputSource(FileUtil.getInputStream(path));
         try {
@@ -279,6 +278,7 @@ public class DocumentMapperDefine {
         resultMap.appendChild(id);
         //column
         Set<EntityTableDefine.ColumnProp> columns = entityTableDefine.getColumns();
+        columns = CollUtil.emptyIfNull(columns);
         for (EntityTableDefine.ColumnProp columnProp : columns) {
             Element result = doc.createElement("result");
             resultMap.appendChild(result);
@@ -421,7 +421,7 @@ public class DocumentMapperDefine {
             Element anIf = doc.createElement("if");
             trim.appendChild(anIf);
             anIf.setAttribute("test", columnProp.getProperty() + " != null");
-            anIf.appendChild(doc.createTextNode(columnProp.getColumn()+","));
+            anIf.appendChild(doc.createTextNode(columnProp.getColumn() + ","));
         }
         Element trim1 = doc.createElement("trim");
         insert.appendChild(trim1);
@@ -565,6 +565,7 @@ public class DocumentMapperDefine {
         StringBuffer stringBuffer = new StringBuffer();
         stringBuffer.append(" ").append(entityTableDefine.getId().getColumn()).append(" ");
         Set<EntityTableDefine.ColumnProp> columns = entityTableDefine.getColumns();
+        columns = CollUtil.emptyIfNull(columns);
         for (EntityTableDefine.ColumnProp columnProp : columns) {
             stringBuffer.append(",");
             stringBuffer.append(" ").append(columnProp.getColumn()).append(" ");

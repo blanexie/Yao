@@ -84,7 +84,6 @@ public class BeanCreateContextUtil implements BeanCreateContext {
                 throw new CircularDependenceException(beanDefinition.toString());
             }
             if (beanDefinition.getBeanStatus() == BeanStatusEnum.Completed) {
-                log.info("BeanDefinition:{}", beanDefinition.toString());
                 return beanDefinition;
             }
             //2. 先初始化这个类。三种类型的有不同的初始化方法
@@ -119,7 +118,7 @@ public class BeanCreateContextUtil implements BeanCreateContext {
 
             return beanDefinition;
         } catch (Exception e) {
-            log.error(e);
+            log.error("初始化出现异常，beanDefinition：{}",beanDefinition.toString(),e);
             throw new RuntimeException(e);
         } finally {
             //移除创建中的

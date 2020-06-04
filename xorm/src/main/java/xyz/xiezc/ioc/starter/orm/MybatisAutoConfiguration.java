@@ -91,7 +91,7 @@ public class MybatisAutoConfiguration implements ApplicationListener {
         ApplicationContextUtil applicationContext = Xioc.getApplicationContext();
         BeanDefinitionContext beanDefinitionContext = applicationContext.getBeanDefinitionContext();
         BeanDefinition beanDefinition1 = beanDefinitionContext.getBeanDefinition(this.getClass());
-
+        //4. 生成Mapper接口的代理类， 并生成对应的bean放入容器中
         for (MapperDefine mapperDefine : mapperDefines) {
             Class<?> mapperInterface = mapperDefine.getMapperInterface();
             BeanDefinition beanDefinition = new BeanDefinition();
@@ -114,12 +114,14 @@ public class MybatisAutoConfiguration implements ApplicationListener {
         }
     }
 
+
     public Object bean(MapperDefine mapperDefine) {
         Class<?> mapperInterface = mapperDefine.getMapperInterface();
         Object mapper = sqlSessionFactory.openSession(true).getMapper(mapperInterface);
         mapperDefine.setCreateMapper(true);
         return mapper;
     }
+
 
     @SneakyThrows
     @Init
@@ -136,7 +138,7 @@ public class MybatisAutoConfiguration implements ApplicationListener {
         List<DocumentMapperDefine> documentMapperDefines = getDocumentMapperDefines(mapperDefines);
         //3. 生成Configuration和SqlSessionFactory
         sqlSessionFactory = getSqlSessionFactory(applicationContext, documentMapperDefines);
-        //4. 生成Mapper接口的代理类， 并生成对应的bean放入容器中
+
         //  createMapperBean(applicationContext, mapperDefines, sqlSessionFactory);
     }
 

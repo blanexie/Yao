@@ -38,7 +38,6 @@ public class MethodBeanCreateStrategy extends BeanCreateStrategy {
     public BeanDefinition createBean(BeanDefinition beanDefinition) {
         BeanStatusEnum beanStatus = beanDefinition.getBeanStatus();
         if (beanStatus != BeanStatusEnum.Original) {
-            log.info("beanDefinition产生了， BeanDefinition:{}", beanDefinition.toString());
             return beanDefinition;
         }
         //检查所有需要注入字段的依赖是否都存在

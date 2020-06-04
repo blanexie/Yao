@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import xyz.xiezc.ioc.starter.orm.common.example.Example;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Data
@@ -18,7 +19,7 @@ public class EntityTableDefine {
      */
     private ColumnProp table;
     private ColumnProp id;
-    private Set<ColumnProp> columns;
+    private Set<ColumnProp> columns=new HashSet<>();
 
 
     @Setter

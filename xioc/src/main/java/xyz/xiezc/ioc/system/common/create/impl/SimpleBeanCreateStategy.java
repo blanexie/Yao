@@ -36,7 +36,6 @@ public class SimpleBeanCreateStategy extends BeanCreateStrategy {
     public BeanDefinition createBean(BeanDefinition beanDefinition) {
         BeanStatusEnum beanStatus = beanDefinition.getBeanStatus();
         if (beanStatus != BeanStatusEnum.Original) {
-            log.info("beanDefinition产生了，BeanDefinition:{}", beanDefinition.toString());
             return beanDefinition;
         }
         if (beanDefinition.getBeanStatus() == BeanStatusEnum.Original) {
