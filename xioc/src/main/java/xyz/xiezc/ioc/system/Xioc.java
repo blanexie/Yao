@@ -25,7 +25,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import static xyz.xiezc.ioc.system.common.enums.EventNameConstant.XiocEnd;
+import static xyz.xiezc.ioc.system.common.enums.EventNameConstant.*;
 
 /**
  * 超级简单的依赖注入小框架
@@ -89,9 +89,6 @@ public final class Xioc {
         BeanDefinitionContext beanDefinitionContext = applicationContextUtil.getBeanDefinitionContext();
         EventPublisherContext eventPublisherContext = applicationContextUtil.getEventPublisherContext();
         loadAnnotationHandlerAndApplicationListener(annotationContext, beanCreateContext, beanDefinitionContext, eventPublisherContext);
-
-       // eventPublisherContext.publisherEvent(new ApplicationEvent(EventNameConstant.loadEventListener));
-
         //## 遍历剩下的的beanDefinition，并且初始化, 优先初始化切面类
         Collection<BeanDefinition> allBeanDefintion = beanDefinitionContext.getAllBeanDefintion();
         CopyOnWriteArrayList<BeanDefinition> copyOnWriteArrayList = new CopyOnWriteArrayList<>(allBeanDefintion);
@@ -125,8 +122,7 @@ public final class Xioc {
             }
         }
         log.info("加载所有的注解处理器类.....................");
-        ApplicationEvent applicationEvent1 = new ApplicationEvent("annotationHandler");
-        eventPublisherContext.publisherEvent(applicationEvent1);
+        eventPublisherContext.publisherEvent(new ApplicationEvent(annotationHandler));
 
         //2. 初始化相关的ApplicationListener
         List<BeanDefinition> beanDefinitionList = beanDefinitionContext.getBeanDefinitions(ApplicationListener.class);
@@ -142,8 +138,7 @@ public final class Xioc {
             }
         }
         log.info("加载所有的事件处理器类.....................");
-        ApplicationEvent applicationEvent2 = new ApplicationEvent("applicationListener");
-        eventPublisherContext.publisherEvent(applicationEvent2);
+        eventPublisherContext.publisherEvent(new ApplicationEvent(applicationListener));
     }
 
     /**

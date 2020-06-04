@@ -15,7 +15,6 @@
  */
 package xyz.xiezc.ioc.starter.orm;
 
-import cn.hutool.aop.ProxyUtil;
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;
@@ -42,7 +41,6 @@ import xyz.xiezc.ioc.starter.orm.xml.DocumentMapperDefine;
 import xyz.xiezc.ioc.starter.orm.xml.MapperDefine;
 import xyz.xiezc.ioc.system.ApplicationContextUtil;
 import xyz.xiezc.ioc.system.Xioc;
-import xyz.xiezc.ioc.system.annotation.Configuration;
 import xyz.xiezc.ioc.system.annotation.EventListener;
 import xyz.xiezc.ioc.system.annotation.Init;
 import xyz.xiezc.ioc.system.annotation.Inject;
@@ -52,7 +50,6 @@ import xyz.xiezc.ioc.system.common.definition.MethodDefinition;
 import xyz.xiezc.ioc.system.common.definition.ParamDefinition;
 import xyz.xiezc.ioc.system.common.enums.BeanStatusEnum;
 import xyz.xiezc.ioc.system.common.enums.BeanTypeEnum;
-import xyz.xiezc.ioc.system.common.enums.EventNameConstant;
 import xyz.xiezc.ioc.system.common.enums.FieldOrParamTypeEnum;
 import xyz.xiezc.ioc.system.event.ApplicationEvent;
 import xyz.xiezc.ioc.system.event.ApplicationListener;
@@ -60,27 +57,19 @@ import xyz.xiezc.ioc.system.event.ApplicationListener;
 import javax.sql.DataSource;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static xyz.xiezc.ioc.system.common.enums.EventNameConstant.applicationListener;
+
 /**
- * <p>
- * configuration file is specified as a property, those will be considered,
- * otherwise this auto-configuration will attempt to register mappers based on
- * the interface definitions in or under the root auto-configuration package.
- *
- * @author Eddú Meléndez
- * @author Josh Long
- * @author Kazuki Shimizu
- * @author Eduardo Macarrón
+ * 事件监听器的 init方法会先于 doExecute方法 被触发
  */
 @Data
-@EventListener(eventName = "applicationListener")
+@EventListener(eventName = applicationListener)
 public class MybatisAutoConfiguration implements ApplicationListener {
 
     private static Log log = LogFactory.get(MybatisAutoConfiguration.class);
@@ -103,17 +92,13 @@ public class MybatisAutoConfiguration implements ApplicationListener {
         BeanDefinitionContext beanDefinitionContext = applicationContext.getBeanDefinitionContext();
         BeanDefinition beanDefinition1 = beanDefinitionContext.getBeanDefinition(this.getClass());
 
-
         for (MapperDefine mapperDefine : mapperDefines) {
             Class<?> mapperInterface = mapperDefine.getMapperInterface();
-            // Object mapper = sqlSessionFactory.openSession(true).getMapper(mapperInterface);
-
             BeanDefinition beanDefinition = new BeanDefinition();
             beanDefinition.setBeanClass(mapperInterface);
             beanDefinition.setBeanName(mapperInterface.getName());
             beanDefinition.setBeanStatus(BeanStatusEnum.Original);
             beanDefinition.setBeanTypeEnum(BeanTypeEnum.methodBean);
-
             MethodDefinition methodDefinition = new MethodDefinition();
             methodDefinition.setBeanDefinition(beanDefinition1);
             methodDefinition.setMethod(ReflectUtil.getMethod(this.getClass(), "bean", MapperDefine.class));
