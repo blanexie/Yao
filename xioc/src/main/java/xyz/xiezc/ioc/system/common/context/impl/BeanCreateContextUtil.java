@@ -1,6 +1,7 @@
 package xyz.xiezc.ioc.system.common.context.impl;
 
 import cn.hutool.core.annotation.AnnotationUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
@@ -8,6 +9,8 @@ import lombok.Getter;
 import lombok.Setter;
 import xyz.xiezc.ioc.system.annotation.AnnotationHandler;
 import xyz.xiezc.ioc.system.ApplicationContextUtil;
+import xyz.xiezc.ioc.system.annotation.Aop;
+import xyz.xiezc.ioc.system.common.AopAspect;
 import xyz.xiezc.ioc.system.common.context.AnnotationContext;
 import xyz.xiezc.ioc.system.common.context.BeanCreateContext;
 import xyz.xiezc.ioc.system.common.context.BeanDefinitionContext;
@@ -16,6 +19,7 @@ import xyz.xiezc.ioc.system.common.create.BeanCreateStrategy;
 import xyz.xiezc.ioc.system.common.create.impl.FactoryBeanCreateStrategy;
 import xyz.xiezc.ioc.system.common.create.impl.MethodBeanCreateStrategy;
 import xyz.xiezc.ioc.system.common.create.impl.SimpleBeanCreateStategy;
+import xyz.xiezc.ioc.system.common.definition.AnnotationAndHandler;
 import xyz.xiezc.ioc.system.common.definition.BeanDefinition;
 import xyz.xiezc.ioc.system.common.definition.FieldDefinition;
 import xyz.xiezc.ioc.system.common.definition.MethodDefinition;
@@ -26,10 +30,7 @@ import xyz.xiezc.ioc.system.common.exception.CircularDependenceException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author xiezc
@@ -95,8 +96,26 @@ public class BeanCreateContextUtil implements BeanCreateContext {
                 dealAnnotationHandler(beanDefinition);
                 beanDefinition.setBeanStatus(BeanStatusEnum.injectField);
             }
-            //todo  4. 判断有无切面，有切面的话，生成代理类替换生成的bean
-
+            //4 处理切面类
+            //处理类上的切面
+            Class<?> beanClass = beanDefinition.getBeanClass();
+            Aop aop = AnnotationUtil.getAnnotation(beanClass, Aop.class);
+            if (aop != null) {
+                AnnotationHandler<Aop> classAnnotationHandler = applicationContextUtil.getAnnotationContext().getClassAnnotationHandler(Aop.class);
+                classAnnotationHandler.processClass(aop, beanClass, beanDefinition);
+            }
+            //处理方法上的AOP注解
+            Set<MethodDefinition> methodDefinitions = beanDefinition.getMethodDefinitions();
+            for (MethodDefinition methodDefinition : methodDefinitions) {
+                Aop aop1 = AnnotationUtil.getAnnotation(methodDefinition.getMethod(), Aop.class);
+                if (aop1 != null) {
+                    AnnotationHandler<Aop> classAnnotationHandler = applicationContextUtil.getAnnotationContext().getMethodAnnotationHandler(Aop.class);
+                    classAnnotationHandler.processMethod(methodDefinition, aop1, beanDefinition);
+                }
+            }
+            if (beanDefinition.getBeanStatus() == BeanStatusEnum.injectField) {
+                beanDefinition.setBeanStatus(BeanStatusEnum.Completed);
+            }
 
             return beanDefinition;
         } catch (Exception e) {
@@ -138,18 +157,48 @@ public class BeanCreateContextUtil implements BeanCreateContext {
      * @param beanDefinition
      */
     private void dealAnnotationHandler(BeanDefinition beanDefinition) {
+
+        this.buildBean(beanDefinition);
+
         AnnotationContext annotationContext = applicationContextUtil.getAnnotationContext();
         //2.1 先获取类上的注解,并调用处理器
         Class<?> beanClass = beanDefinition.getBeanClass();
         Annotation[] annotations = AnnotationUtil.getAnnotations(beanClass, true);
-        for (Annotation annotation : annotations) {
-            Class<? extends Annotation> aClass = annotation.annotationType();
-            AnnotationHandler<? extends Annotation> classAnnotationHandler = annotationContext.getClassAnnotationHandler(aClass);
-            if (classAnnotationHandler != null) {
-                this.buildBean(beanDefinition);
-                classAnnotationHandler.processClass(annotation, beanClass, beanDefinition);
-            }
-        }
+        //获取所有的注解处理器并排序
+        CollUtil.toList(annotations).stream()
+                .filter(annotation -> annotation.annotationType() != Aop.class)
+                .map(annotation -> {
+                    AnnotationAndHandler annotationAndHandler = new AnnotationAndHandler();
+                    AnnotationHandler<? extends Annotation> classAnnotationHandler = annotationContext.getClassAnnotationHandler(annotation.annotationType());
+                    annotationAndHandler.setAnnotationHandler(classAnnotationHandler);
+                    annotationAndHandler.setAnnotation(annotation);
+                    return annotationAndHandler;
+                })
+                .filter(annotationAndHandler -> annotationAndHandler.getAnnotationHandler() != null)
+                .sorted((a, b) -> {
+                    AnnotationHandler annotationHandler = a.getAnnotationHandler();
+                    int ordera = annotationHandler.getOrder();
+
+                    AnnotationHandler annotationHandlerb = b.getAnnotationHandler();
+                    int orderb = annotationHandlerb.getOrder();
+                    if (ordera < orderb) {
+                        return -1;
+                    } else {
+                        return 1;
+                    }
+                }).forEach(annotationAndHandler -> {
+            AnnotationHandler annotationHandler = annotationAndHandler.getAnnotationHandler();
+            annotationHandler.processClass(annotationAndHandler.getAnnotation(), beanClass, beanDefinition);
+        });
+
+//        for (Annotation annotation : annotations) {
+//            Class<? extends Annotation> aClass = annotation.annotationType();
+//            AnnotationHandler<? extends Annotation> classAnnotationHandler = annotationContext.getClassAnnotationHandler(aClass);
+//            if (classAnnotationHandler != null) {
+//                this.buildBean(beanDefinition);
+//                classAnnotationHandler.processClass(annotation, beanClass, beanDefinition);
+//            }
+//        }
         //2.2 获取字段上的注解，并处理
         Set<FieldDefinition> fieldDefinitions = beanDefinition.getFieldDefinitions();
         for (FieldDefinition fieldDefinition : fieldDefinitions) {
@@ -159,15 +208,40 @@ public class BeanCreateContextUtil implements BeanCreateContext {
             if (annotations1 == null) {
                 continue;
             }
-            for (Annotation annotation : annotations1) {
-                //每个注解都检查下有无处理器来处理
-                Class<? extends Annotation> aClass = annotation.annotationType();
-                AnnotationHandler<? extends Annotation> fieldAnnotationHandler = annotationContext.getFieldAnnotationHandler(aClass);
-                if (fieldAnnotationHandler != null) {
-                    this.buildBean(beanDefinition);
-                    fieldAnnotationHandler.processField(fieldDefinition, annotation, beanDefinition);
-                }
-            }
+            CollUtil.toList(annotations1).stream()
+                    .map(annotation -> {
+                        AnnotationAndHandler annotationAndHandler = new AnnotationAndHandler();
+                        AnnotationHandler<? extends Annotation> classAnnotationHandler = annotationContext.getFieldAnnotationHandler(annotation.annotationType());
+                        annotationAndHandler.setAnnotationHandler(classAnnotationHandler);
+                        annotationAndHandler.setAnnotation(annotation);
+                        return annotationAndHandler;
+                    }).filter(annotationAndHandler -> annotationAndHandler.getAnnotationHandler() != null)
+                    .sorted((a, b) -> {
+                        AnnotationHandler annotationHandler = a.getAnnotationHandler();
+                        int ordera = annotationHandler.getOrder();
+
+                        AnnotationHandler annotationHandlerb = b.getAnnotationHandler();
+                        int orderb = annotationHandlerb.getOrder();
+                        if (ordera < orderb) {
+                            return -1;
+                        } else {
+                            return 1;
+                        }
+                    })
+                    .forEach(annotationAndHandler -> {
+                        AnnotationHandler fieldAnnotationHandler = annotationAndHandler.getAnnotationHandler();
+                        fieldAnnotationHandler.processField(fieldDefinition, annotationAndHandler.getAnnotation(), beanDefinition);
+                    });
+
+//            for (Annotation annotation : annotations1) {
+//                //每个注解都检查下有无处理器来处理
+//                Class<? extends Annotation> aClass = annotation.annotationType();
+//                AnnotationHandler<? extends Annotation> fieldAnnotationHandler = annotationContext.getFieldAnnotationHandler(aClass);
+//                if (fieldAnnotationHandler != null) {
+//                    this.buildBean(beanDefinition);
+//                    fieldAnnotationHandler.processField(fieldDefinition, annotation, beanDefinition);
+//                }
+//            }
         }
         //2.3 获取方法上的注解，并处理
         Set<MethodDefinition> methodDefinitions = beanDefinition.getMethodDefinitions();
@@ -178,15 +252,31 @@ public class BeanCreateContextUtil implements BeanCreateContext {
             if (annotations1 == null) {
                 continue;
             }
-            for (Annotation annotation : annotations1) {
-                //每个注解都检查下有无处理器来处理
-                Class<? extends Annotation> aClass = annotation.annotationType();
-                AnnotationHandler<? extends Annotation> methodAnnotationHandler = annotationContext.getMethodAnnotationHandler(aClass);
-                if (methodAnnotationHandler != null) {
-                    this.buildBean(beanDefinition);
-                    methodAnnotationHandler.processMethod(methodDefinition, annotation, beanDefinition);
-                }
-            }
+            CollUtil.toList(annotations1).stream()
+                    .filter(annotation -> annotation.annotationType() != Aop.class)
+                    .map(annotation -> {
+                        AnnotationAndHandler annotationAndHandler = new AnnotationAndHandler();
+                        AnnotationHandler<? extends Annotation> classAnnotationHandler = annotationContext.getMethodAnnotationHandler(annotation.annotationType());
+                        annotationAndHandler.setAnnotationHandler(classAnnotationHandler);
+                        annotationAndHandler.setAnnotation(annotation);
+                        return annotationAndHandler;
+                    }).filter(annotationAndHandler -> annotationAndHandler.getAnnotationHandler() != null)
+                    .sorted((a, b) -> {
+                        AnnotationHandler annotationHandler = a.getAnnotationHandler();
+                        int ordera = annotationHandler.getOrder();
+
+                        AnnotationHandler annotationHandlerb = b.getAnnotationHandler();
+                        int orderb = annotationHandlerb.getOrder();
+                        if (ordera < orderb) {
+                            return -1;
+                        } else {
+                            return 1;
+                        }
+                    })
+                    .forEach(annotationAndHandler -> {
+                        AnnotationHandler methodAnnotationHandler = annotationAndHandler.getAnnotationHandler();
+                        methodAnnotationHandler.processMethod(methodDefinition, annotationAndHandler.getAnnotation(), beanDefinition);
+                    });
         }
     }
 

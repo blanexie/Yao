@@ -1,6 +1,5 @@
 package xyz.xiezc.ioc.system.annotation.handler;
 
-import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.Data;
@@ -14,7 +13,6 @@ import xyz.xiezc.ioc.system.common.definition.MethodDefinition;
 import xyz.xiezc.ioc.system.common.enums.FieldOrParamTypeEnum;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.AnnotatedElement;
 
 @Data
 public class ValueAnnotationHandler extends AnnotationHandler<Value> {

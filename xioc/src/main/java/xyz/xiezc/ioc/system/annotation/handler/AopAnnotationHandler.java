@@ -27,13 +27,18 @@ public class AopAnnotationHandler extends AnnotationHandler<Aop> {
         return Aop.class;
     }
 
+    @Override
+    public int getOrder() {
+        return Integer.MIN_VALUE;
+    }
+
     BeanCreateContext beanCreateContext;
 
     BeanDefinitionContext beanDefinitionContext;
 
     @Override
-    public void processClass(Annotation annotation, Class clazz,BeanDefinition beanDefinition1) {
-        Class<?> aopClass =((Aop)annotation).value();// AnnotationUtil.getAnnotationValue((AnnotatedElement) annotation, annotation.annotationType());
+    public void processClass(Annotation annotation, Class clazz, BeanDefinition beanDefinition) {
+        Class<?> aopClass = ((Aop) annotation).value();// AnnotationUtil.getAnnotationValue((AnnotatedElement) annotation, annotation.annotationType());
         //获取切面类
         BeanDefinition aopAspectBeanDefinition = beanDefinitionContext.getBeanDefinition(aopClass);
         beanCreateContext.createBean(aopAspectBeanDefinition);
@@ -44,8 +49,7 @@ public class AopAnnotationHandler extends AnnotationHandler<Aop> {
             aspectBean.addMethod(publicMethod);
         }
         //获取bean实例
-        BeanDefinition beanDefinition = beanDefinitionContext.getBeanDefinition(clazz);
-        beanCreateContext.createBean(aopAspectBeanDefinition);
+        beanCreateContext.buildBean(beanDefinition);
         Object parentBean = beanDefinition.getBean();
         beanDefinition.setBean(ProxyUtil.proxy(parentBean, aspectBean));
     }
@@ -54,7 +58,7 @@ public class AopAnnotationHandler extends AnnotationHandler<Aop> {
     @Override
     public void processMethod(MethodDefinition methodDefinition, Annotation annotation, BeanDefinition beanDefinition) {
         //获取切面类
-        Class<?> aopClass = ((Aop)annotation).value();
+        Class<?> aopClass = ((Aop) annotation).value();
         BeanDefinition aopAspectBeanDefinition = beanDefinitionContext.getBeanDefinition(aopClass);
         beanCreateContext.createBean(aopAspectBeanDefinition);
         AopAspect aspectBean = aopAspectBeanDefinition.getBean();

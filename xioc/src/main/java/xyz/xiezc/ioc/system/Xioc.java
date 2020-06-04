@@ -83,22 +83,21 @@ public final class Xioc {
         applicationContextUtil.loadBeanDefinitions(clazz);
         log.info("加载注解初始化类完成........................");
 
-
         //## 遍历所有的beanDefinition，优先初始化用户自定义的annotationHandler类和ApplicationListener类。
         AnnotationContext annotationContext = applicationContextUtil.getAnnotationContext();
         BeanCreateContext beanCreateContext = applicationContextUtil.getBeanCreateContext();
         BeanDefinitionContext beanDefinitionContext = applicationContextUtil.getBeanDefinitionContext();
         EventPublisherContext eventPublisherContext = applicationContextUtil.getEventPublisherContext();
         loadAnnotationHandlerAndApplicationListener(annotationContext, beanCreateContext, beanDefinitionContext, eventPublisherContext);
-        eventPublisherContext.publisherEvent(new ApplicationEvent(EventNameConstant.loadEventListener));
 
-        //## 遍历剩下的的beanDefinition，并且初始化
+       // eventPublisherContext.publisherEvent(new ApplicationEvent(EventNameConstant.loadEventListener));
+
+        //## 遍历剩下的的beanDefinition，并且初始化, 优先初始化切面类
         Collection<BeanDefinition> allBeanDefintion = beanDefinitionContext.getAllBeanDefintion();
         CopyOnWriteArrayList<BeanDefinition> copyOnWriteArrayList = new CopyOnWriteArrayList<>(allBeanDefintion);
         for (BeanDefinition beanDefinition : copyOnWriteArrayList) {
             beanCreateContext.createBean(beanDefinition);
         }
-
         log.info("初始化所有类完成..........................");
         eventPublisherContext.publisherEvent(new ApplicationEvent(EventNameConstant.XiocEnd));
 

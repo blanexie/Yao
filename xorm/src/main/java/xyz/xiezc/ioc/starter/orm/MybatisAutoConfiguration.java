@@ -15,11 +15,13 @@
  */
 package xyz.xiezc.ioc.starter.orm;
 
+import cn.hutool.aop.ProxyUtil;
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.db.ds.DSFactory;
 import cn.hutool.json.JSONUtil;
@@ -40,19 +42,26 @@ import xyz.xiezc.ioc.starter.orm.xml.DocumentMapperDefine;
 import xyz.xiezc.ioc.starter.orm.xml.MapperDefine;
 import xyz.xiezc.ioc.system.ApplicationContextUtil;
 import xyz.xiezc.ioc.system.Xioc;
+import xyz.xiezc.ioc.system.annotation.Configuration;
 import xyz.xiezc.ioc.system.annotation.EventListener;
+import xyz.xiezc.ioc.system.annotation.Init;
 import xyz.xiezc.ioc.system.annotation.Inject;
 import xyz.xiezc.ioc.system.common.context.BeanDefinitionContext;
-import xyz.xiezc.ioc.system.event.ApplicationEvent;
-import xyz.xiezc.ioc.system.event.ApplicationListener;
 import xyz.xiezc.ioc.system.common.definition.BeanDefinition;
+import xyz.xiezc.ioc.system.common.definition.MethodDefinition;
+import xyz.xiezc.ioc.system.common.definition.ParamDefinition;
 import xyz.xiezc.ioc.system.common.enums.BeanStatusEnum;
 import xyz.xiezc.ioc.system.common.enums.BeanTypeEnum;
 import xyz.xiezc.ioc.system.common.enums.EventNameConstant;
+import xyz.xiezc.ioc.system.common.enums.FieldOrParamTypeEnum;
+import xyz.xiezc.ioc.system.event.ApplicationEvent;
+import xyz.xiezc.ioc.system.event.ApplicationListener;
 
 import javax.sql.DataSource;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -71,7 +80,7 @@ import java.util.stream.Collectors;
  * @author Eduardo Macarrón
  */
 @Data
-@EventListener(eventName = {EventNameConstant.loadEventListener})
+@EventListener(eventName = "applicationListener")
 public class MybatisAutoConfiguration implements ApplicationListener {
 
     private static Log log = LogFactory.get(MybatisAutoConfiguration.class);
@@ -83,26 +92,69 @@ public class MybatisAutoConfiguration implements ApplicationListener {
 
     private DatabaseIdProvider databaseIdProvider;
 
+    private SqlSessionFactory sqlSessionFactory;
 
-    @SneakyThrows
+    private List<MapperDefine> mapperDefines;
+
+
     @Override
     public void doExecute(ApplicationEvent applicationEvent) {
+        ApplicationContextUtil applicationContext = Xioc.getApplicationContext();
+        BeanDefinitionContext beanDefinitionContext = applicationContext.getBeanDefinitionContext();
+        BeanDefinition beanDefinition1 = beanDefinitionContext.getBeanDefinition(this.getClass());
+
+
+        for (MapperDefine mapperDefine : mapperDefines) {
+            Class<?> mapperInterface = mapperDefine.getMapperInterface();
+            // Object mapper = sqlSessionFactory.openSession(true).getMapper(mapperInterface);
+
+            BeanDefinition beanDefinition = new BeanDefinition();
+            beanDefinition.setBeanClass(mapperInterface);
+            beanDefinition.setBeanName(mapperInterface.getName());
+            beanDefinition.setBeanStatus(BeanStatusEnum.Original);
+            beanDefinition.setBeanTypeEnum(BeanTypeEnum.methodBean);
+
+            MethodDefinition methodDefinition = new MethodDefinition();
+            methodDefinition.setBeanDefinition(beanDefinition1);
+            methodDefinition.setMethod(ReflectUtil.getMethod(this.getClass(), "bean", MapperDefine.class));
+            methodDefinition.setMethodName("bean");
+            methodDefinition.setReturnType(mapperInterface);
+            ParamDefinition paramDefinition = new ParamDefinition();
+            paramDefinition.setParam(mapperDefine);
+            paramDefinition.setFieldOrParamTypeEnum(FieldOrParamTypeEnum.Simple);
+            methodDefinition.setParamDefinitions(new ParamDefinition[]{paramDefinition});
+            beanDefinition.setInvokeMethodBean(methodDefinition);
+
+            beanDefinitionContext.addBeanDefinition(beanDefinition.getBeanName(), beanDefinition.getBeanClass(), beanDefinition);
+        }
+    }
+
+    public Object bean(MapperDefine mapperDefine) {
+        Class<?> mapperInterface = mapperDefine.getMapperInterface();
+        Object mapper = sqlSessionFactory.openSession(true).getMapper(mapperInterface);
+        mapperDefine.setCreateMapper(true);
+        return mapper;
+    }
+
+    @SneakyThrows
+    @Init
+    public void init() {
         ApplicationContextUtil applicationContext = Xioc.getApplicationContext();
         BeanDefinitionContext beanDefinitionContext = applicationContext.getBeanDefinitionContext();
         List<BeanDefinition> beanDefinitions = beanDefinitionContext.getBeanDefinitions(Interceptor.class);
         List<Interceptor> collect = beanDefinitions.stream().map(beanDefinition -> (Interceptor) beanDefinition.getBean()).collect(Collectors.toList());
         interceptors = ArrayUtil.toArray(collect, Interceptor.class);
-
         //1. 扫描mapper接口，获取实体类和对应表格的关系。
         //获取注解中配置的信息
-        List<MapperDefine> mapperDefines = getMapperDefines();
+        mapperDefines = getMapperDefines();
         //2. 组装改造后的mapper.xml的文档
         List<DocumentMapperDefine> documentMapperDefines = getDocumentMapperDefines(mapperDefines);
         //3. 生成Configuration和SqlSessionFactory
-        SqlSessionFactory sqlSessionFactory = getSqlSessionFactory(applicationContext, documentMapperDefines);
+        sqlSessionFactory = getSqlSessionFactory(applicationContext, documentMapperDefines);
         //4. 生成Mapper接口的代理类， 并生成对应的bean放入容器中
-        createMapperBean(applicationContext, mapperDefines, sqlSessionFactory);
+        //  createMapperBean(applicationContext, mapperDefines, sqlSessionFactory);
     }
+
 
     private void createMapperBean(ApplicationContextUtil applicationContext, List<MapperDefine> mapperDefines, SqlSessionFactory sqlSessionFactory) {
         BeanDefinitionContext beanDefinitionContext = applicationContext.getBeanDefinitionContext();
@@ -118,6 +170,7 @@ public class MybatisAutoConfiguration implements ApplicationListener {
             beanDefinitionContext.addBeanDefinition(beanDefinition.getBeanName(), beanDefinition.getBeanClass(), beanDefinition);
         }
     }
+
 
     private SqlSessionFactory getSqlSessionFactory(ApplicationContextUtil applicationContext, List<DocumentMapperDefine> documentMapperDefines) {
         //1. 获取数据源
@@ -229,7 +282,6 @@ public class MybatisAutoConfiguration implements ApplicationListener {
 
         return factory.getObject();
     }
-
 
     @Override
     public int order() {

@@ -38,8 +38,6 @@ public abstract class BeanCreateStrategy {
 
 
     /**
-
-     *
      * @param beanDefinition
      */
     public abstract BeanDefinition createBean(BeanDefinition beanDefinition);
@@ -51,74 +49,13 @@ public abstract class BeanCreateStrategy {
      */
     protected abstract BeanTypeEnum getBeanTypeEnum();
 
-
-
-
-    /**
-     * 设置bean的字段属性值
-     *
-     * @param beanDefinition
-     */
-    protected void injectFieldValue(BeanDefinition beanDefinition) {
-        //设置字段的属性值
-        Set<FieldDefinition> fieldDefinitions = beanDefinition.getFieldDefinitions();
-        fieldDefinitions = CollectionUtil.emptyIfNull(fieldDefinitions);
-        for (FieldDefinition fieldDefinition : fieldDefinitions) {
-            var obj = fieldDefinition.getFieldValue();
-            if (obj == null) {
-                if (FieldOrParamTypeEnum.Array == fieldDefinition.getFieldOrParamTypeEnum()) {
-                    List<BeanDefinition> beanDefinitions = beanDefinitionContext.getBeanDefinitions(fieldDefinition.getFieldType());
-                    List<Object> collect = beanDefinitions.stream().map(definition -> {
-                        beanCreateContext.createBean(definition);
-                        return definition.getBean();
-                    }).collect(Collectors.toList());
-                    fieldDefinition.setFieldValue(collect.toArray());
-                }
-                if (FieldOrParamTypeEnum.Collection == fieldDefinition.getFieldOrParamTypeEnum()) {
-                    List<BeanDefinition> beanDefinitions = beanDefinitionContext.getBeanDefinitions(fieldDefinition.getFieldType());
-                    Collection<Object> collect = beanDefinitions.stream().map(definition -> {
-                        beanCreateContext.createBean(definition);
-                        return definition.getBean();
-                    }).collect(Collectors.toList());
-                    fieldDefinition.setFieldValue(collect);
-                }
-                if (FieldOrParamTypeEnum.Simple == fieldDefinition.getFieldOrParamTypeEnum()) {
-                    BeanDefinition injectBeanDefinition = beanDefinitionContext.getInjectBeanDefinition(fieldDefinition.getFieldName(), fieldDefinition.getFieldType());
-                    beanCreateContext.createBean(injectBeanDefinition);
-                    fieldDefinition.setFieldValue(injectBeanDefinition.getBean());
-                }
-                if (FieldOrParamTypeEnum.Properties == fieldDefinition.getFieldOrParamTypeEnum()) {
-                    String paramName = fieldDefinition.getFieldName();
-                    String s = propertiesContext.getSetting().get(paramName);
-                    Object convert = Convert.convert(fieldDefinition.getFieldType(), s);
-                    fieldDefinition.setFieldValue(convert);
-                }
-                obj = fieldDefinition.getFieldValue();
-            } else {
-                if (obj instanceof BeanDefinition) {
-                    BeanDefinition beanDefinitionParam = beanCreateContext.createBean((BeanDefinition) obj);
-                    fieldDefinition.setFieldValue(beanDefinitionParam.getBean());
-                    obj = beanDefinitionParam.getBean();
-                }
-            }
-
-            //空的对象， 不用注入
-            if (obj instanceof NullObj) {
-                continue;
-            }
-
-            if (beanDefinition.getBeanTypeEnum() == BeanTypeEnum.factoryBean) {
-                ReflectUtil.setFieldValue(beanDefinition.getFactoryBean(), fieldDefinition.getFieldName(), obj);
-            } else {
-                ReflectUtil.setFieldValue(beanDefinition.getBean(), fieldDefinition.getFieldName(), obj);
-            }
-        }
-    }
-
     /**
      * 校验init方法
      */
     protected void checkInitMethod(MethodDefinition methodDefinition) {
+        if (methodDefinition == null) {
+            return;
+        }
         Method method = methodDefinition.getMethod();
         int parameterCount = method.getParameterCount();
         if (parameterCount > 0) {
@@ -131,6 +68,10 @@ public abstract class BeanCreateStrategy {
      */
     protected void checkMethodParam(ParamDefinition[] paramDefinitions) {
         for (ParamDefinition paramDefinition : paramDefinitions) {
+            //已经有值了，就不用校验
+            if (paramDefinition.getParam() != null) {
+                continue;
+            }
             FieldOrParamTypeEnum fieldOrParamTypeEnum = paramDefinition.getFieldOrParamTypeEnum();
             //数组类型
             if (fieldOrParamTypeEnum != FieldOrParamTypeEnum.Properties) {
@@ -159,6 +100,9 @@ public abstract class BeanCreateStrategy {
      */
     protected void checkFieldDefinitions(Set<FieldDefinition> fieldDefinitions) {
         for (FieldDefinition fieldDefinition : fieldDefinitions) {
+            if(fieldDefinition.getFieldValue()!=null){
+               continue;
+            }
             FieldOrParamTypeEnum fieldOrParamTypeEnum = fieldDefinition.getFieldOrParamTypeEnum();
             //数组类型
             if (fieldOrParamTypeEnum != FieldOrParamTypeEnum.Properties) {

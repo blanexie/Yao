@@ -16,7 +16,7 @@ public enum BeanStatusEnum {
     HalfCooked,
 
     /**
-     *  注入了所有的依赖字段
+     * 注入了所有的依赖字段
      */
     injectField,
     /**

@@ -1,6 +1,7 @@
 package xyz.xiezc.example.web;
 
 import cn.hutool.json.JSONUtil;
+import xyz.xiezc.ioc.system.annotation.Aop;
 import xyz.xiezc.ioc.system.annotation.Inject;
 import xyz.xiezc.ioc.starter.orm.common.example.Example;
 import xyz.xiezc.ioc.starter.starter.web.annotation.Controller;
@@ -10,17 +11,18 @@ import xyz.xiezc.ioc.starter.starter.web.entity.WebContext;
 import java.util.List;
 import java.util.Map;
 
+@Aop(TestAopspect.class)
 @Controller("/")
 public class TestController {
 
     @Inject
     AlbumMapper albumMapper;
     @Inject
-    TestA[] albumMappers;
+    TestA[] testAS;
 
     @GetMapping("/get.json")
     public String get1() {
-        return  albumMappers.length+"";
+        return testAS.length + "";
     }
 
 

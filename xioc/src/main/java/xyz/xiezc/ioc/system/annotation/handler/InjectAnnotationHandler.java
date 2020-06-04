@@ -55,7 +55,7 @@ public class InjectAnnotationHandler extends AnnotationHandler<Inject> {
     }
 
     /**
-     * 这个方法就是设置fieldDefinition中的beanName字段值。
+     * 这个方法就是注入依赖的字段。 在注入依赖前需要先判断这个被注入的依赖是否是切面类， 如果是切面类。
      *
      * @param fieldDefinition 被注解的字段
      * @param annotation      这个类上的所有注解
@@ -112,6 +112,7 @@ public class InjectAnnotationHandler extends AnnotationHandler<Inject> {
             ReflectUtil.setFieldValue(bean, fieldDefinition.getField(), bean1);
         }
     }
+
 
     private Object getBean(BeanDefinition beanDefinition) {
         Object bean;

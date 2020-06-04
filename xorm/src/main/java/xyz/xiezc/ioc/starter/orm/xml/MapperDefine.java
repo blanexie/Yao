@@ -36,6 +36,11 @@ public class MapperDefine {
      */
     Class<?> mapperInterface;
 
+    /**
+     * 是否创建了mapper
+     */
+    boolean isCreateMapper;
+
     public MapperDefine(Class<?> mapperInterface) {
         this.init(mapperInterface);
     }
