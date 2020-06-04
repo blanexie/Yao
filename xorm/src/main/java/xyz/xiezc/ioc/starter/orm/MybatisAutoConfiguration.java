@@ -26,7 +26,6 @@ import cn.hutool.db.ds.DSFactory;
 import cn.hutool.json.JSONUtil;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
-import com.mysql.cj.util.StringUtils;
 import lombok.Data;
 import lombok.SneakyThrows;
 import org.apache.ibatis.io.ResolverUtil;
@@ -257,10 +256,10 @@ public class MybatisAutoConfiguration implements ApplicationListener {
         if (this.databaseIdProvider != null) {
             factory.setDatabaseIdProvider(this.databaseIdProvider);
         }
-        if (!StringUtils.isNullOrEmpty(this.properties.getTypeAliasesPackage())) {
+        if (StrUtil.isNotBlank(this.properties.getTypeAliasesPackage())) {
             factory.setTypeAliasesPackage(this.properties.getTypeAliasesPackage());
         }
-        if (!StringUtils.isNullOrEmpty(this.properties.getTypeHandlersPackage())) {
+        if (StrUtil.isNotBlank(this.properties.getTypeHandlersPackage())) {
             factory.setTypeHandlersPackage(this.properties.getTypeHandlersPackage());
         }
         if (CollUtil.isNotEmpty(documentMapperDefines)) {
