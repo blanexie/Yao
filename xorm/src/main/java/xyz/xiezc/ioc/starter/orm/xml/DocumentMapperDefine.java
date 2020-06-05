@@ -46,15 +46,7 @@ public class DocumentMapperDefine {
     }
 
     public DocumentMapperDefine(File path) throws IOException {
-        InputSource inputSource = new InputSource(FileUtil.getInputStream(path));
-        try {
-            this.path = path.toPath();
-            inputSource.setEncoding("utf8");
-            document = this.createDocument(inputSource);
-            nameSpace = getNameSpace();
-        } finally {
-            inputSource.getCharacterStream().close();
-        }
+        this(path.toPath());
     }
 
     public DocumentMapperDefine(Path path) throws IOException {

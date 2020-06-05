@@ -28,8 +28,6 @@ import java.io.File;
 @BeanScan(basePackages = {"xyz.xiezc.ioc.starter.web"})
 public class WebConfiguration implements WebServerBootstrap {
 
-    Log log = LogFactory.get(WebConfiguration.class);
-
     @Inject
     DispatcherHandler dispatcherHandler;
 
@@ -44,7 +42,6 @@ public class WebConfiguration implements WebServerBootstrap {
         // Configure SSL.
         final SslContext sslCtx;
         if (ssl) {
-
             File certChainFile = new File(xWebProperties.getCertChainFilePath());
             File privateKeyFile = new File(xWebProperties.getPrivatekeyFilePath());
             if (!certChainFile.exists() || !privateKeyFile.exists()) {

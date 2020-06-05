@@ -30,6 +30,12 @@ public class TestController {
     }
 
 
+    @GetMapping("/queryById.json")
+    public String queryById(Integer id) {
+        Album album = albumMapper.queryById(id);
+        return JSONUtil.toJsonStr(album);
+    }
+
     @GetMapping("/test.json")
     public String get(String param) {
         WebContext webContext = WebContext.get();

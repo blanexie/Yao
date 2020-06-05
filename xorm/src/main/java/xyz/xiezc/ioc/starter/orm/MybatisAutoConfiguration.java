@@ -20,6 +20,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.db.ds.DSFactory;
@@ -186,6 +187,7 @@ public class MybatisAutoConfiguration implements ApplicationListener {
         }
         for (String mapperLocation : mapperLocations) {
             String s = mapperLocation.replaceAll("\\.", "/");
+            s = ClassUtil.getClassPath() + s;
             List<File> files = FileUtil.loopFiles(s, file -> file.getName().endsWith(".xml"));
             ret.addAll(files);
         }
