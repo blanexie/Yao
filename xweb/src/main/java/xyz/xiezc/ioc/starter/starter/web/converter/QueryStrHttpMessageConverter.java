@@ -1,9 +1,9 @@
 package xyz.xiezc.ioc.starter.starter.web.converter;
 
 import cn.hutool.core.collection.CollUtil;
-import xyz.xiezc.ioc.system.annotation.Component;
-import xyz.xiezc.ioc.system.common.definition.MethodDefinition;
-import xyz.xiezc.ioc.system.common.definition.ParamDefinition;
+import xyz.xiezc.ioc.starter.annotation.Component;
+import xyz.xiezc.ioc.starter.common.definition.MethodDefinition;
+import xyz.xiezc.ioc.starter.common.definition.ParamDefinition;
 import xyz.xiezc.ioc.starter.starter.web.common.ContentType;
 import xyz.xiezc.ioc.starter.starter.web.entity.HttpRequest;
 

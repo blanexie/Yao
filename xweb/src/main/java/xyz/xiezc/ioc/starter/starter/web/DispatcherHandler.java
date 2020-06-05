@@ -18,11 +18,11 @@ import xyz.xiezc.ioc.starter.starter.web.converter.HttpMessageConverter;
 import xyz.xiezc.ioc.starter.starter.web.entity.HttpRequest;
 import xyz.xiezc.ioc.starter.starter.web.entity.WebContext;
 import xyz.xiezc.ioc.starter.starter.web.netty.websocket.WebSocketFrameHandler;
-import xyz.xiezc.ioc.system.annotation.Component;
-import xyz.xiezc.ioc.system.annotation.Init;
-import xyz.xiezc.ioc.system.annotation.Inject;
-import xyz.xiezc.ioc.system.common.definition.BeanDefinition;
-import xyz.xiezc.ioc.system.common.definition.MethodDefinition;
+import xyz.xiezc.ioc.starter.annotation.Component;
+import xyz.xiezc.ioc.starter.annotation.Init;
+import xyz.xiezc.ioc.starter.annotation.Inject;
+import xyz.xiezc.ioc.starter.common.definition.BeanDefinition;
+import xyz.xiezc.ioc.starter.common.definition.MethodDefinition;
 
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;

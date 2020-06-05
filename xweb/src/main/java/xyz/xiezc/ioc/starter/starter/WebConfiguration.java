@@ -13,13 +13,13 @@ import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.SelfSignedCertificate;
-import xyz.xiezc.ioc.system.annotation.BeanScan;
-import xyz.xiezc.ioc.system.annotation.Configuration;
+import xyz.xiezc.ioc.starter.annotation.BeanScan;
+import xyz.xiezc.ioc.starter.annotation.Configuration;
 import xyz.xiezc.ioc.starter.starter.web.DispatcherHandler;
 import xyz.xiezc.ioc.starter.starter.web.WebServerBootstrap;
 import xyz.xiezc.ioc.starter.starter.web.common.XWebProperties;
 import xyz.xiezc.ioc.starter.starter.web.netty.NettyWebServerInitializer;
-import xyz.xiezc.ioc.system.annotation.Inject;
+import xyz.xiezc.ioc.starter.annotation.Inject;
 
 @Configuration
 @BeanScan(basePackages = {"xyz.xiezc.ioc.starter.web"})

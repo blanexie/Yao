@@ -1,6 +1,6 @@
 package xyz.xiezc.example.web;
 
-import xyz.xiezc.ioc.system.annotation.Component;
+import xyz.xiezc.ioc.starter.annotation.Component;
 
 @Component
 public class TestAA implements TestA{

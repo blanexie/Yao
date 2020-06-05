@@ -42,8 +42,8 @@ import xyz.xiezc.ioc.starter.orm.common.YaoManagedTransactionFactory;
 import xyz.xiezc.ioc.starter.orm.common.YaoMybatisException;
 import xyz.xiezc.ioc.starter.orm.util.StringUtil;
 import xyz.xiezc.ioc.starter.orm.xml.XMLMapperBuilder;
-import xyz.xiezc.ioc.system.annotation.Init;
-import xyz.xiezc.ioc.system.common.definition.FactoryBean;
+import xyz.xiezc.ioc.starter.annotation.Init;
+import xyz.xiezc.ioc.starter.common.definition.FactoryBean;
 import xyz.xiezc.ioc.starter.orm.xml.DocumentMapperDefine;
 
 import javax.sql.DataSource;

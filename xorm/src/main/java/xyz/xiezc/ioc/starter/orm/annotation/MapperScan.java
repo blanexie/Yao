@@ -1,6 +1,6 @@
 package xyz.xiezc.ioc.starter.orm.annotation;
 
-import xyz.xiezc.ioc.system.annotation.Component;
+import xyz.xiezc.ioc.starter.annotation.Component;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
