@@ -1,16 +1,34 @@
-# Yao 总框架
+@[TOC](目录)
+# [Yao框架](https://github.com/blanexie/Yao)
+> 每次看spring的源码都是难以看进去， 但是平时都会通过各种各样的博客文章中大致理解了spring的基本原理。 同时我也萌生了自己实现一个类似框架的想法，于是便有了这个项目。虽然是重复造轮子，但是写这个项目的过程中我对于spring的实现也有了更深的了解吧。
+
+> 虽然我只是无人气的小博主， 但是我还是在我的在这里推下我的框架，因为梦想还是要有的，万一这个框架哪天火了呢!
+
+[博客地址](https://blog.csdn.net/leisurelen/article/details/106265817) ： https://blog.csdn.net/leisurelen/article/details/106265817
+
+**本项目使用的是java11版本的基础上开发，不能保证在小于java11的版本上能正常运行 ** 
+
+
+想学习spring的，又难以看进去源码的， 可以看看我的这个项目， 
+  欢迎star和留言。有疑问请留言， 我很乐意与你们一起探讨技术问题。 这个项目我会坚持更新的，希望大家能给与我支持。 
+## 项目地址
+[https://github.com/blanexie/Yao](https://github.com/blanexie/Yao)
 
 
 ##  使用示例
+
+可以参照我的项目源码中的example模块来使用
+
 > 说明除了下面示例的方式， 还可以使用FactoryBean接口和@Bean注解方法的方式将bean放入容器中
 
 ### 导入maven包
+
 ```xml
 <!-- 依赖注入的核心包， 提供基本的依赖注入功能  -->
 <dependency>
     <groupId>xyz.xiezc</groupId>
     <artifactId>xioc</artifactId>
-    <version>1.0</version>
+    <version>2.2</version>
 </dependency>
 ```
 
@@ -19,15 +37,21 @@
 <dependency>
     <groupId>xyz.xiezc</groupId>
     <artifactId>xorm</artifactId>
-    <version>1.0</version>
+    <version>2.2</version>
 </dependency>
 ```
+
 ```xml
 <!--  数据源链接池  -->
-<dependency>
-    <groupId>com.alibaba</groupId>
-    <artifactId>druid</artifactId>
-    <version>${druid.version}</version>
+  <dependency>
+    <groupId>mysql</groupId>
+    <artifactId>mysql-connector-java</artifactId>
+    <version>8.0.20</version>
+ </dependency>
+ <dependency>
+  <groupId>com.alibaba</groupId>
+  <artifactId>druid</artifactId>
+     <version>1.1.22</version>
 </dependency>
 ```
 
@@ -36,64 +60,104 @@
 <dependency>
     <groupId>xyz.xiezc</groupId>
     <artifactId>xweb</artifactId>
-    <version>1.0</version>
+    <version>2.2</version>
 </dependency>
 
 ```
 
 ### 定义一个启动类
+
 ```java
+package xyz.xiezc.example;
 
-import Xioc;
-import Configuration;
-import MapperScan;
 
-@MapperScan("xyz.xiezc.example.web")
+import xyz.xiezc.ioc.starter.Xioc;
+import xyz.xiezc.ioc.starter.annotation.Configuration;
+import xyz.xiezc.ioc.starter.annotation.Cron;
+import xyz.xiezc.ioc.starter.annotation.EnableCron;
+import xyz.xiezc.ioc.starter.orm.annotation.MapperScan;
+
+import java.time.LocalTime;
+
+@MapperScan({"xyz.xiezc.example.web.mapper"})  //扫描mapper包
 @Configuration
-public class ExampleApplication {
+@EnableCron  //启用定时任务
+public class Application {
+
+    /**
+     * 每3秒执行一次。<br>
+     * 表达式每部分的意思如下：
+     * 秒 分 时 日 月 星期
+     */
+    @Cron("*/3 * * * * *")
+    public void cronTest() {
+        System.out.println("定时任务执行: " + LocalTime.now());
+    }
 
     public static void main(String[] args) {
-        Xioc.run(ExampleApplication.class);
+        Xioc.run(Application.class);
     }
 }
+
 ```
+
 ###  定义一个Controller放入容器中
+
 ```java
+package xyz.xiezc.example.web.controller;
+
 import cn.hutool.json.JSONUtil;
-import Inject;
-import Example;
-import Controller;
-import GetMapping;
-import WebContext;
+import xyz.xiezc.example.web.common.TestAopspect;
+import xyz.xiezc.example.web.entity.Album;
+import xyz.xiezc.example.web.mapper.AlbumMapper;
+import xyz.xiezc.example.web.service.TestService;
+import xyz.xiezc.ioc.starter.annotation.Aop;
+import xyz.xiezc.ioc.starter.annotation.Inject;
+import xyz.xiezc.ioc.starter.orm.common.example.Example;
+import xyz.xiezc.ioc.starter.starter.web.annotation.Controller;
+import xyz.xiezc.ioc.starter.starter.web.annotation.GetMapping;
+import xyz.xiezc.ioc.starter.starter.web.entity.WebContext;
 
 import java.util.List;
 import java.util.Map;
 
+@Aop(TestAopspect.class)
 @Controller("/")
 public class TestController {
 
     @Inject
     AlbumMapper albumMapper;
+  	/**
+  	 *  支持list注入， 会将符合TestService类型的bean都注入到这个list中
+  	*/
+    @Inject
+    TestService[] testServices;
+
+    @GetMapping("/get.json")
+    public String get() {
+        return testServices.length + "";
+    }
 
     @GetMapping("/test.json")
     public String get(String param) {
         WebContext webContext = WebContext.get();
         //
         Example build = Example.of(Album.class)
-                .andEqualTo(Album::getId,3537) //支持类似mybatis-plus的lambda的使用方式
+                .andEqualTo(Album::getId, 3537) //支持类似mybatis-plus的lambda的使用方式
                 .build();
         List<Album> albums = albumMapper.selectByExample(build);
         //获取session信息
         Map<String, Object> session = webContext.getSession();
         session.put("param", param);
-        
-        return JSONUtil.toJsonStr( albums);
+        return JSONUtil.toJsonStr(albums);
     }
 }
-```
-### 定义一个实体类
-```java
 
+```
+
+### 定义一个实体类
+
+```java
 import lombok.Data;
 import Column;
 import Id;
@@ -121,16 +185,22 @@ public class Album implements Serializable {
     Integer see;
 }
 ```
+
 ### 定义一个Mapper接口
+
 ```java
 import BaseMapper;
-
+/**
+* BaseMapper 中内置了很多的方法
+*/
 public interface AlbumMapper extends BaseMapper<Album> {
+  
 }
 ```
-### 定义一个websocket的controller
-```java
 
+### 定义一个websocket的controller
+
+```java
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
@@ -154,32 +224,74 @@ public class WebSocketHandler implements WebSocketFrameHandler {
 }
 
 ```
+
 ### 配置文件
+
 ```properties
-
-## 基本配置信息
-# JDBC URL，根据不同的数据库，使用相应的JDBC连接字符串
-url = jdbc:mysql://127.0.0.1:8306/daily
-# 用户名，此处也可以使用 user 代替
-username = root
-# 密码，此处也可以使用 pass 代替
-password = 123456
-# JDBC驱动名，可选（Hutool会自动识别）
-driver = com.mysql.cj.jdbc.Driver
-
-## 是否启用ssl
-xweb.server.ssl.enable = false
 ### web服务的端口
 xweb.server.port=8443
 ### 静态文件的目录
 xweb.static.path=/static
 
+## 是否启用ssl
+xweb.server.ssl.enable = false
+##  证书链文件， .crt后缀的文件。启用ssl后这个文件必须存在
+xweb.server.ssl.certChainFile.Path=
+## 私钥文件， .pem后缀的文件。启用ssl后这个文件必须存在
+xweb.server.ssl.privatekeyFile.Path=
+
+
+#----------------------------------------------------------------------------------------------------------------
+## 基本配置信息
+# JDBC URL，根据不同的数据库，使用相应的JDBC连接字符串
+url =jdbc:mysql://localhost:8306/daily
+# 用户名，此处也可以使用 user 代替
+username = root
+# 密码，此处也可以使用 pass 代替
+password = 123456
+# JDBC驱动名，可选（Hutool会自动识别）
+# driver = com.mysql.jdbc.Driver
+# 是否在日志中显示执行的SQL
+showSql = true
+# 是否格式化显示的SQL
+formatSql = true
+
+
+#----------------------------------------------------------------------------------------------------------------
+## 连接池配置项
+
+## ---------------------------------------------------- Druid
+# 初始化时建立物理连接的个数。初始化发生在显示调用init方法，或者第一次getConnection时
+initialSize = 0
+# 最大连接池数量
+maxActive = 8
+# 最小连接池数量
+minIdle = 0
+# 获取连接时最大等待时间，单位毫秒。配置了maxWait之后， 缺省启用公平锁，并发效率会有所下降， 如果需要可以通过配置useUnfairLock属性为true使用非公平锁。
+maxWait = 0
+# 是否缓存preparedStatement，也就是PSCache。 PSCache对支持游标的数据库性能提升巨大，比如说oracle。 在mysql5.5以下的版本中没有PSCache功能，建议关闭掉。作者在5.5版本中使用PSCache，通过监控界面发现PSCache有缓存命中率记录， 该应该是支持PSCache。
+poolPreparedStatements = false
+# 要启用PSCache，必须配置大于0，当大于0时， poolPreparedStatements自动触发修改为true。 在Druid中，不会存在Oracle下PSCache占用内存过多的问题， 可以把这个数值配置大一些，比如说100
+maxOpenPreparedStatements = -1
+# 用来检测连接是否有效的sql，要求是一个查询语句。 如果validationQuery为null，testOnBorrow、testOnReturn、 testWhileIdle都不会其作用。
+validationQuery = SELECT 1
+# 申请连接时执行validationQuery检测连接是否有效，做了这个配置会降低性能。
+testOnBorrow = true
+# 归还连接时执行validationQuery检测连接是否有效，做了这个配置会降低性能
+testOnReturn = false
+# 建议配置为true，不影响性能，并且保证安全性。 申请连接的时候检测，如果空闲时间大于 timeBetweenEvictionRunsMillis，执行validationQuery检测连接是否有效。
+testWhileIdle = false
+# 有两个含义： 1) Destroy线程会检测连接的间隔时间 2) testWhileIdle的判断依据，详细看testWhileIdle属性的说明
+timeBetweenEvictionRunsMillis = 60000
+# 物理连接初始化的时候执行的sql
+connectionInitSqls = SELECT 1
+# 属性类型是字符串，通过别名的方式配置扩展插件， 常用的插件有： 监控统计用的filter:stat  日志用的filter:log4j 防御sql注入的filter:wall
+filters = stat,wall
+# 类型是List<com.alibaba.druid.filter.Filter>， 如果同时配置了filters和proxyFilters， 是组合关系，并非替换关系
+proxyFilters =
+
 ```
-
-
-![Xioc](./demo.png)
-
-
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20200605172338301.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xlaXN1cmVsZW4=,size_16,color_FFFFFF,t_70)
 
 ## Xioc 小型的依赖注入框架， 
 ### 目前支持的注解详解
@@ -191,6 +303,8 @@ xweb.static.path=/static
 * @Init 方法注解，  被注解的方法在所在bean初始化完成后调用， 方法必须无参 
 * @Value 字段注解。  将配置中的内容注入到字段中， 类型转换参照Hutool的类型转换工具。 
 * @EventListener 类注解， 被注解的方类必须有无参构造方法，且实现ApplicationListener接口， 注解中必须设置处理的时间名称。
+* @Cron 方法注解， 被注解的方法会作为定时任务执行
+* @EnableCron 在启动类上的注解， 只有这个注解存在， @Cron 注解才会起作用
 
 ### 目前支持功能列表如下
 * 所有的bean都是单例模式
@@ -221,23 +335,15 @@ xweb.static.path=/static
 * 请求路径只有在controller中找不到后才会进入静态文件目录下查找。
 * GET和POST请求只返回application/json格式的内容，不返回其他类型。这样已经够用了， 现在几乎都是前后端分离的项目。
 
-### 不完美的地方
+### 待改进
 * 只支持GET和Post请求
 * Post请求只默认提供支持的ContentType类型只有 "application/json" ，"multipart/form-data" ， 
 "application/x-www-form-urlencoded"和从url中获取参数的Default几种类型，但是提供了扩展接口。 
 只要实现HttpMessageConverter接口，并将实现类放入容器中，就可以了。
 
-### 支持的配置文件的配置
-```shell script
+###  配置文件 
+参考上面使用示例中的配置文件
 
-## 是否启用ssl
-xweb.server.ssl.enable = false
-### web服务的端口
-xweb.server.port=8443
-### 静态文件的目录
-xweb.static.path=/static
-
-```
 
 
 ## XORM 整合mybatis方便查询的项目 
@@ -255,7 +361,7 @@ xweb.static.path=/static
 
 ### 数据源的配置
 > 本框架中数据源的使用是完全使用hutool中的数据源的方式
-
+#### 基本配置
 ```shell script
 
 ## 基本配置信息
@@ -342,7 +448,7 @@ filters = stat
 proxyFilters = 
 ```
 
-3. 开始你的表演， 写你最熟悉的mapper 代码
+3. 开始你的表演， 写你最熟悉的mapper代码
 
 
 
@@ -354,7 +460,6 @@ proxyFilters =
 mapper.xml文件的默认路径是classPath:mapper/ 。 也可以通过配置文件mybatis.mapperLocations来指定
 
 ### 本框架待改进的地方
-* 不要引入mysql的jdbc链接包。 因为用户不一定是使用的mysql。
 * 实现事务的管理功能， 可以参考spring的事务管理实现 
 
 
@@ -369,7 +474,3 @@ mapper.xml文件的默认路径是classPath:mapper/ 。 也可以通过配置文
 **spring**
 
 **netty**
-
-
-
-

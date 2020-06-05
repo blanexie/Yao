@@ -1,4 +1,4 @@
-package xyz.xiezc.example.web;
+package xyz.xiezc.example.web.controller;
 
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;

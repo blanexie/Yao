@@ -1,5 +1,6 @@
-package xyz.xiezc.example.web;
+package xyz.xiezc.example.web.mapper;
 
+import xyz.xiezc.example.web.entity.Tag;
 import xyz.xiezc.ioc.starter.orm.common.BaseMapper;
 
 /**

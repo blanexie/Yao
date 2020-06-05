@@ -1,4 +1,4 @@
-package xyz.xiezc.example.web;
+package xyz.xiezc.example.web.entity;
 
 import lombok.Data;
 import xyz.xiezc.ioc.starter.orm.annotation.Column;

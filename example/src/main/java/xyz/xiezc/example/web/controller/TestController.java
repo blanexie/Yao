@@ -1,6 +1,10 @@
-package xyz.xiezc.example.web;
+package xyz.xiezc.example.web.controller;
 
 import cn.hutool.json.JSONUtil;
+import xyz.xiezc.example.web.common.TestAopspect;
+import xyz.xiezc.example.web.entity.Album;
+import xyz.xiezc.example.web.mapper.AlbumMapper;
+import xyz.xiezc.example.web.service.TestService;
 import xyz.xiezc.ioc.starter.annotation.Aop;
 import xyz.xiezc.ioc.starter.annotation.Inject;
 import xyz.xiezc.ioc.starter.orm.common.example.Example;
@@ -18,11 +22,11 @@ public class TestController {
     @Inject
     AlbumMapper albumMapper;
     @Inject
-    TestA[] testAS;
+    TestService[] testServices;
 
     @GetMapping("/get.json")
-    public String get1() {
-        return testAS.length + "";
+    public String get() {
+        return testServices.length + "";
     }
 
 
@@ -37,7 +41,6 @@ public class TestController {
         //获取session信息
         Map<String, Object> session = webContext.getSession();
         session.put("param", param);
-
         return JSONUtil.toJsonStr(albums);
     }
 }
