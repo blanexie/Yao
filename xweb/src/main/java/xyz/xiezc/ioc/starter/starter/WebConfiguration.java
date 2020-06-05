@@ -50,8 +50,7 @@ public class WebConfiguration implements WebServerBootstrap {
             if (!certChainFile.exists() || !privateKeyFile.exists()) {
                 throw new RuntimeException("启用了SSL, 请配置证书文件路径");
             }
-            sslCtx = SslContextBuilder.forServer(certChainFile, privateKeyFile)
-                    .build();
+            sslCtx = SslContextBuilder.forServer(certChainFile, privateKeyFile).build();
         } else {
             sslCtx = null;
         }
