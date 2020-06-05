@@ -10,6 +10,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import io.netty.handler.ssl.ClientAuth;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.SelfSignedCertificate;
@@ -20,6 +21,8 @@ import xyz.xiezc.ioc.starter.starter.web.WebServerBootstrap;
 import xyz.xiezc.ioc.starter.starter.web.common.XWebProperties;
 import xyz.xiezc.ioc.starter.starter.web.netty.NettyWebServerInitializer;
 import xyz.xiezc.ioc.starter.annotation.Inject;
+
+import java.io.File;
 
 @Configuration
 @BeanScan(basePackages = {"xyz.xiezc.ioc.starter.web"})
@@ -41,8 +44,14 @@ public class WebConfiguration implements WebServerBootstrap {
         // Configure SSL.
         final SslContext sslCtx;
         if (ssl) {
-            SelfSignedCertificate ssc = new SelfSignedCertificate();
-            sslCtx = SslContextBuilder.forServer(ssc.certificate(), ssc.privateKey()).build();
+
+            File certChainFile = new File(xWebProperties.getCertChainFilePath());
+            File privateKeyFile = new File(xWebProperties.getPrivatekeyFilePath());
+            if (!certChainFile.exists() || !privateKeyFile.exists()) {
+                throw new RuntimeException("启用了SSL, 请配置证书文件路径");
+            }
+            sslCtx = SslContextBuilder.forServer(certChainFile, privateKeyFile)
+                    .build();
         } else {
             sslCtx = null;
         }
