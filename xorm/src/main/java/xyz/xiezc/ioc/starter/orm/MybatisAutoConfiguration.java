@@ -33,12 +33,6 @@ import org.apache.ibatis.io.ResolverUtil;
 import org.apache.ibatis.mapping.DatabaseIdProvider;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.SqlSessionFactory;
-import xyz.xiezc.ioc.starter.orm.annotation.MapperScan;
-import xyz.xiezc.ioc.starter.orm.bean.SqlSessionFactoryBean;
-import xyz.xiezc.ioc.starter.orm.common.BaseMapper;
-import xyz.xiezc.ioc.starter.orm.common.SpringBootVFS;
-import xyz.xiezc.ioc.starter.orm.xml.DocumentMapperDefine;
-import xyz.xiezc.ioc.starter.orm.xml.MapperDefine;
 import xyz.xiezc.ioc.starter.ApplicationContextUtil;
 import xyz.xiezc.ioc.starter.Xioc;
 import xyz.xiezc.ioc.starter.annotation.EventListener;
@@ -53,6 +47,12 @@ import xyz.xiezc.ioc.starter.common.enums.BeanTypeEnum;
 import xyz.xiezc.ioc.starter.common.enums.FieldOrParamTypeEnum;
 import xyz.xiezc.ioc.starter.event.ApplicationEvent;
 import xyz.xiezc.ioc.starter.event.ApplicationListener;
+import xyz.xiezc.ioc.starter.orm.annotation.MapperScan;
+import xyz.xiezc.ioc.starter.orm.bean.SqlSessionFactoryBean;
+import xyz.xiezc.ioc.starter.orm.common.BaseMapper;
+import xyz.xiezc.ioc.starter.orm.common.SpringBootVFS;
+import xyz.xiezc.ioc.starter.orm.xml.DocumentMapperDefine;
+import xyz.xiezc.ioc.starter.orm.xml.MapperDefine;
 
 import javax.sql.DataSource;
 import java.io.File;
@@ -63,13 +63,13 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static xyz.xiezc.ioc.starter.common.enums.EventNameConstant.applicationListener;
+import static xyz.xiezc.ioc.starter.common.enums.EventNameConstant.LoadApplicationListener;
 
 /**
  * 事件监听器的 init方法会先于 doExecute方法 被触发
  */
 @Data
-@EventListener(eventName = applicationListener)
+@EventListener(eventName = LoadApplicationListener)
 public class MybatisAutoConfiguration implements ApplicationListener {
 
     private static Log log = LogFactory.get(MybatisAutoConfiguration.class);

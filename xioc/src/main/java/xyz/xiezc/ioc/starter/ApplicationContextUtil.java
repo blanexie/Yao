@@ -3,18 +3,24 @@ package xyz.xiezc.ioc.starter;
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.ClassUtil;
+import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 import lombok.Data;
 import xyz.xiezc.ioc.starter.annotation.AnnotationHandler;
 import xyz.xiezc.ioc.starter.annotation.Component;
 import xyz.xiezc.ioc.starter.annotation.Configuration;
+import xyz.xiezc.ioc.starter.annotation.EventListener;
 import xyz.xiezc.ioc.starter.annotation.handler.ComponentAnnotationHandler;
 import xyz.xiezc.ioc.starter.annotation.handler.ConfigurationAnnotationHandler;
 import xyz.xiezc.ioc.starter.common.context.*;
 import xyz.xiezc.ioc.starter.common.context.impl.*;
 import xyz.xiezc.ioc.starter.common.definition.BeanDefinition;
+import xyz.xiezc.ioc.starter.common.enums.BeanStatusEnum;
+import xyz.xiezc.ioc.starter.common.enums.BeanTypeEnum;
+import xyz.xiezc.ioc.starter.event.ApplicationListener;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
@@ -25,6 +31,10 @@ import java.util.concurrent.ExecutorService;
 public class ApplicationContextUtil {
 
     Log log = LogFactory.get(ApplicationContextUtil.class);
+
+
+    private Set<Class<? extends ApplicationListener>> systemListener = new HashSet<>();
+
 
     /**
      * 全局线程池
@@ -45,6 +55,31 @@ public class ApplicationContextUtil {
      * 加载其他starter需要扫描的package路径
      */
     public final String starterPackage = "xyz.xiezc.ioc.starter";
+
+
+    protected ApplicationContextUtil() {
+        for (Class<? extends ApplicationListener> aClass : systemListener) {
+            BeanDefinition beanDefinition = new BeanDefinition();
+            beanDefinition.setBean(ReflectUtil.newInstanceIfPossible(aClass));
+            beanDefinition.setBeanClass(aClass);
+            beanDefinition.setBeanName(aClass.getSimpleName());
+            beanDefinition.setBeanStatus(BeanStatusEnum.Completed);
+            beanDefinition.setBeanTypeEnum(BeanTypeEnum.bean);
+            beanDefinitionContext.addBeanDefinition(beanDefinition.getBeanName(), beanDefinition.getBeanClass(), beanDefinition);
+            EventListener annotation = AnnotationUtil.getAnnotation(aClass, EventListener.class);
+            if (annotation == null) {
+                throw new RuntimeException(aClass.getSimpleName() + "系统监听器请配置EventListener注解");
+            }
+            String[] strings = annotation.eventName();
+            if (strings == null) {
+                throw new RuntimeException(aClass.getSimpleName() + "系统监听器请配置EventListener注解");
+            }
+            for (String string : strings) {
+                eventPublisherContext.addApplicationListener(string, beanDefinition.getBean());
+            }
+        }
+    }
+
 
     /**
      * 扫描本项目和所有starter中的所有容器类

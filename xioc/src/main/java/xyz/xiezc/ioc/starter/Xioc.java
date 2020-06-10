@@ -1,6 +1,7 @@
 package xyz.xiezc.ioc.starter;
 
 import cn.hutool.core.annotation.AnnotationUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
@@ -46,10 +47,6 @@ public final class Xioc {
      */
     private ApplicationContextUtil applicationContextUtil;
 
-    /**
-     * 加载其他starter需要扫描的package路径
-     */
-    public final String starterPackage = "xyz.xiezc.ioc.starter";
 
     private static Xioc xioc;
     public static Class bootClass;
@@ -68,26 +65,31 @@ public final class Xioc {
         }
         //new创建ApplicationContextUtil类， beanDefinitionContext，annotationContext，propertiesContext，eventPublisherContext 等实现类
         ApplicationContextUtil applicationContextUtil = new ApplicationContextUtil();
+        EventPublisherContext eventPublisherContext = applicationContextUtil.getEventPublisherContext();
         xioc.applicationContextUtil = applicationContextUtil;
+        eventPublisherContext.publisherEvent(new ApplicationEvent(EventNameConstant.LoadApplicationContextUtil));
         log.info("ApplicationContextUtil加载完成.............");
 
         //## 调用propertiesContext的loadProperties方法，先加载配置文件到容器中。
         applicationContextUtil.getPropertiesContext().loadProperties();
+        eventPublisherContext.publisherEvent(new ApplicationEvent(EventNameConstant.LoadPropertiesContext));
         log.info("PropertiesContext加载完成..................");
 
         //## 先初始化系统中的annotationHandler类，并将注解处理器全部放入annotationContext中.
         loadAnnotationHandler(applicationContextUtil);
+        eventPublisherContext.publisherEvent(new ApplicationEvent(LoadSystemAnnotationHandler));
         log.info("加载注解初始化类完成........................");
 
         //## 扫描路径下的所有的需要需要注入容器中的类， 主要是Component和Configuration两个注解注释的类
         applicationContextUtil.loadBeanDefinitions(clazz);
+        eventPublisherContext.publisherEvent(new ApplicationEvent(loadBeanDefinitions));
         log.info("加载注解初始化类完成........................");
 
         //## 遍历所有的beanDefinition，优先初始化用户自定义的annotationHandler类和ApplicationListener类。
         AnnotationContext annotationContext = applicationContextUtil.getAnnotationContext();
         BeanCreateContext beanCreateContext = applicationContextUtil.getBeanCreateContext();
         BeanDefinitionContext beanDefinitionContext = applicationContextUtil.getBeanDefinitionContext();
-        EventPublisherContext eventPublisherContext = applicationContextUtil.getEventPublisherContext();
+
         loadAnnotationHandlerAndApplicationListener(annotationContext, beanCreateContext, beanDefinitionContext, eventPublisherContext);
         //## 遍历剩下的的beanDefinition，并且初始化, 优先初始化切面类
         Collection<BeanDefinition> allBeanDefintion = beanDefinitionContext.getAllBeanDefintion();
@@ -122,10 +124,83 @@ public final class Xioc {
             }
         }
         log.info("加载所有的注解处理器类.....................");
-        eventPublisherContext.publisherEvent(new ApplicationEvent(annotationHandler));
+        eventPublisherContext.publisherEvent(new ApplicationEvent(LoadAnnotationHandler));
 
-        //2. 初始化相关的ApplicationListener
+        //2. 初始化相关的ApplicationListener， 需要保证在前面的事件先初始化
         List<BeanDefinition> beanDefinitionList = beanDefinitionContext.getBeanDefinitions(ApplicationListener.class);
+
+//        public static final String LoadApplicationContextUtil = "ApplicationContextUtil";
+        beanDefinitionList.stream().filter(beanDefinition -> {
+            Class<?> beanClass = beanDefinition.getBeanClass();
+            EventListener eventListener = AnnotationUtil.getAnnotation(beanClass, EventListener.class);
+            String[] strings = eventListener.eventName();
+            boolean contains = CollUtil.newArrayList(strings).contains(LoadApplicationContextUtil);
+            return contains;
+        }).forEach(beanDefinition -> {
+            beanCreateContext.createBean(beanDefinition);
+        });
+
+//        public static final String LoadPropertiesContext = "PropertiesContext";
+        beanDefinitionList.stream().filter(beanDefinition -> {
+            Class<?> beanClass = beanDefinition.getBeanClass();
+            EventListener eventListener = AnnotationUtil.getAnnotation(beanClass, EventListener.class);
+            String[] strings = eventListener.eventName();
+            boolean contains = CollUtil.newArrayList(strings).contains(LoadPropertiesContext);
+            return contains;
+        }).forEach(beanDefinition -> {
+            beanCreateContext.createBean(beanDefinition);
+        });
+//        public static final String LoadSystemAnnotationHandler = "LoadSystemAnnotationHandler";
+        beanDefinitionList.stream().filter(beanDefinition -> {
+            Class<?> beanClass = beanDefinition.getBeanClass();
+            EventListener eventListener = AnnotationUtil.getAnnotation(beanClass, EventListener.class);
+            String[] strings = eventListener.eventName();
+            boolean contains = CollUtil.newArrayList(strings).contains(LoadSystemAnnotationHandler);
+            return contains;
+        }).forEach(beanDefinition -> {
+            beanCreateContext.createBean(beanDefinition);
+        });
+//        public static final String LoadAnnotationHandler = "LoadAnnotationHandler";
+        beanDefinitionList.stream().filter(beanDefinition -> {
+            Class<?> beanClass = beanDefinition.getBeanClass();
+            EventListener eventListener = AnnotationUtil.getAnnotation(beanClass, EventListener.class);
+            String[] strings = eventListener.eventName();
+            boolean contains = CollUtil.newArrayList(strings).contains(LoadAnnotationHandler);
+            return contains;
+        }).forEach(beanDefinition -> {
+            beanCreateContext.createBean(beanDefinition);
+        });
+//        public static final String loadBeanDefinitions = "loadBeanDefinitions";
+        beanDefinitionList.stream().filter(beanDefinition -> {
+            Class<?> beanClass = beanDefinition.getBeanClass();
+            EventListener eventListener = AnnotationUtil.getAnnotation(beanClass, EventListener.class);
+            String[] strings = eventListener.eventName();
+            boolean contains = CollUtil.newArrayList(strings).contains(loadBeanDefinitions);
+            return contains;
+        }).forEach(beanDefinition -> {
+            beanCreateContext.createBean(beanDefinition);
+        });
+//        public static final String LoadApplicationListener = "applicationListener";
+        beanDefinitionList.stream().filter(beanDefinition -> {
+            Class<?> beanClass = beanDefinition.getBeanClass();
+            EventListener eventListener = AnnotationUtil.getAnnotation(beanClass, EventListener.class);
+            String[] strings = eventListener.eventName();
+            boolean contains = CollUtil.newArrayList(strings).contains(LoadApplicationListener);
+            return contains;
+        }).forEach(beanDefinition -> {
+            beanCreateContext.createBean(beanDefinition);
+        });
+//        public static final String XiocEnd = "XiocEnd";
+        beanDefinitionList.stream().filter(beanDefinition -> {
+            Class<?> beanClass = beanDefinition.getBeanClass();
+            EventListener eventListener = AnnotationUtil.getAnnotation(beanClass, EventListener.class);
+            String[] strings = eventListener.eventName();
+            boolean contains = CollUtil.newArrayList(strings).contains(XiocEnd);
+            return contains;
+        }).forEach(beanDefinition -> {
+            beanCreateContext.createBean(beanDefinition);
+        });
+
         for (BeanDefinition beanDefinition : beanDefinitionList) {
             BeanDefinition bean = beanCreateContext.createBean(beanDefinition);
             ApplicationListener applicationListener = bean.getBean();
@@ -138,7 +213,7 @@ public final class Xioc {
             }
         }
         log.info("加载所有的事件处理器类.....................");
-        eventPublisherContext.publisherEvent(new ApplicationEvent(applicationListener));
+        eventPublisherContext.publisherEvent(new ApplicationEvent(LoadApplicationListener));
     }
 
     /**
