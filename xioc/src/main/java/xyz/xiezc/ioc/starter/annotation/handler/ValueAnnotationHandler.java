@@ -3,7 +3,10 @@ package xyz.xiezc.ioc.starter.annotation.handler;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.Data;
+import xyz.xiezc.ioc.starter.ApplicationContextUtil;
+import xyz.xiezc.ioc.starter.Xioc;
 import xyz.xiezc.ioc.starter.annotation.AnnotationHandler;
+import xyz.xiezc.ioc.starter.annotation.SystemLoad;
 import xyz.xiezc.ioc.starter.annotation.Value;
 import xyz.xiezc.ioc.starter.common.NullObj;
 import xyz.xiezc.ioc.starter.common.context.PropertiesContext;
@@ -15,6 +18,7 @@ import xyz.xiezc.ioc.starter.common.enums.FieldOrParamTypeEnum;
 import java.lang.annotation.Annotation;
 
 @Data
+@SystemLoad
 public class ValueAnnotationHandler extends AnnotationHandler<Value> {
 
     @Override
@@ -22,7 +26,6 @@ public class ValueAnnotationHandler extends AnnotationHandler<Value> {
         return Value.class;
     }
 
-    PropertiesContext propertiesContext;
 
     @Override
     public void processClass(Annotation annotation, Class clazz, BeanDefinition beanDefinition) {
@@ -36,6 +39,9 @@ public class ValueAnnotationHandler extends AnnotationHandler<Value> {
 
     @Override
     public void processField(FieldDefinition fieldDefinition, Annotation annotation, BeanDefinition beanDefinition) {
+        ApplicationContextUtil applicationContextUtil = Xioc.getApplicationContext();
+        PropertiesContext propertiesContext = applicationContextUtil.getPropertiesContext();
+
         Object bean = beanDefinition.getBean();
         String value = ((Value) annotation).value();
         if (StrUtil.isBlank(value)) {

@@ -21,7 +21,6 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ClassUtil;
-import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.db.ds.DSFactory;
 import cn.hutool.json.JSONUtil;
@@ -36,15 +35,12 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import xyz.xiezc.ioc.starter.ApplicationContextUtil;
 import xyz.xiezc.ioc.starter.Xioc;
 import xyz.xiezc.ioc.starter.annotation.EventListener;
-import xyz.xiezc.ioc.starter.annotation.Init;
-import xyz.xiezc.ioc.starter.annotation.Inject;
+import xyz.xiezc.ioc.starter.annotation.SystemLoad;
+import xyz.xiezc.ioc.starter.common.context.BeanCreateContext;
 import xyz.xiezc.ioc.starter.common.context.BeanDefinitionContext;
 import xyz.xiezc.ioc.starter.common.definition.BeanDefinition;
-import xyz.xiezc.ioc.starter.common.definition.MethodDefinition;
-import xyz.xiezc.ioc.starter.common.definition.ParamDefinition;
 import xyz.xiezc.ioc.starter.common.enums.BeanStatusEnum;
 import xyz.xiezc.ioc.starter.common.enums.BeanTypeEnum;
-import xyz.xiezc.ioc.starter.common.enums.FieldOrParamTypeEnum;
 import xyz.xiezc.ioc.starter.event.ApplicationEvent;
 import xyz.xiezc.ioc.starter.event.ApplicationListener;
 import xyz.xiezc.ioc.starter.orm.annotation.MapperScan;
@@ -63,83 +59,51 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static xyz.xiezc.ioc.starter.common.enums.EventNameConstant.LoadApplicationListener;
+import static xyz.xiezc.ioc.starter.common.enums.EventNameConstant.loadBeanDefinitions;
 
 /**
  * 事件监听器的 init方法会先于 doExecute方法 被触发
  */
 @Data
-@EventListener(eventName = LoadApplicationListener)
+@SystemLoad
+@EventListener(eventName = loadBeanDefinitions)
 public class MybatisAutoConfiguration implements ApplicationListener {
 
     private static Log log = LogFactory.get(MybatisAutoConfiguration.class);
 
-    @Inject
     private MybatisProperties properties;
 
     private Interceptor[] interceptors;
 
     private DatabaseIdProvider databaseIdProvider;
 
-    private SqlSessionFactory sqlSessionFactory;
-
-    private List<MapperDefine> mapperDefines;
-
-
     @Override
     public void doExecute(ApplicationEvent applicationEvent) {
         ApplicationContextUtil applicationContext = Xioc.getApplicationContext();
-        BeanDefinitionContext beanDefinitionContext = applicationContext.getBeanDefinitionContext();
-        BeanDefinition beanDefinition1 = beanDefinitionContext.getBeanDefinition(this.getClass());
-        //4. 生成Mapper接口的代理类， 并生成对应的bean放入容器中
-        for (MapperDefine mapperDefine : mapperDefines) {
-            Class<?> mapperInterface = mapperDefine.getMapperInterface();
-            BeanDefinition beanDefinition = new BeanDefinition();
-            beanDefinition.setBeanClass(mapperInterface);
-            beanDefinition.setBeanName(mapperInterface.getName());
-            beanDefinition.setBeanStatus(BeanStatusEnum.Original);
-            beanDefinition.setBeanTypeEnum(BeanTypeEnum.methodBean);
-            MethodDefinition methodDefinition = new MethodDefinition();
-            methodDefinition.setBeanDefinition(beanDefinition1);
-            methodDefinition.setMethod(ReflectUtil.getMethod(this.getClass(), "bean", MapperDefine.class));
-            methodDefinition.setMethodName("bean");
-            methodDefinition.setReturnType(mapperInterface);
-            ParamDefinition paramDefinition = new ParamDefinition();
-            paramDefinition.setParam(mapperDefine);
-            paramDefinition.setFieldOrParamTypeEnum(FieldOrParamTypeEnum.Simple);
-            methodDefinition.setParamDefinitions(new ParamDefinition[]{paramDefinition});
-            beanDefinition.setInvokeMethodBean(methodDefinition);
-
-            beanDefinitionContext.addBeanDefinition(beanDefinition.getBeanName(), beanDefinition.getBeanClass(), beanDefinition);
-        }
-    }
-
-
-    public Object bean(MapperDefine mapperDefine) {
-        Class<?> mapperInterface = mapperDefine.getMapperInterface();
-        Object mapper = sqlSessionFactory.openSession(true).getMapper(mapperInterface);
-        mapperDefine.setCreateMapper(true);
-        return mapper;
-    }
-
-
-    @SneakyThrows
-    @Init
-    public void init() {
-        ApplicationContextUtil applicationContext = Xioc.getApplicationContext();
+        BeanCreateContext beanCreateContext = applicationContext.getBeanCreateContext();
         BeanDefinitionContext beanDefinitionContext = applicationContext.getBeanDefinitionContext();
         List<BeanDefinition> beanDefinitions = beanDefinitionContext.getBeanDefinitions(Interceptor.class);
-        List<Interceptor> collect = beanDefinitions.stream().map(beanDefinition -> (Interceptor) beanDefinition.getBean()).collect(Collectors.toList());
+        List<Interceptor> collect = beanDefinitions.stream()
+                .map(beanDefinition -> {
+                    beanCreateContext.createBean(beanDefinition);
+                    return (Interceptor) beanDefinition.getBean();
+                })
+                .collect(Collectors.toList());
         interceptors = ArrayUtil.toArray(collect, Interceptor.class);
+
+        BeanDefinition beanDefinition = beanDefinitionContext.getBeanDefinition(MybatisProperties.class);
+        beanCreateContext.createBean(beanDefinition);
+        properties = beanDefinition.getBean();
+
         //1. 扫描mapper接口，获取实体类和对应表格的关系。
         //获取注解中配置的信息
-        mapperDefines = getMapperDefines();
+        List<MapperDefine> mapperDefines = getMapperDefines();
         //2. 组装改造后的mapper.xml的文档
         List<DocumentMapperDefine> documentMapperDefines = getDocumentMapperDefines(mapperDefines);
         //3. 生成Configuration和SqlSessionFactory
-        sqlSessionFactory = getSqlSessionFactory(applicationContext, documentMapperDefines);
-
-        //  createMapperBean(applicationContext, mapperDefines, sqlSessionFactory);
+        SqlSessionFactory sqlSessionFactory = getSqlSessionFactory(applicationContext, documentMapperDefines);
+        //4. 生成Mapper接口的代理类， 并生成对应的bean放入容器中
+        createMapperBean(applicationContext, mapperDefines, sqlSessionFactory);
     }
 
 

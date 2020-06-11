@@ -3,8 +3,11 @@ package xyz.xiezc.ioc.starter.annotation.handler;
 import cn.hutool.aop.ProxyUtil;
 import cn.hutool.core.util.ClassUtil;
 import lombok.Data;
+import xyz.xiezc.ioc.starter.ApplicationContextUtil;
+import xyz.xiezc.ioc.starter.Xioc;
 import xyz.xiezc.ioc.starter.annotation.AnnotationHandler;
 import xyz.xiezc.ioc.starter.annotation.Aop;
+import xyz.xiezc.ioc.starter.annotation.SystemLoad;
 import xyz.xiezc.ioc.starter.common.AopAspect;
 import xyz.xiezc.ioc.starter.common.context.BeanCreateContext;
 import xyz.xiezc.ioc.starter.common.context.BeanDefinitionContext;
@@ -16,6 +19,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
 @Data
+@SystemLoad
 public class AopAnnotationHandler extends AnnotationHandler<Aop> {
 
     @Override
@@ -28,12 +32,13 @@ public class AopAnnotationHandler extends AnnotationHandler<Aop> {
         return Integer.MIN_VALUE;
     }
 
-    BeanCreateContext beanCreateContext;
-
-    BeanDefinitionContext beanDefinitionContext;
 
     @Override
     public void processClass(Annotation annotation, Class clazz, BeanDefinition beanDefinition) {
+        ApplicationContextUtil applicationContextUtil = Xioc.getApplicationContext();
+        BeanCreateContext beanCreateContext = applicationContextUtil.getBeanCreateContext();
+        BeanDefinitionContext beanDefinitionContext = applicationContextUtil.getBeanDefinitionContext();
+
         Class<?> aopClass = ((Aop) annotation).value();// AnnotationUtil.getAnnotationValue((AnnotatedElement) annotation, annotation.annotationType());
         //获取切面类
         BeanDefinition aopAspectBeanDefinition = beanDefinitionContext.getBeanDefinition(aopClass);
@@ -53,6 +58,9 @@ public class AopAnnotationHandler extends AnnotationHandler<Aop> {
 
     @Override
     public void processMethod(MethodDefinition methodDefinition, Annotation annotation, BeanDefinition beanDefinition) {
+        ApplicationContextUtil applicationContextUtil = Xioc.getApplicationContext();
+        BeanCreateContext beanCreateContext = applicationContextUtil.getBeanCreateContext();
+        BeanDefinitionContext beanDefinitionContext = applicationContextUtil.getBeanDefinitionContext();
         //获取切面类
         Class<?> aopClass = ((Aop) annotation).value();
         BeanDefinition aopAspectBeanDefinition = beanDefinitionContext.getBeanDefinition(aopClass);

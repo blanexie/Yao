@@ -29,6 +29,9 @@ public class EventPublisherContextUtil implements EventPublisherContext {
         if (CollUtil.isEmpty(applicationListeners)) {
             applicationListeners = CollUtil.newArrayList();
         }
+        if (applicationListeners.contains(listener)) {
+            return;
+        }
 
         applicationListeners.add(listener);
         applicationListeners = applicationListeners.stream()

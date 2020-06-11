@@ -10,6 +10,7 @@ import xyz.xiezc.ioc.starter.Xioc;
 import xyz.xiezc.ioc.starter.annotation.AnnotationHandler;
 import xyz.xiezc.ioc.starter.annotation.Cron;
 import xyz.xiezc.ioc.starter.annotation.EnableCron;
+import xyz.xiezc.ioc.starter.annotation.SystemLoad;
 import xyz.xiezc.ioc.starter.common.cron.CronApplicationListener;
 import xyz.xiezc.ioc.starter.common.cron.CronDefinition;
 import xyz.xiezc.ioc.starter.common.definition.BeanDefinition;
@@ -25,11 +26,11 @@ import java.lang.annotation.Annotation;
  * @Date 2020/6/5 11:54 上午
  **/
 @Data
+@SystemLoad
 public class CronAnnotationHandler extends AnnotationHandler<Cron> {
 
     Log log = LogFactory.get(CronAnnotationHandler.class);
 
-    private ApplicationContextUtil applicationContextUtil;
 
     @Override
     public Class<Cron> getAnnotationType() {
@@ -43,6 +44,7 @@ public class CronAnnotationHandler extends AnnotationHandler<Cron> {
 
     @Override
     public void processMethod(MethodDefinition methodDefinition, Annotation annotation, BeanDefinition beanDefinition) {
+        ApplicationContextUtil applicationContextUtil = Xioc.getApplicationContext();
         //查看是否启用了cron
         Class bootClass = Xioc.bootClass;
         EnableCron enableCron = AnnotationUtil.getAnnotation(bootClass, EnableCron.class);

@@ -5,11 +5,9 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.Data;
-import xyz.xiezc.ioc.starter.annotation.AnnotationHandler;
+import xyz.xiezc.ioc.starter.Xioc;
+import xyz.xiezc.ioc.starter.annotation.*;
 import xyz.xiezc.ioc.starter.ApplicationContextUtil;
-import xyz.xiezc.ioc.starter.annotation.Bean;
-import xyz.xiezc.ioc.starter.annotation.BeanScan;
-import xyz.xiezc.ioc.starter.annotation.Configuration;
 import xyz.xiezc.ioc.starter.common.context.BeanDefinitionContext;
 import xyz.xiezc.ioc.starter.common.definition.BeanDefinition;
 import xyz.xiezc.ioc.starter.common.definition.FieldDefinition;
@@ -27,6 +25,7 @@ import java.util.stream.Collectors;
  * 被configuration 注解的方法的处理逻辑
  */
 @Data
+@SystemLoad
 public class ConfigurationAnnotationHandler extends AnnotationHandler<Configuration> {
 
     @Override
@@ -34,11 +33,11 @@ public class ConfigurationAnnotationHandler extends AnnotationHandler<Configurat
         return Configuration.class;
     }
 
-    ApplicationContextUtil applicationContextUtil;
-
 
     @Override
     public void processClass(Annotation annotation, Class clazz, BeanDefinition beanDefinition1) {
+        ApplicationContextUtil applicationContextUtil = Xioc.getApplicationContext();
+
         BeanDefinitionContext beanDefinitionContext = applicationContextUtil.getBeanDefinitionContext();
         BeanDefinition beanDefinition = dealBeanAnnotation(annotation, clazz, applicationContextUtil);
         beanDefinitionContext.addBeanDefinition(beanDefinition.getBeanName(), getRealBeanClass(beanDefinition), beanDefinition);

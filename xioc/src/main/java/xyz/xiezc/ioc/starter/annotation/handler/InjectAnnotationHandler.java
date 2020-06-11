@@ -5,8 +5,10 @@ import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.Data;
 import xyz.xiezc.ioc.starter.ApplicationContextUtil;
+import xyz.xiezc.ioc.starter.Xioc;
 import xyz.xiezc.ioc.starter.annotation.AnnotationHandler;
 import xyz.xiezc.ioc.starter.annotation.Inject;
+import xyz.xiezc.ioc.starter.annotation.SystemLoad;
 import xyz.xiezc.ioc.starter.common.context.BeanCreateContext;
 import xyz.xiezc.ioc.starter.common.context.BeanDefinitionContext;
 import xyz.xiezc.ioc.starter.common.definition.BeanDefinition;
@@ -25,10 +27,10 @@ import java.util.stream.Collectors;
 
 
 @Data
+@SystemLoad
 public class InjectAnnotationHandler extends AnnotationHandler<Inject> {
 
 
-    ApplicationContextUtil applicationContextUtil;
 
     @Override
     public int getOrder() {
@@ -59,6 +61,9 @@ public class InjectAnnotationHandler extends AnnotationHandler<Inject> {
      */
     @Override
     public void processField(FieldDefinition fieldDefinition, Annotation annotation, BeanDefinition beanDefinition) {
+        ApplicationContextUtil applicationContextUtil = Xioc.getApplicationContext();
+
+
         BeanDefinitionContext beanDefinitionContext = applicationContextUtil.getBeanDefinitionContext();
         BeanCreateContext beanCreateContext = applicationContextUtil.getBeanCreateContext();
         String beanName = ((Inject) annotation).value();

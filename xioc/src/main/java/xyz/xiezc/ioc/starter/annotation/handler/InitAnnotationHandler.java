@@ -2,8 +2,12 @@ package xyz.xiezc.ioc.starter.annotation.handler;
 
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.util.ReflectUtil;
+import lombok.Data;
+import xyz.xiezc.ioc.starter.ApplicationContextUtil;
+import xyz.xiezc.ioc.starter.Xioc;
 import xyz.xiezc.ioc.starter.annotation.AnnotationHandler;
 import xyz.xiezc.ioc.starter.annotation.Init;
+import xyz.xiezc.ioc.starter.annotation.SystemLoad;
 import xyz.xiezc.ioc.starter.common.definition.BeanDefinition;
 import xyz.xiezc.ioc.starter.common.definition.FieldDefinition;
 import xyz.xiezc.ioc.starter.common.definition.MethodDefinition;
@@ -11,7 +15,12 @@ import xyz.xiezc.ioc.starter.common.definition.ParamDefinition;
 
 import java.lang.annotation.Annotation;
 
+@SystemLoad
+@Data
 public class InitAnnotationHandler extends AnnotationHandler<Init> {
+
+
+
 
     @Override
     public Class<Init> getAnnotationType() {

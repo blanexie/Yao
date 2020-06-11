@@ -3,8 +3,10 @@ package xyz.xiezc.ioc.starter.annotation.handler;
 
 import lombok.Data;
 import xyz.xiezc.ioc.starter.ApplicationContextUtil;
+import xyz.xiezc.ioc.starter.Xioc;
 import xyz.xiezc.ioc.starter.annotation.AnnotationHandler;
 import xyz.xiezc.ioc.starter.annotation.Component;
+import xyz.xiezc.ioc.starter.annotation.SystemLoad;
 import xyz.xiezc.ioc.starter.common.definition.BeanDefinition;
 import xyz.xiezc.ioc.starter.common.definition.FieldDefinition;
 import xyz.xiezc.ioc.starter.common.definition.MethodDefinition;
@@ -12,6 +14,7 @@ import xyz.xiezc.ioc.starter.common.definition.MethodDefinition;
 import java.lang.annotation.Annotation;
 
 @Data
+@SystemLoad
 public class ComponentAnnotationHandler extends AnnotationHandler<Component> {
 
     @Override
@@ -20,7 +23,6 @@ public class ComponentAnnotationHandler extends AnnotationHandler<Component> {
     }
 
 
-    ApplicationContextUtil applicationContextUtil;
 
     /**
      * 这个注解的左右就是把bean放入容器中
@@ -30,6 +32,8 @@ public class ComponentAnnotationHandler extends AnnotationHandler<Component> {
      */
     @Override
     public void processClass(Annotation annotation, Class clazz, BeanDefinition beanDefinition) {
+        ApplicationContextUtil applicationContextUtil = Xioc.getApplicationContext();
+
         BeanDefinition beanDefinition1 = dealBeanAnnotation(annotation, clazz, applicationContextUtil);
         Class<?> beanClass = getRealBeanClass(beanDefinition1);
         applicationContextUtil.getBeanDefinitionContext().addBeanDefinition(beanDefinition1.getBeanName(), beanClass, beanDefinition1);

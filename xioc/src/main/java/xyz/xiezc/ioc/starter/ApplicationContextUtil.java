@@ -33,8 +33,6 @@ public class ApplicationContextUtil {
     Log log = LogFactory.get(ApplicationContextUtil.class);
 
 
-    private Set<Class<? extends ApplicationListener>> systemListener = new HashSet<>();
-
 
     /**
      * 全局线程池
@@ -58,26 +56,7 @@ public class ApplicationContextUtil {
 
 
     protected ApplicationContextUtil() {
-        for (Class<? extends ApplicationListener> aClass : systemListener) {
-            BeanDefinition beanDefinition = new BeanDefinition();
-            beanDefinition.setBean(ReflectUtil.newInstanceIfPossible(aClass));
-            beanDefinition.setBeanClass(aClass);
-            beanDefinition.setBeanName(aClass.getSimpleName());
-            beanDefinition.setBeanStatus(BeanStatusEnum.Completed);
-            beanDefinition.setBeanTypeEnum(BeanTypeEnum.bean);
-            beanDefinitionContext.addBeanDefinition(beanDefinition.getBeanName(), beanDefinition.getBeanClass(), beanDefinition);
-            EventListener annotation = AnnotationUtil.getAnnotation(aClass, EventListener.class);
-            if (annotation == null) {
-                throw new RuntimeException(aClass.getSimpleName() + "系统监听器请配置EventListener注解");
-            }
-            String[] strings = annotation.eventName();
-            if (strings == null) {
-                throw new RuntimeException(aClass.getSimpleName() + "系统监听器请配置EventListener注解");
-            }
-            for (String string : strings) {
-                eventPublisherContext.addApplicationListener(string, beanDefinition.getBean());
-            }
-        }
+
     }
 
 
