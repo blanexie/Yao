@@ -337,6 +337,7 @@ public class DocumentMapperDefine {
             stringBuffer.append(columnProp.getColumn()).append("= #{record.")
                     .append(columnProp.getProperty()).append("},");
         }
+        update.appendChild(doc.createTextNode(stringBuffer.toString()));
         Element anIf = doc.createElement("if");
         update.appendChild(anIf);
         anIf.setAttribute("test", "_parameter != null");
