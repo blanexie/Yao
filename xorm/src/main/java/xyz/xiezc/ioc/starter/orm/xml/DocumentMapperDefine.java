@@ -294,9 +294,17 @@ public class DocumentMapperDefine {
             stringBuffer.append(columnProp.getColumn()).append("=#{")
                     .append(columnProp.getProperty()).append("},");
         }
+        deleteLastComma(stringBuffer);
         stringBuffer.append(" where " + entityTableDefine.getId().getColumn() + " = #{" + entityTableDefine.getId().getProperty() + " } ");
         update.appendChild(doc.createTextNode(stringBuffer.toString()));
         return update;
+    }
+
+    private void deleteLastComma(StringBuffer stringBuffer) {
+        char c = stringBuffer.charAt(stringBuffer.length() - 1);
+        if (Objects.equals(c, ',')) {
+            stringBuffer.deleteCharAt(stringBuffer.length() - 1);
+        }
     }
 
     private Element createUpdateByPrimaryKeySelective() {
@@ -337,8 +345,8 @@ public class DocumentMapperDefine {
             stringBuffer.append(columnProp.getColumn()).append("= #{record.")
                     .append(columnProp.getProperty()).append("},");
         }
-
-        update.appendChild(doc.createTextNode(stringBuffer.toString().substring(0, stringBuffer.length() - 1)));
+        deleteLastComma(stringBuffer);
+        update.appendChild(doc.createTextNode(stringBuffer.toString()));
         Element anIf = doc.createElement("if");
         update.appendChild(anIf);
         anIf.setAttribute("test", "_parameter != null");
