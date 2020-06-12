@@ -85,19 +85,19 @@ public class ApplicationContextUtil {
      * 加载某个具体的类BeanDefinition到容器中， 前提是这个类必须被@Component 和 Configuration注解
      */
     private void loadBeanDefinition(Class clazz) {
+        Configuration configuration = AnnotationUtil.getAnnotation(clazz, Configuration.class);
+        if (configuration != null) {
+            BeanDefinition beanDefinition = beanDefinitionContext.getBeanDefinition(ConfigurationAnnotationHandler.class);
+            AnnotationHandler annotationHandler = beanDefinition.getBean();
+            annotationHandler.processClass(configuration, clazz, null);
+        }
+
         //获取上面的component 注解
         Component component = AnnotationUtil.getAnnotation(clazz, Component.class);
         if (component != null) {
             BeanDefinition beanDefinition = beanDefinitionContext.getBeanDefinition(ComponentAnnotationHandler.class);
             AnnotationHandler annotationHandler = beanDefinition.getBean();
             annotationHandler.processClass(component, clazz, null);
-        }
-
-        Configuration configuration = AnnotationUtil.getAnnotation(clazz, Configuration.class);
-        if (configuration != null) {
-            BeanDefinition beanDefinition = beanDefinitionContext.getBeanDefinition(ConfigurationAnnotationHandler.class);
-            AnnotationHandler annotationHandler = beanDefinition.getBean();
-            annotationHandler.processClass(configuration, clazz, null);
         }
     }
 

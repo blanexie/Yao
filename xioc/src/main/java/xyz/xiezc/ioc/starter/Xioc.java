@@ -150,35 +150,6 @@ public final class Xioc {
     }
 
     /**
-     * 初始化系统中的时间监听器
-     *
-     * @param beanDefinitionContext
-     * @param eventPublisherContext
-     */
-    private static void loadSystemListener(BeanDefinitionContext beanDefinitionContext, EventPublisherContext eventPublisherContext) {
-        for (Class<? extends ApplicationListener> aClass : systemListener) {
-            BeanDefinition beanDefinition = new BeanDefinition();
-            beanDefinition.setBean(ReflectUtil.newInstanceIfPossible(aClass));
-            beanDefinition.setBeanClass(aClass);
-            beanDefinition.setBeanName(aClass.getSimpleName());
-            beanDefinition.setBeanStatus(BeanStatusEnum.Completed);
-            beanDefinition.setBeanTypeEnum(BeanTypeEnum.bean);
-            beanDefinitionContext.addBeanDefinition(beanDefinition.getBeanName(), beanDefinition.getBeanClass(), beanDefinition);
-            EventListener annotation = AnnotationUtil.getAnnotation(aClass, EventListener.class);
-            if (annotation == null) {
-                throw new RuntimeException(aClass.getSimpleName() + "系统监听器请配置EventListener注解");
-            }
-            String[] strings = annotation.eventName();
-            if (strings == null) {
-                throw new RuntimeException(aClass.getSimpleName() + "系统监听器请配置EventListener注解");
-            }
-            for (String string : strings) {
-                eventPublisherContext.addApplicationListener(string, beanDefinition.getBean());
-            }
-        }
-    }
-
-    /**
      * 先加载系统中的beanDefintion, 这里加载的beanDefintion都是Completed状态的，并且没有依赖注入的情况
      *
      * @param applicationContextUtil
@@ -192,7 +163,6 @@ public final class Xioc {
         classes1.forEach(clazz -> {
             classes.add(clazz);
         });
-
 
         for (Class<?> aClass : classes) {
             //是注解处理器
@@ -224,7 +194,6 @@ public final class Xioc {
                 }
         }
 
-
     }
 
     private static BeanDefinition newBeanDefinition(BeanDefinitionContext beanDefinitionContext, Class<?> aClass, Object annotationHandler) {
@@ -240,20 +209,6 @@ public final class Xioc {
 
     public static ApplicationContextUtil getApplicationContext() {
         return xioc.getApplicationContextUtil();
-    }
-
-
-    /**
-     *
-     */
-    private static <T> BeanDefinition newInstance(Class<T> clazz, T t) {
-        BeanDefinition beanDefinition = new BeanDefinition();
-        beanDefinition.setBeanTypeEnum(BeanTypeEnum.bean);
-        beanDefinition.setBeanStatus(BeanStatusEnum.Completed);
-        beanDefinition.setBeanClass(clazz);
-        beanDefinition.setBeanName(clazz.getName());
-        beanDefinition.setBean(t);
-        return beanDefinition;
     }
 
 }
