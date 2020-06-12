@@ -199,7 +199,7 @@ public class MybatisAutoConfiguration implements ApplicationListener {
                     .forEach(mapperDefine -> {
                         log.info("扫描到mapper接口，mapperInterface: " + mapperDefine.getMapperInterface()
                                 + ", 对应实体类：" + mapperDefine.getEntityClazz().getName()
-                                + ", 对应表信息：" + JSONUtil.toJsonStr(mapperDefine.getEntityTableDefine())
+                                + ", 对应表信息：" + JSONUtil.toJsonStr(mapperDefine.getEntityTableDefine().getTable())
                         );
                         ret.add(mapperDefine);
                     });
