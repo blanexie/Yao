@@ -1,14 +1,18 @@
 package xyz.xiezc.ioc.starter.common.context.impl;
 
-import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.log.Log;
+import cn.hutool.log.LogFactory;
 import cn.hutool.setting.Setting;
 import xyz.xiezc.ioc.starter.common.context.PropertiesContext;
 
-import java.io.File;
+import java.net.URL;
 
 public class PropertiesContextUtil implements PropertiesContext {
+
+    Log log = LogFactory.get(PropertiesContextUtil.class);
 
     private Setting setting;
 
@@ -37,36 +41,21 @@ public class PropertiesContextUtil implements PropertiesContext {
     public void loadProperties() {
         //读取classpath下的Application.setting，不使用变量
         //优先加载框架主要的配置文件
-        File file1 = FileUtil.file("yao.setting");
-        if (FileUtil.exist(file1)) {
-            this.addSetting(new Setting(file1.getPath(), true));
+        URL appSetting = ResourceUtil.getResource("app.setting");
+        if (appSetting != null) {
+            this.addSetting(new Setting(appSetting, CharsetUtil.CHARSET_UTF_8, true));
         }
-        File file2 = FileUtil.file("xioc.setting");
-        if (FileUtil.exist(file2)) {
-            this.addSetting(new Setting(file2.getPath(), true));
-        }
-        File file3 = FileUtil.file("xweb.setting");
-        if (FileUtil.exist(file3)) {
-            this.addSetting(new Setting(file3.getPath(), true));
-        }
-        File file5 = FileUtil.file("app.setting");
-        if (FileUtil.exist(file5)) {
-            this.addSetting(new Setting(file5.getPath(), true));
-        }
-
-        File file6 = FileUtil.file("app.properties");
-        if (FileUtil.exist(file6)) {
-            this.addSetting(new Setting(file6, CharsetUtil.CHARSET_UTF_8, true));
-        }
-
-        //加载关联的配置文件
+        URL appProperties = ResourceUtil.getResource("app.properties");
+        if (appProperties != null) {
+            this.addSetting(new Setting(appProperties, CharsetUtil.CHARSET_UTF_8, true));
+        } //加载关联的配置文件
         String s = this.getSetting().get("properties.import.path");
         if (StrUtil.isNotBlank(s)) {
             String[] split = s.split(",");
             for (String s1 : split) {
-                File file4 = FileUtil.file(s1);
-                if (FileUtil.exist(file4)) {
-                    this.addSetting(new Setting(file4.getPath(), true));
+                URL s1Res = ResourceUtil.getResource(s1);
+                if (s1Res != null) {
+                    this.addSetting(new Setting(s1Res, CharsetUtil.CHARSET_UTF_8, true));
                 }
             }
         }

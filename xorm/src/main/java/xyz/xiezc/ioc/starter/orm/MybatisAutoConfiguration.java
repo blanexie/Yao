@@ -26,6 +26,7 @@ import cn.hutool.db.ds.DSFactory;
 import cn.hutool.json.JSONUtil;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
+import cn.hutool.setting.Setting;
 import lombok.Data;
 import lombok.SneakyThrows;
 import org.apache.ibatis.io.ResolverUtil;
@@ -125,8 +126,8 @@ public class MybatisAutoConfiguration implements ApplicationListener {
 
     private SqlSessionFactory getSqlSessionFactory(ApplicationContextUtil applicationContext, List<DocumentMapperDefine> documentMapperDefines) {
         //1. 获取数据源
-        DataSource ds = DSFactory.create(applicationContext.getPropertiesContext().getSetting()).getDataSource();
-
+        Setting setting = applicationContext.getPropertiesContext().getSetting();
+        DataSource ds = DSFactory.create(setting).getDataSource();
         //2. 根据数据源生成sqlSessionFactory
         SqlSessionFactory sqlSessionFactory = createSqlSessionFactory(ds, documentMapperDefines);
         //3.放入容器中

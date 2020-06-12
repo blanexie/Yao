@@ -1,26 +1,25 @@
 package xyz.xiezc.ioc.starter;
 
 import cn.hutool.core.annotation.AnnotationUtil;
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ReflectUtil;
+import cn.hutool.json.JSONUtil;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 import lombok.Data;
 import xyz.xiezc.ioc.starter.annotation.AnnotationHandler;
-import xyz.xiezc.ioc.starter.annotation.EventListener;
 import xyz.xiezc.ioc.starter.annotation.Configuration;
+import xyz.xiezc.ioc.starter.annotation.EventListener;
 import xyz.xiezc.ioc.starter.annotation.SystemLoad;
-import xyz.xiezc.ioc.starter.annotation.handler.*;
 import xyz.xiezc.ioc.starter.common.context.AnnotationContext;
 import xyz.xiezc.ioc.starter.common.context.BeanCreateContext;
 import xyz.xiezc.ioc.starter.common.context.BeanDefinitionContext;
 import xyz.xiezc.ioc.starter.common.context.EventPublisherContext;
-import xyz.xiezc.ioc.starter.common.enums.EventNameConstant;
-import xyz.xiezc.ioc.starter.event.ApplicationEvent;
 import xyz.xiezc.ioc.starter.common.definition.BeanDefinition;
 import xyz.xiezc.ioc.starter.common.enums.BeanStatusEnum;
 import xyz.xiezc.ioc.starter.common.enums.BeanTypeEnum;
+import xyz.xiezc.ioc.starter.common.enums.EventNameConstant;
+import xyz.xiezc.ioc.starter.event.ApplicationEvent;
 import xyz.xiezc.ioc.starter.event.ApplicationListener;
 
 import java.lang.annotation.Annotation;
@@ -84,6 +83,7 @@ public final class Xioc {
         applicationContextUtil.getPropertiesContext().loadProperties();
         eventPublisherContext.publisherEvent(new ApplicationEvent(EventNameConstant.LoadPropertiesContext));
         log.info("PropertiesContext加载完成..................");
+        log.info("配置信息如下：{}", JSONUtil.toJsonStr(applicationContextUtil.getPropertiesContext().getSetting()));
 
         //## 先初始化系统中的annotationHandler类，并将注解处理器全部放入annotationContext中.
         loadSystemBeanDefinition(applicationContextUtil);
