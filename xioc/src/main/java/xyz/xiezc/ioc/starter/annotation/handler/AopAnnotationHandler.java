@@ -14,6 +14,7 @@ import xyz.xiezc.ioc.starter.common.context.BeanDefinitionContext;
 import xyz.xiezc.ioc.starter.common.definition.BeanDefinition;
 import xyz.xiezc.ioc.starter.common.definition.FieldDefinition;
 import xyz.xiezc.ioc.starter.common.definition.MethodDefinition;
+import xyz.xiezc.ioc.starter.common.enums.BeanStatusEnum;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -50,7 +51,9 @@ public class AopAnnotationHandler extends AnnotationHandler<Aop> {
             aspectBean.addMethod(publicMethod);
         }
         //获取bean实例
-        beanCreateContext.buildBean(beanDefinition);
+        if (beanDefinition.getBeanStatus() == BeanStatusEnum.Original || beanDefinition.getBean() == null) {
+            beanCreateContext.createBean(beanDefinition);
+        }
         Object parentBean = beanDefinition.getBean();
         beanDefinition.setBean(ProxyUtil.proxy(parentBean, aspectBean));
     }
@@ -65,6 +68,7 @@ public class AopAnnotationHandler extends AnnotationHandler<Aop> {
         Class<?> aopClass = ((Aop) annotation).value();
         BeanDefinition aopAspectBeanDefinition = beanDefinitionContext.getBeanDefinition(aopClass);
         beanCreateContext.createBean(aopAspectBeanDefinition);
+
         AopAspect aspectBean = aopAspectBeanDefinition.getBean();
         //获取被切方法
         Method method = methodDefinition.getMethod();

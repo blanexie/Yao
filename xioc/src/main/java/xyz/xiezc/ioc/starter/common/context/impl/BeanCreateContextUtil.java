@@ -30,6 +30,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
 
+import static xyz.xiezc.ioc.starter.common.enums.BeanStatusEnum.Original;
+
 /**
  * @author xiezc
  */
@@ -76,11 +78,6 @@ public class BeanCreateContextUtil implements BeanCreateContext {
     @Override
     public BeanDefinition createBean(BeanDefinition beanDefinition) {
         try {
-            //1. 将这个bean放入待初始化集合中，这个主要是用来解决循环依赖的判断的
-            //判断循环依赖， 同时把BeanDefinition 放路创建中的缓存map中
-            if (isCircularDependenceBeanDefinition(beanDefinition)) {
-                throw new CircularDependenceException(beanDefinition.toString());
-            }
             if (beanDefinition.getBeanStatus() == BeanStatusEnum.Completed) {
                 return beanDefinition;
             }
@@ -116,13 +113,9 @@ public class BeanCreateContextUtil implements BeanCreateContext {
 
             return beanDefinition;
         } catch (Exception e) {
-            log.error("初始化出现异常，beanDefinition：{}",beanDefinition.toString(),e);
+            log.error("初始化出现异常，beanDefinition：{}", beanDefinition.toString(), e);
             throw new RuntimeException(e);
-        } finally {
-            //移除创建中的
-            removeCreatingBeanDefinition(beanDefinition);
         }
-
     }
 
     @Override
@@ -144,7 +137,17 @@ public class BeanCreateContextUtil implements BeanCreateContext {
             beanCreateStrategy.setPropertiesContext(propertiesContext);
             beanCreateStrategyMap.put(beanTypeEnum, beanCreateStrategy);
         }
-        return beanCreateStrategy.createBean(beanDefinition);
+        try {
+            //1. 将这个bean放入待初始化集合中，这个主要是用来解决循环依赖的判断的
+            //判断循环依赖，  判断循环依赖的条件是没有这个依赖就无法创建bean。 如果bean已经HalfCooked状态了。 没必要判断
+            if (isCircularDependenceBeanDefinition(beanDefinition)) {
+                throw new CircularDependenceException(beanDefinition.toString());
+            }
+            return beanCreateStrategy.createBean(beanDefinition);
+        } finally {
+            //移除创建中的
+            removeCreatingBeanDefinition(beanDefinition);
+        }
     }
 
 
@@ -154,9 +157,6 @@ public class BeanCreateContextUtil implements BeanCreateContext {
      * @param beanDefinition
      */
     private void dealAnnotationHandler(BeanDefinition beanDefinition) {
-
-        this.buildBean(beanDefinition);
-
         AnnotationContext annotationContext = applicationContextUtil.getAnnotationContext();
         //2.1 先获取类上的注解,并调用处理器
         Class<?> beanClass = beanDefinition.getBeanClass();
@@ -188,14 +188,6 @@ public class BeanCreateContextUtil implements BeanCreateContext {
             annotationHandler.processClass(annotationAndHandler.getAnnotation(), beanClass, beanDefinition);
         });
 
-//        for (Annotation annotation : annotations) {
-//            Class<? extends Annotation> aClass = annotation.annotationType();
-//            AnnotationHandler<? extends Annotation> classAnnotationHandler = annotationContext.getClassAnnotationHandler(aClass);
-//            if (classAnnotationHandler != null) {
-//                this.buildBean(beanDefinition);
-//                classAnnotationHandler.processClass(annotation, beanClass, beanDefinition);
-//            }
-//        }
         //2.2 获取字段上的注解，并处理
         Set<FieldDefinition> fieldDefinitions = beanDefinition.getFieldDefinitions();
         for (FieldDefinition fieldDefinition : fieldDefinitions) {
@@ -230,15 +222,6 @@ public class BeanCreateContextUtil implements BeanCreateContext {
                         fieldAnnotationHandler.processField(fieldDefinition, annotationAndHandler.getAnnotation(), beanDefinition);
                     });
 
-//            for (Annotation annotation : annotations1) {
-//                //每个注解都检查下有无处理器来处理
-//                Class<? extends Annotation> aClass = annotation.annotationType();
-//                AnnotationHandler<? extends Annotation> fieldAnnotationHandler = annotationContext.getFieldAnnotationHandler(aClass);
-//                if (fieldAnnotationHandler != null) {
-//                    this.buildBean(beanDefinition);
-//                    fieldAnnotationHandler.processField(fieldDefinition, annotation, beanDefinition);
-//                }
-//            }
         }
         //2.3 获取方法上的注解，并处理
         Set<MethodDefinition> methodDefinitions = beanDefinition.getMethodDefinitions();

@@ -85,7 +85,10 @@ public class MethodBeanCreateStrategy extends BeanCreateStrategy {
         if (FieldOrParamTypeEnum.Array == paramDefinition.getFieldOrParamTypeEnum()) {
             List<BeanDefinition> beanDefinitions = beanDefinitionContext.getBeanDefinitions(paramDefinition.getParamType());
             List<Object> collect = beanDefinitions.stream().map(definition -> {
-                beanCreateContext.createBean(definition);
+                if (definition.getBean() == null || definition.getBeanStatus() == BeanStatusEnum.Original) {
+                    beanCreateContext.createBean(definition);
+                }
+
                 return definition.getBean();
             }).collect(Collectors.toList());
             paramDefinition.setParam(collect.toArray());
@@ -93,14 +96,18 @@ public class MethodBeanCreateStrategy extends BeanCreateStrategy {
         if (FieldOrParamTypeEnum.Collection == paramDefinition.getFieldOrParamTypeEnum()) {
             List<BeanDefinition> beanDefinitions = beanDefinitionContext.getBeanDefinitions(paramDefinition.getParamType());
             Collection<Object> collect = beanDefinitions.stream().map(definition -> {
-                beanCreateContext.createBean(definition);
+                if (definition.getBean() == null || definition.getBeanStatus() == BeanStatusEnum.Original) {
+                    beanCreateContext.createBean(definition);
+                }
                 return definition.getBean();
             }).collect(Collectors.toList());
             paramDefinition.setParam(collect);
         }
         if (FieldOrParamTypeEnum.Simple == paramDefinition.getFieldOrParamTypeEnum()) {
             BeanDefinition injectBeanDefinition = beanDefinitionContext.getInjectBeanDefinition(paramDefinition.getParamName(), paramDefinition.getParamType());
-            beanCreateContext.createBean(injectBeanDefinition);
+            if (injectBeanDefinition.getBean() == null || injectBeanDefinition.getBeanStatus() == BeanStatusEnum.Original) {
+                beanCreateContext.createBean(injectBeanDefinition);
+            }
             paramDefinition.setParam(injectBeanDefinition.getBean());
         }
         if (FieldOrParamTypeEnum.Properties == paramDefinition.getFieldOrParamTypeEnum()) {

@@ -17,7 +17,6 @@ public class FactoryBeanCreateStrategy extends BeanCreateStrategy {
 
     Log log = LogFactory.get(SimpleBeanCreateStategy.class);
 
-
     @Override
     public BeanTypeEnum getBeanTypeEnum() {
         return BeanTypeEnum.factoryBean;
@@ -26,8 +25,7 @@ public class FactoryBeanCreateStrategy extends BeanCreateStrategy {
     @Override
     public BeanDefinition createBean(BeanDefinition beanDefinition) {
         BeanStatusEnum beanStatus = beanDefinition.getBeanStatus();
-        if (beanStatus == BeanStatusEnum.Original) {
-            log.info("beanDefinition已经产生了， BeanDefinition:{}", beanDefinition.toString());
+        if (beanStatus != BeanStatusEnum.Original) {
             return beanDefinition;
         }
 

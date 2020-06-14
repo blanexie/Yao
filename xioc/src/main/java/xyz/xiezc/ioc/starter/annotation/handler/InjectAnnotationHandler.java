@@ -14,6 +14,7 @@ import xyz.xiezc.ioc.starter.common.context.BeanDefinitionContext;
 import xyz.xiezc.ioc.starter.common.definition.BeanDefinition;
 import xyz.xiezc.ioc.starter.common.definition.FieldDefinition;
 import xyz.xiezc.ioc.starter.common.definition.MethodDefinition;
+import xyz.xiezc.ioc.starter.common.enums.BeanStatusEnum;
 import xyz.xiezc.ioc.starter.common.enums.BeanTypeEnum;
 import xyz.xiezc.ioc.starter.common.enums.FieldOrParamTypeEnum;
 
@@ -29,7 +30,6 @@ import java.util.stream.Collectors;
 @Data
 @SystemLoad
 public class InjectAnnotationHandler extends AnnotationHandler<Inject> {
-
 
 
     @Override
@@ -81,8 +81,10 @@ public class InjectAnnotationHandler extends AnnotationHandler<Inject> {
 
             List<BeanDefinition> beanDefinitions = beanDefinitionContext.getBeanDefinitions(componentType);
             List<Object> collect = beanDefinitions.stream().map(beanDefinition1 -> {
-                BeanDefinition bean1 = beanCreateContext.createBean(beanDefinition1);
-                return bean1.getBean();
+                if (beanDefinition1.getBean() == null || beanDefinition1.getBeanStatus() == BeanStatusEnum.Original) {
+                    beanCreateContext.createBean(beanDefinition1);
+                }
+                return beanDefinition1.getBean();
             }).collect(Collectors.toList());
 
             ReflectUtil.setFieldValue(bean, fieldDefinition.getField(), collect.toArray());
@@ -98,8 +100,10 @@ public class InjectAnnotationHandler extends AnnotationHandler<Inject> {
 
                 List<BeanDefinition> beanDefinitions = beanDefinitionContext.getBeanDefinitions(genericClazz);
                 List<Object> collect = beanDefinitions.stream().map(beanDefinition1 -> {
-                    BeanDefinition bean1 = beanCreateContext.createBean(beanDefinition1);
-                    return bean1.getBean();
+                    if (beanDefinition1.getBean() == null || beanDefinition1.getBeanStatus() == BeanStatusEnum.Original) {
+                        beanCreateContext.createBean(beanDefinition1);
+                    }
+                    return beanDefinition1.getBean();
                 }).collect(Collectors.toList());
                 ReflectUtil.setFieldValue(bean, fieldDefinition.getField(), collect);
             } else {
@@ -109,8 +113,10 @@ public class InjectAnnotationHandler extends AnnotationHandler<Inject> {
         } else {
             fieldDefinition.setFieldOrParamTypeEnum(FieldOrParamTypeEnum.Simple);
             BeanDefinition injectBeanDefinition = beanDefinitionContext.getInjectBeanDefinition(beanName, fieldDefinition.getFieldType());
-            Object bean1 = beanCreateContext.createBean(injectBeanDefinition).getBean();
-            ReflectUtil.setFieldValue(bean, fieldDefinition.getField(), bean1);
+            if (injectBeanDefinition.getBean() == null || injectBeanDefinition.getBeanStatus() == BeanStatusEnum.Original) {
+                beanCreateContext.createBean(injectBeanDefinition);
+            }
+            ReflectUtil.setFieldValue(bean, fieldDefinition.getField(), injectBeanDefinition.getBean());
         }
     }
 
