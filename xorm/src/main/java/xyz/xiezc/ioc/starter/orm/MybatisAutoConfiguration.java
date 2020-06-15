@@ -18,10 +18,9 @@ package xyz.xiezc.ioc.starter.orm;
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.resource.Resource;
 import cn.hutool.core.io.resource.ResourceUtil;
-import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.ClassUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.*;
 import cn.hutool.db.ds.DSFactory;
 import cn.hutool.json.JSONUtil;
 import cn.hutool.log.Log;
@@ -54,6 +53,7 @@ import xyz.xiezc.ioc.starter.orm.xml.MapperDefine;
 import javax.sql.DataSource;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -152,8 +152,9 @@ public class MybatisAutoConfiguration implements ApplicationListener {
         }
         for (String mapperLocation : mapperLocations) {
             String s = mapperLocation.replaceAll("\\.", "/");
-            s = ClassUtil.getClassPath() + s;
-            List<File> files = FileUtil.loopFiles(s, file -> file.getName().endsWith(".xml"));
+            Resource resourceObj =  ResourceUtil.getResourceObj(URLUtil.CLASSPATH_URL_PREFIX+s);
+            String file1 =resourceObj.getUrl().getFile();
+            List<File> files = FileUtil.loopFiles(file1, file -> file.getName().endsWith(".xml"));
             ret.addAll(files);
         }
         List<DocumentMapperDefine> documentPars = ret.stream()
