@@ -17,11 +17,11 @@ package xyz.xiezc.ioc.starter.orm;
 
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.io.resource.ClassPathResource;
 import cn.hutool.core.io.resource.Resource;
 import cn.hutool.core.io.resource.ResourceUtil;
-import cn.hutool.core.util.*;
+import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.CharsetUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.db.ds.DSFactory;
 import cn.hutool.json.JSONUtil;
 import cn.hutool.log.Log;
@@ -52,15 +52,11 @@ import xyz.xiezc.ioc.starter.orm.xml.DocumentMapperDefine;
 import xyz.xiezc.ioc.starter.orm.xml.MapperDefine;
 
 import javax.sql.DataSource;
-import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 
 import static xyz.xiezc.ioc.starter.common.enums.EventNameConstant.loadBeanDefinitions;
@@ -156,7 +152,7 @@ public class MybatisAutoConfiguration implements ApplicationListener {
         for (String mapperLocation : mapperLocations) {
             String s = mapperLocation.replaceAll("\\.", "/");
             log.info("获取的mapperLocation：{}", s);
-            List<Resource> resources = xyz.xiezc.ioc.starter.orm.util.ResourceUtil.findResources( mapperLocation, ".xml");
+            List<Resource> resources = xyz.xiezc.ioc.starter.common.ResourceUtil.findResources(Xioc.bootClass, mapperLocation, ".xml");
             ret.addAll(resources);
         }
         List<DocumentMapperDefine> documentPars = ret.stream()

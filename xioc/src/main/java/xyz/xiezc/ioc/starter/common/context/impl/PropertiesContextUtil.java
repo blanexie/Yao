@@ -41,21 +41,31 @@ public class PropertiesContextUtil implements PropertiesContext {
     public void loadProperties() {
         //读取classpath下的Application.setting，不使用变量
         //优先加载框架主要的配置文件
-        URL appSetting = ResourceUtil.getResource("app.setting");
-        if (appSetting != null) {
-            this.addSetting(new Setting(appSetting, CharsetUtil.CHARSET_UTF_8, true));
+        try {
+            URL resourceObj = ResourceUtil.getResource("app.setting");
+            this.addSetting(new Setting(resourceObj, CharsetUtil.CHARSET_UTF_8, true));
+            log.info("已经加载配置文件app.setting");
+        } catch (Exception e) {
+            log.info("未加载到配置文件app.setting");
         }
-        URL appProperties = ResourceUtil.getResource("app.properties");
-        if (appProperties != null) {
-            this.addSetting(new Setting(appProperties, CharsetUtil.CHARSET_UTF_8, true));
-        } //加载关联的配置文件
+        try {
+            URL resourceObj = ResourceUtil.getResource("app.properties");
+            this.addSetting(new Setting(resourceObj, CharsetUtil.CHARSET_UTF_8, true));
+            log.info("已经加载配置文件app.properties");
+        } catch (Exception e) {
+            log.info("未加载到配置文件app.properties");
+        }
+        //加载关联的配置文件
         String s = this.getSetting().get("properties.import.path");
         if (StrUtil.isNotBlank(s)) {
             String[] split = s.split(",");
             for (String s1 : split) {
-                URL s1Res = ResourceUtil.getResource(s1);
-                if (s1Res != null) {
-                    this.addSetting(new Setting(s1Res, CharsetUtil.CHARSET_UTF_8, true));
+                try {
+                    URL resourceObj = ResourceUtil.getResource(s1);
+                    this.addSetting(new Setting(resourceObj, CharsetUtil.CHARSET_UTF_8, true));
+                    log.info("已经加载配置文件{}", s1);
+                } catch (Exception e) {
+                    log.info("未加载到配置文件{}", s1);
                 }
             }
         }

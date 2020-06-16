@@ -1,20 +1,15 @@
-package xyz.xiezc.ioc.starter.orm.util;
+package xyz.xiezc.ioc.starter.common;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.collection.EnumerationIter;
-import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.io.IORuntimeException;
 import cn.hutool.core.io.resource.FileResource;
 import cn.hutool.core.io.resource.Resource;
-import cn.hutool.core.util.*;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.URLUtil;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 import lombok.SneakyThrows;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -30,13 +25,16 @@ import java.util.stream.Collectors;
  **/
 public class ResourceUtil {
 
+
     static Log log = LogFactory.get(ResourceUtil.class);
 
-    private List<Resource> findResources(Class clazz, String prefixStr, String suffixStr) throws IOException {
+    @SneakyThrows
+    public static List<Resource> findResources(Class clazz, String prefixStr, String suffixStr) {
+        if (prefixStr.startsWith(StrUtil.SLASH)) {
+            prefixStr = prefixStr.substring(1);
+        }
         //获取传入的class类的文件路径地址
-
         String path = clazz.getProtectionDomain().getCodeSource().getLocation().getPath();
-        String prefixPackagePath = prefixStr;
         List<Resource> classFiles = new ArrayList<>();
         //根据这个地址的后缀来判断 是否是jar包， 如果jar包就使用JarFile类来读取文件
         if (path.endsWith(".jar")) {
@@ -45,7 +43,7 @@ public class ResourceUtil {
                 while (entries.hasMoreElements()) {
                     JarEntry jarEntry = entries.nextElement();
                     String name = jarEntry.getName();
-                    if (name.endsWith(suffixStr) && name.startsWith(prefixPackagePath)) {
+                    if (name.endsWith(suffixStr) && name.startsWith(prefixStr)) {
                         Resource resourceObj = cn.hutool.core.io.resource.ResourceUtil.getResourceObj(name);
                         classFiles.add(resourceObj);
                     }
@@ -54,10 +52,13 @@ public class ResourceUtil {
         } else {
             Resource resourceObj = cn.hutool.core.io.resource
                     .ResourceUtil
-                    .getResourceObj(URLUtil.CLASSPATH_URL_PREFIX + prefixPackagePath);
+                    .getResourceObj(URLUtil.CLASSPATH_URL_PREFIX + prefixStr);
             List<File> files = FileUtil.loopFiles(resourceObj.getUrl().getFile(), file -> file.getName().endsWith(suffixStr));
             List<FileResource> collect = files.stream().map(FileResource::new).collect(Collectors.toList());
             classFiles.addAll(collect);
+        }
+        for (Resource classFile : classFiles) {
+            log.info("加载文件：{}", classFile.getName());
         }
         return classFiles;
     }
