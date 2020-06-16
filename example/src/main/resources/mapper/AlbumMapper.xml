@@ -3,7 +3,7 @@
 <mapper namespace="xyz.xiezc.example.web.mapper.AlbumMapper">
 
     <!--查询单个-->
-    <select id="queryById" resultType="xyz.xiezc.example.web.entity.Album">
+    <select id="queryById" resultMap="XZCBaseResultMap">
         select id,
                title,
                publish_time as publishTime,

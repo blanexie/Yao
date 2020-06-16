@@ -18,6 +18,7 @@ package xyz.xiezc.ioc.starter.orm;
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.resource.ClassPathResource;
 import cn.hutool.core.io.resource.Resource;
 import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.util.*;
@@ -51,6 +52,7 @@ import xyz.xiezc.ioc.starter.orm.xml.DocumentMapperDefine;
 import xyz.xiezc.ioc.starter.orm.xml.MapperDefine;
 
 import javax.sql.DataSource;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -58,6 +60,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 
 import static xyz.xiezc.ioc.starter.common.enums.EventNameConstant.loadBeanDefinitions;
@@ -142,7 +145,7 @@ public class MybatisAutoConfiguration implements ApplicationListener {
     }
 
     private List<DocumentMapperDefine> getDocumentMapperDefines(List<MapperDefine> mapperDefines) {
-        List<File> ret = CollUtil.newArrayList();
+        List<Resource> ret = CollUtil.newArrayList();
 
         List<String> mapperLocations = CollUtil.newArrayList();
         if (properties != null) {
@@ -152,15 +155,14 @@ public class MybatisAutoConfiguration implements ApplicationListener {
         }
         for (String mapperLocation : mapperLocations) {
             String s = mapperLocation.replaceAll("\\.", "/");
-            Resource resourceObj =  ResourceUtil.getResourceObj(URLUtil.CLASSPATH_URL_PREFIX+s);
-            String file1 =resourceObj.getUrl().getFile();
-            List<File> files = FileUtil.loopFiles(file1, file -> file.getName().endsWith(".xml"));
-            ret.addAll(files);
+            log.info("获取的mapperLocation：{}", s);
+            List<Resource> resources = xyz.xiezc.ioc.starter.orm.util.ResourceUtil.findResources( mapperLocation, ".xml");
+            ret.addAll(resources);
         }
         List<DocumentMapperDefine> documentPars = ret.stream()
-                .map(file -> {
+                .map(resource -> {
                     try {
-                        return new DocumentMapperDefine(file);
+                        return new DocumentMapperDefine(resource.getReader(CharsetUtil.CHARSET_UTF_8));
                     } catch (IOException e) {
                         return null;
                     }

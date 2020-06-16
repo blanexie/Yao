@@ -9,8 +9,10 @@ import org.xml.sax.InputSource;
 import xyz.xiezc.ioc.starter.orm.util.DocumentUtil;
 
 import javax.xml.parsers.DocumentBuilder;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -25,14 +27,11 @@ public class DocumentMapperDefine {
 
     String nameSpace;
 
-    Path path;
-
     boolean hasCheckDoc = false;
 
     public DocumentMapperDefine(MapperDefine mapperDefine, Path path) throws IOException {
         InputSource inputSource = new InputSource(Files.newBufferedReader(path));
         try {
-            this.path = path;
             inputSource.setEncoding("utf8");
             this.mapperDefine = mapperDefine;
             document = this.createDocument(inputSource);
@@ -52,7 +51,17 @@ public class DocumentMapperDefine {
     public DocumentMapperDefine(Path path) throws IOException {
         InputSource inputSource = new InputSource(Files.newBufferedReader(path));
         try {
-            this.path = path;
+            inputSource.setEncoding("utf8");
+            document = this.createDocument(inputSource);
+            nameSpace = getNameSpace();
+        } finally {
+            inputSource.getCharacterStream().close();
+        }
+    }
+
+    public DocumentMapperDefine(BufferedReader reader) throws IOException {
+        InputSource inputSource = new InputSource(reader);
+        try {
             inputSource.setEncoding("utf8");
             document = this.createDocument(inputSource);
             nameSpace = getNameSpace();

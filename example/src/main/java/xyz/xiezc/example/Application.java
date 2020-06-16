@@ -1,6 +1,8 @@
 package xyz.xiezc.example;
 
 
+import cn.hutool.core.io.resource.ResourceUtil;
+import io.netty.util.internal.ResourcesUtil;
 import xyz.xiezc.ioc.starter.Xioc;
 import xyz.xiezc.ioc.starter.annotation.Configuration;
 import xyz.xiezc.ioc.starter.annotation.Cron;
@@ -26,5 +28,8 @@ public class Application {
 
     public static void main(String[] args) {
         Xioc.run(Application.class);
+
+
+
     }
 }
