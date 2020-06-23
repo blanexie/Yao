@@ -759,24 +759,23 @@ public class DocumentMapperDefine {
         mapper.appendChild(this.createUpdateByExample());
         mapper.appendChild(this.createUpdateByPrimaryKeySelective());
         mapper.appendChild(this.createUpdateByPrimaryKey());
-
         document.appendChild(mapper);
 
-        ByteArrayOutputStream byteArrayOutputStream=new ByteArrayOutputStream();
-        serializeDocument(document,byteArrayOutputStream);
-        byte[] bytes = byteArrayOutputStream.toByteArray();
-        System.out.println(new String(bytes));
-
+        //打印出来xml文档信息，用来对照查看问题
+        // serializeDocument(document);
     }
 
-    public void serializeDocument(Document document, OutputStream os) {
+    public void serializeDocument(Document document) {
         try {
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
             TransformerFactory tFactory = TransformerFactory.newInstance();
             Transformer transformer = tFactory.newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             DOMSource source = new DOMSource(document);
             StreamResult result = new StreamResult(os);
             transformer.transform(source, result);
+            byte[] bytes = os.toByteArray();
+            System.out.println(new String(bytes));
         } catch (TransformerException e) {
             e.printStackTrace();
         }
