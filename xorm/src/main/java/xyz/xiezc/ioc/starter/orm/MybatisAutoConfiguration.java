@@ -22,6 +22,7 @@ import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.db.dialect.DriverUtil;
 import cn.hutool.db.ds.DSFactory;
 import cn.hutool.json.JSONUtil;
 import cn.hutool.log.Log;
@@ -48,6 +49,7 @@ import xyz.xiezc.ioc.starter.orm.annotation.MapperScan;
 import xyz.xiezc.ioc.starter.orm.bean.SqlSessionFactoryBean;
 import xyz.xiezc.ioc.starter.orm.common.BaseMapper;
 import xyz.xiezc.ioc.starter.orm.common.SpringBootVFS;
+import xyz.xiezc.ioc.starter.orm.common.example.Example;
 import xyz.xiezc.ioc.starter.orm.xml.DocumentMapperDefine;
 import xyz.xiezc.ioc.starter.orm.xml.MapperDefine;
 
@@ -98,6 +100,12 @@ public class MybatisAutoConfiguration implements ApplicationListener {
         //1. 扫描mapper接口，获取实体类和对应表格的关系。
         //获取注解中配置的信息
         List<MapperDefine> mapperDefines = getMapperDefines();
+        //缓存到Example中
+        mapperDefines.stream()
+                .forEach(mapperDefine -> {
+                    Example.mapperDefineMap.put(mapperDefine.getEntityClazz(), mapperDefine);
+                });
+
         //2. 组装改造后的mapper.xml的文档
         List<DocumentMapperDefine> documentMapperDefines = getDocumentMapperDefines(mapperDefines);
         //3. 生成Configuration和SqlSessionFactory
@@ -127,6 +135,16 @@ public class MybatisAutoConfiguration implements ApplicationListener {
         //1. 获取数据源
         Setting setting = applicationContext.getPropertiesContext().getSetting();
         DataSource ds = DSFactory.create(setting).getDataSource();
+        //1.1 数据源放入容器中
+        BeanDefinition beanDefinition1 = new BeanDefinition();
+        beanDefinition1.setBeanClass(DataSource.class);
+        beanDefinition1.setBeanName(DataSource.class.getName());
+        beanDefinition1.setBeanStatus(BeanStatusEnum.Completed);
+        beanDefinition1.setBeanTypeEnum(BeanTypeEnum.bean);
+        beanDefinition1.setBean(ds);
+        BeanDefinitionContext beanDefinitionContext = applicationContext.getBeanDefinitionContext();
+        beanDefinitionContext.addBeanDefinition(beanDefinition1.getBeanName(), beanDefinition1.getBeanClass(), beanDefinition1);
+
         //2. 根据数据源生成sqlSessionFactory
         SqlSessionFactory sqlSessionFactory = createSqlSessionFactory(ds, documentMapperDefines);
         //3.放入容器中
@@ -184,6 +202,7 @@ public class MybatisAutoConfiguration implements ApplicationListener {
         for (DocumentMapperDefine documentMapperDefine : documentPars) {
             documentMapperDefine.checkDoc();
         }
+
         return documentPars;
     }
 

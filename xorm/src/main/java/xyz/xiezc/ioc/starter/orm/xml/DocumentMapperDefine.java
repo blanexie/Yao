@@ -9,10 +9,13 @@ import org.xml.sax.InputSource;
 import xyz.xiezc.ioc.starter.orm.util.DocumentUtil;
 
 import javax.xml.parsers.DocumentBuilder;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -553,17 +556,57 @@ public class DocumentMapperDefine {
         anIf2.setAttribute("test", "orderByClause != null");
         anIf2.appendChild(doc.createTextNode(" order by ${orderByClause} "));
 
+
         Element anIf3 = doc.createElement("if");
         select.appendChild(anIf3);
         anIf3.setAttribute("test", "limit != null");
+
+        Element choose = doc.createElement("choose");
+        anIf3.appendChild(choose);
+
+        // sqllite 数据库的分页
+        Element when = doc.createElement("when");
+        choose.appendChild(when);
+        when.setAttribute("test", "dbType == 'sqllite'");
+
         Element anIf4 = doc.createElement("if");
-        anIf3.appendChild(anIf4);
+        when.appendChild(anIf4);
         anIf4.setAttribute("test", "offset != null");
-        anIf4.appendChild(doc.createTextNode(" limit ${offset}, ${limit} "));
+        anIf4.appendChild(doc.createTextNode("limit ${limit} offset ${offset}"));
+
         Element anIf5 = doc.createElement("if");
-        anIf3.appendChild(anIf5);
+        when.appendChild(anIf5);
         anIf5.setAttribute("test", "offset == null");
-        anIf5.appendChild(doc.createTextNode(" limit ${limit} "));
+        anIf5.appendChild(doc.createTextNode("limit ${limit} offset 0"));
+        // mysql  数据库的分页
+        Element when1 = doc.createElement("when");
+        choose.appendChild(when1);
+        when1.setAttribute("test", "dbType == 'mysql'");
+
+        Element anIf41 = doc.createElement("if");
+        anIf41.setAttribute("test", "offset != null");
+        anIf41.appendChild(doc.createTextNode("limit ${offset}, ${limit}"));
+        when1.appendChild(anIf41);
+
+        Element anIf51 = doc.createElement("if");
+        anIf51.setAttribute("test", "offset == null");
+        anIf51.appendChild(doc.createTextNode("limit ${limit}"));
+        when1.appendChild(anIf51);
+        //postgres 数据库分页
+        Element when2 = doc.createElement("when");
+        choose.appendChild(when2);
+        when2.setAttribute("test", "dbType == 'postgresql'");
+
+        Element anIf42 = doc.createElement("if");
+        anIf42.setAttribute("test", "offset != null");
+        anIf42.appendChild(doc.createTextNode("limit ${limit} offset ${offset}"));
+        when2.appendChild(anIf42);
+
+        Element anIf52 = doc.createElement("if");
+        anIf52.setAttribute("test", "offset == null");
+        anIf52.appendChild(doc.createTextNode("limit ${limit} offset 0"));
+        when2.appendChild(anIf52);
+        //结束
         return select;
     }
 
@@ -719,7 +762,24 @@ public class DocumentMapperDefine {
 
         document.appendChild(mapper);
 
+        ByteArrayOutputStream byteArrayOutputStream=new ByteArrayOutputStream();
+        serializeDocument(document,byteArrayOutputStream);
+        byte[] bytes = byteArrayOutputStream.toByteArray();
+        System.out.println(new String(bytes));
+
     }
 
+    public void serializeDocument(Document document, OutputStream os) {
+        try {
+            TransformerFactory tFactory = TransformerFactory.newInstance();
+            Transformer transformer = tFactory.newTransformer();
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            DOMSource source = new DOMSource(document);
+            StreamResult result = new StreamResult(os);
+            transformer.transform(source, result);
+        } catch (TransformerException e) {
+            e.printStackTrace();
+        }
+    }
 
 }

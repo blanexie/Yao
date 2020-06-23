@@ -1,16 +1,9 @@
 package xyz.xiezc.ioc.starter.orm.common.example;
 
-import cn.hutool.core.annotation.AnnotationUtil;
-import cn.hutool.core.util.ClassUtil;
-import cn.hutool.core.util.StrUtil;
-import org.jetbrains.annotations.NotNull;
-import xyz.xiezc.ioc.starter.orm.annotation.Id;
 import xyz.xiezc.ioc.starter.orm.lambda.LambdaUtils;
 import xyz.xiezc.ioc.starter.orm.lambda.SFunction;
-import xyz.xiezc.ioc.starter.orm.util.StringUtil;
 import xyz.xiezc.ioc.starter.orm.xml.EntityTableDefine;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,22 +11,24 @@ public abstract class GeneratedCriteria {
 
     protected Example example;
 
+    /**
+     * 这里面的条件都是 使用 and 连接
+     */
+    protected List<Criterion> criteria;
+
     String idStr;
 
     protected GeneratedCriteria(Example example) {
         super();
         criteria = new ArrayList<Criterion>();
         this.example = example;
-        this.idStr = getIdColumn(example);
+        EntityTableDefine.ColumnProp id = example.getMapperDefine().getEntityTableDefine().getId();
+        this.idStr = id.getColumn();
     }
 
     public Example build() {
         return example;
     }
-
-
-    protected List<Criterion> criteria;
-
 
     public boolean isValid() {
         return criteria.size() > 0;
@@ -71,24 +66,6 @@ public abstract class GeneratedCriteria {
     public Criteria andIdIsNull() {
         addCriterion(idStr + " is null");
         return (Criteria) this;
-    }
-
-    @NotNull
-    private String getIdColumn(Example example) {
-        String idStr = "id";
-        for (Field declaredField : ClassUtil.getDeclaredFields(example.entityClass)) {
-            Id annotation = AnnotationUtil.getAnnotation(declaredField, Id.class);
-            if (annotation != null) {
-                if (StrUtil.isNotBlank(annotation.value())) {
-                    idStr = annotation.value();
-                } else {
-                    String name = declaredField.getName();
-                    idStr = StringUtil.underscoreName(name);
-                }
-                break;
-            }
-        }
-        return idStr;
     }
 
     public Criteria andIdIsNotNull() {

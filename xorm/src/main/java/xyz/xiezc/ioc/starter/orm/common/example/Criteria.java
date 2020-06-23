@@ -22,7 +22,6 @@ public class Criteria extends GeneratedCriteria {
     }
 
 
-
     public Criteria orderByClause(String orderByClause) {
         example.orderByClause = orderByClause;
         return this;
@@ -33,26 +32,13 @@ public class Criteria extends GeneratedCriteria {
         return this;
     }
 
-    public Criteria oredCriteria(List<Criteria> oredCriteria) {
-        example.oredCriteria = oredCriteria;
+    public Criteria or(List<Criteria> oredCriteria) {
+        example.oredCriteria.addAll(oredCriteria);
         return this;
     }
 
     public Criteria limit(Integer limit) {
         example.limit = limit;
-        return this;
-    }
-
-    public Criteria pageSize(int pageSize) {
-        example.limit = pageSize;
-        example.pageSize = pageSize;
-        example.offset = (example.pageNo - 1L) * pageSize;
-        return this;
-    }
-
-    public Criteria pageNo(int pageNo) {
-        example.pageNo = pageNo;
-        example.offset = (pageNo - 1L) * example.pageSize;
         return this;
     }
 
