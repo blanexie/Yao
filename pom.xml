@@ -16,6 +16,7 @@
         <maven.test.skip>false</maven.test.skip>
         <java.version>11</java.version>
         <java.encoding>UTF-8</java.encoding>
+        <dubbo.version>2.7.7</dubbo.version>
         <project.build.sourceEncoding>${java.encoding}</project.build.sourceEncoding>
         <maven.build.timestamp.format>yyyy-MM-dd_HH_mm</maven.build.timestamp.format>
         <maven.compiler.source>${java.version}</maven.compiler.source>
@@ -29,6 +30,7 @@
         <module>xweb</module>
         <module>xorm</module>
         <module>example</module>
+        <module>xdubbo</module>
     </modules>
 
 
@@ -47,6 +49,18 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- https://mvnrepository.com/artifact/org.apache.dubbo/dubbo -->
+            <dependency>
+                <groupId>org.apache.dubbo</groupId>
+                <artifactId>dubbo</artifactId>
+                <version>${dubbo.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.dubbo</groupId>
+                <artifactId>dubbo-dependencies-zookeeper</artifactId>
+                <type>pom</type>
+                <version>${dubbo.version}</version>
+            </dependency>
             <dependency>
                 <groupId>xyz.xiezc</groupId>
                 <artifactId>xweb</artifactId>
