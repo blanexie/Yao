@@ -36,9 +36,9 @@ import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.apache.ibatis.transaction.TransactionFactory;
+import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import org.apache.ibatis.type.TypeHandler;
 import org.w3c.dom.Document;
-import xyz.xiezc.ioc.starter.orm.common.YaoManagedTransactionFactory;
 import xyz.xiezc.ioc.starter.orm.common.YaoMybatisException;
 import xyz.xiezc.ioc.starter.orm.util.StringUtil;
 import xyz.xiezc.ioc.starter.orm.xml.XMLMapperBuilder;
@@ -344,7 +344,7 @@ public class SqlSessionFactoryBean implements FactoryBean<SqlSessionFactory> {
      * a transaction is active.
      *
      * @param transactionFactory the MyBatis TransactionFactory
-     * @see YaoManagedTransactionFactory
+     * @see JdbcTransactionFactory
      */
     public void setTransactionFactory(TransactionFactory transactionFactory) {
         this.transactionFactory = transactionFactory;
@@ -498,7 +498,7 @@ public class SqlSessionFactoryBean implements FactoryBean<SqlSessionFactory> {
         }
 
         if (this.transactionFactory == null) {
-            this.transactionFactory = new YaoManagedTransactionFactory();
+            this.transactionFactory = new JdbcTransactionFactory();
         }
 
         configuration.setEnvironment(new Environment(this.environment, this.transactionFactory, this.dataSource));
