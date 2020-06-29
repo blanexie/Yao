@@ -1,5 +1,6 @@
 package xyz.xiezc.ioc.starter.annotation.handler;
 
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.Data;
@@ -53,7 +54,9 @@ public class ValueAnnotationHandler extends AnnotationHandler<Value> {
             fieldDefinition.setFieldValue(NullObj.NULL);
         } else {
             fieldDefinition.setFieldValue(str);
-            ReflectUtil.setFieldValue(bean, fieldDefinition.getField(), str);
+            Class<?> fieldType = fieldDefinition.getFieldType();
+            Object convert = Convert.convert(fieldType, str);
+            ReflectUtil.setFieldValue(bean, fieldDefinition.getField(), convert);
         }
     }
 }

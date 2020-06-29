@@ -170,28 +170,27 @@ public final class Xioc {
                 AnnotationHandler annotationHandler = (AnnotationHandler) ReflectUtil.newInstanceIfPossible(aClass);
                 annotationContext.addAnnotationHandler(annotationHandler);
                 newBeanDefinition(beanDefinitionContext, aClass, annotationHandler);
-            } else
+            } else if (ClassUtil.isAssignable(ApplicationListener.class, aClass)) {
                 //是事件监听器
-                if (ClassUtil.isAssignable(ApplicationListener.class, aClass)) {
-                    EventListener eventListener = AnnotationUtil.getAnnotation(aClass, EventListener.class);
-                    if (eventListener == null) {
-                        throw new RuntimeException(aClass.getSimpleName() + "系统监听器请配置EventListener注解");
-                    }
-                    String[] eventNames = eventListener.eventName();
-                    if (eventNames == null) {
-                        throw new RuntimeException(aClass.getSimpleName() + "系统监听器请配置EventListener注解");
-                    }
-                    ApplicationListener applicationListener = (ApplicationListener) ReflectUtil.newInstanceIfPossible(aClass);
-                    newBeanDefinition(beanDefinitionContext, aClass, applicationListener);
-
-                    for (String eventName : eventNames) {
-                        eventPublisherContext.addApplicationListener(eventName, applicationListener);
-                    }
-                } else {
-                    //普通的bean
-                    Object bean = ReflectUtil.newInstanceIfPossible(aClass);
-                    newBeanDefinition(beanDefinitionContext, aClass, bean);
+                EventListener eventListener = AnnotationUtil.getAnnotation(aClass, EventListener.class);
+                if (eventListener == null) {
+                    throw new RuntimeException(aClass.getSimpleName() + "系统监听器请配置EventListener注解");
                 }
+                String[] eventNames = eventListener.eventName();
+                if (eventNames == null) {
+                    throw new RuntimeException(aClass.getSimpleName() + "系统监听器请配置EventListener注解");
+                }
+                ApplicationListener applicationListener = (ApplicationListener) ReflectUtil.newInstanceIfPossible(aClass);
+                newBeanDefinition(beanDefinitionContext, aClass, applicationListener);
+
+                for (String eventName : eventNames) {
+                    eventPublisherContext.addApplicationListener(eventName, applicationListener);
+                }
+            } else {
+                //普通的bean
+                Object bean = ReflectUtil.newInstanceIfPossible(aClass);
+                newBeanDefinition(beanDefinitionContext, aClass, bean);
+            }
         }
 
     }

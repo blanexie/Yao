@@ -84,7 +84,7 @@ public class BeanCreateContextUtil implements BeanCreateContext {
             //2. 先初始化这个类。三种类型的有不同的初始化方法
             beanDefinition = this.buildBean(beanDefinition);
             //3. 检查有无自定义注解，如果有的话，此时获取对应的annotationHandler来处理下。Inject和Value的注解处理器很重要，需要判断依赖是否存在
-            //注入字段
+            //注入依赖字段
             if (beanDefinition.getBeanStatus() == BeanStatusEnum.HalfCooked) {
                 //设置字段的属性值
                 dealAnnotationHandler(beanDefinition);
@@ -162,7 +162,8 @@ public class BeanCreateContextUtil implements BeanCreateContext {
         Class<?> beanClass = beanDefinition.getBeanClass();
         Annotation[] annotations = AnnotationUtil.getAnnotations(beanClass, true);
         //获取所有的注解处理器并排序
-        CollUtil.toList(annotations).stream()
+        CollUtil.toList(annotations)
+                .stream()
                 .filter(annotation -> annotation.annotationType() != Aop.class)
                 .map(annotation -> {
                     AnnotationAndHandler annotationAndHandler = new AnnotationAndHandler();
@@ -183,10 +184,11 @@ public class BeanCreateContextUtil implements BeanCreateContext {
                     } else {
                         return 1;
                     }
-                }).forEach(annotationAndHandler -> {
-            AnnotationHandler annotationHandler = annotationAndHandler.getAnnotationHandler();
-            annotationHandler.processClass(annotationAndHandler.getAnnotation(), beanClass, beanDefinition);
-        });
+                })
+                .forEach(annotationAndHandler -> {
+                    AnnotationHandler annotationHandler = annotationAndHandler.getAnnotationHandler();
+                    annotationHandler.processClass(annotationAndHandler.getAnnotation(), beanClass, beanDefinition);
+                });
 
         //2.2 获取字段上的注解，并处理
         Set<FieldDefinition> fieldDefinitions = beanDefinition.getFieldDefinitions();
@@ -197,7 +199,8 @@ public class BeanCreateContextUtil implements BeanCreateContext {
             if (annotations1 == null) {
                 continue;
             }
-            CollUtil.toList(annotations1).stream()
+            CollUtil.toList(annotations1)
+                    .stream()
                     .map(annotation -> {
                         AnnotationAndHandler annotationAndHandler = new AnnotationAndHandler();
                         AnnotationHandler<? extends Annotation> classAnnotationHandler = annotationContext.getFieldAnnotationHandler(annotation.annotationType());
@@ -232,7 +235,8 @@ public class BeanCreateContextUtil implements BeanCreateContext {
             if (annotations1 == null) {
                 continue;
             }
-            CollUtil.toList(annotations1).stream()
+            CollUtil.toList(annotations1)
+                    .stream()
                     .filter(annotation -> annotation.annotationType() != Aop.class)
                     .map(annotation -> {
                         AnnotationAndHandler annotationAndHandler = new AnnotationAndHandler();

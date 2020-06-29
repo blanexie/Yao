@@ -1,6 +1,7 @@
 package xyz.xiezc.example.web.controller;
 
 import cn.hutool.json.JSONUtil;
+import xyz.xiezc.example.web.common.PropertiesConfig;
 import xyz.xiezc.example.web.common.TestAopspect;
 import xyz.xiezc.example.web.entity.Album;
 import xyz.xiezc.example.web.mapper.AlbumMapper;
@@ -24,9 +25,12 @@ public class TestController {
     @Inject
     TestService[] testServices;
 
+    @Inject
+    PropertiesConfig propertiesConfig;
+
     @GetMapping("/get.json")
     public String get() {
-        return testServices.length + "";
+        return JSONUtil.toJsonStr(propertiesConfig);
     }
 
 
