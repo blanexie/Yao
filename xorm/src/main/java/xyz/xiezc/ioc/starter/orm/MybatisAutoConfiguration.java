@@ -134,7 +134,13 @@ public class MybatisAutoConfiguration implements ApplicationListener {
     private SqlSessionFactory getSqlSessionFactory(ApplicationContextUtil applicationContext, List<DocumentMapperDefine> documentMapperDefines) {
         //1. 获取数据源
         Setting setting = applicationContext.getPropertiesContext().getSetting();
-        DataSource ds = DSFactory.create(setting).getDataSource();
+        Setting db = setting.getSetting("db");
+        DataSource ds;
+        if (db.isEmpty()) {
+            ds = DSFactory.create(setting).getDataSource();
+        } else {
+            ds = DSFactory.create(db).getDataSource();
+        }
         //1.1 数据源放入容器中
         BeanDefinition beanDefinition1 = new BeanDefinition();
         beanDefinition1.setBeanClass(DataSource.class);
