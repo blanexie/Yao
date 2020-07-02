@@ -6,11 +6,7 @@
     <select id="queryById" resultMap="XZCBaseResultMap">
         select id,
                title,
-               publish_time as publishTime,
-               type,
-               create_time,
-               cover_id,
-               see
+               create_time
         from t_album
         where id = #{id}
     </select>

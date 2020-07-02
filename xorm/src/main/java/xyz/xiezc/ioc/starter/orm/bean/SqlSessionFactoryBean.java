@@ -40,6 +40,7 @@ import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import org.apache.ibatis.type.TypeHandler;
 import org.w3c.dom.Document;
 import xyz.xiezc.ioc.starter.orm.common.YaoMybatisException;
+import xyz.xiezc.ioc.starter.orm.common.transaction.YaoTransactionFactory;
 import xyz.xiezc.ioc.starter.orm.util.StringUtil;
 import xyz.xiezc.ioc.starter.orm.xml.XMLMapperBuilder;
 import xyz.xiezc.ioc.starter.annotation.Init;
@@ -498,7 +499,7 @@ public class SqlSessionFactoryBean implements FactoryBean<SqlSessionFactory> {
         }
 
         if (this.transactionFactory == null) {
-            this.transactionFactory = new JdbcTransactionFactory();
+            this.transactionFactory = new YaoTransactionFactory();
         }
 
         configuration.setEnvironment(new Environment(this.environment, this.transactionFactory, this.dataSource));

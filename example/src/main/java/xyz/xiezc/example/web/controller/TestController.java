@@ -3,7 +3,7 @@ package xyz.xiezc.example.web.controller;
 import cn.hutool.json.JSONUtil;
 import xyz.xiezc.example.web.common.PropertiesConfig;
 import xyz.xiezc.example.web.common.TestAopspect;
-import xyz.xiezc.example.web.entity.Album;
+import xyz.xiezc.example.web.entity.AlbumDO;
 import xyz.xiezc.example.web.mapper.AlbumMapper;
 import xyz.xiezc.example.web.service.TestService;
 import xyz.xiezc.ioc.starter.annotation.Aop;
@@ -36,7 +36,7 @@ public class TestController {
 
     @GetMapping("/queryById.json")
     public String queryById(Integer id) {
-        Album album = albumMapper.queryById(id);
+        AlbumDO album = albumMapper.queryById(id);
         return JSONUtil.toJsonStr(album);
     }
 
@@ -44,10 +44,10 @@ public class TestController {
     public String get(String param) {
         WebContext webContext = WebContext.get();
         //
-        Example build = Example.of(Album.class)
-                .andEqualTo(Album::getId, 3537) //支持类似mybatis-plus的lambda的使用方式
+        Example build = Example.of(AlbumDO.class)
+                .andEqualTo(AlbumDO::getId, 3537) //支持类似mybatis-plus的lambda的使用方式
                 .build();
-        List<Album> albums = albumMapper.selectByExample(build);
+        List<AlbumDO> albums = albumMapper.selectByExample(build);
         //获取session信息
         Map<String, Object> session = webContext.getSession();
         session.put("param", param);
