@@ -1,4 +1,4 @@
-package xyz.xiezc.ioc.starter.annotation;
+package xyz.xiezc.ioc.starter.annotation.core;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -19,11 +19,7 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Inject {
+public @interface Autowire {
 
-    /**
-     * @return
-     */
-    String value() default "";
 
 }

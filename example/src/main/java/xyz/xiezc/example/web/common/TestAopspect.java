@@ -1,7 +1,7 @@
 package xyz.xiezc.example.web.common;
 
 import cn.hutool.json.JSONUtil;
-import xyz.xiezc.ioc.starter.annotation.Component;
+import xyz.xiezc.ioc.starter.annotation.core.Component;
 import xyz.xiezc.ioc.starter.common.AopAspect;
 
 import java.lang.reflect.Method;

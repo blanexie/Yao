@@ -1,12 +1,10 @@
 package xyz.xiezc.example;
 
 
-import cn.hutool.core.io.resource.ResourceUtil;
-import io.netty.util.internal.ResourcesUtil;
 import xyz.xiezc.ioc.starter.Xioc;
-import xyz.xiezc.ioc.starter.annotation.Configuration;
-import xyz.xiezc.ioc.starter.annotation.Cron;
-import xyz.xiezc.ioc.starter.annotation.EnableCron;
+import xyz.xiezc.ioc.starter.annotation.core.Configuration;
+import xyz.xiezc.ioc.starter.annotation.cron.Cron;
+import xyz.xiezc.ioc.starter.annotation.cron.EnableCron;
 import xyz.xiezc.ioc.starter.orm.annotation.MapperScan;
 
 import java.time.LocalTime;

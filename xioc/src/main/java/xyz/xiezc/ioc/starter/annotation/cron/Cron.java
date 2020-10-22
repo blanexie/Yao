@@ -1,4 +1,4 @@
-package xyz.xiezc.ioc.starter.annotation;
+package xyz.xiezc.ioc.starter.annotation.cron;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -8,19 +8,18 @@ import lombok.Getter;
 import lombok.Setter;
 import xyz.xiezc.ioc.starter.annotation.AnnotationHandler;
 import xyz.xiezc.ioc.starter.ApplicationContextUtil;
-import xyz.xiezc.ioc.starter.annotation.Aop;
+import xyz.xiezc.ioc.starter.annotation.aop.Aop;
 import xyz.xiezc.ioc.starter.common.context.AnnotationContext;
 import xyz.xiezc.ioc.starter.common.context.BeanCreateContext;
 import xyz.xiezc.ioc.starter.common.context.BeanDefinitionContext;
 import xyz.xiezc.ioc.starter.common.context.PropertiesContext;
 import xyz.xiezc.ioc.starter.common.create.BeanCreateStrategy;
-import xyz.xiezc.ioc.starter.common.create.impl.FactoryBeanCreateStrategy;
 import xyz.xiezc.ioc.starter.common.create.impl.MethodBeanCreateStrategy;
 import xyz.xiezc.ioc.starter.common.create.impl.SimpleBeanCreateStategy;
-import xyz.xiezc.ioc.starter.common.definition.AnnotationAndHandler;
-import xyz.xiezc.ioc.starter.common.definition.BeanDefinition;
-import xyz.xiezc.ioc.starter.common.definition.FieldDefinition;
-import xyz.xiezc.ioc.starter.common.definition.MethodDefinition;
+import xyz.xiezc.ioc.starter.core.definition.AnnotationAndHandler;
+import xyz.xiezc.ioc.starter.core.definition.BeanDefinition;
+import xyz.xiezc.ioc.starter.core.definition.FieldDefinition;
+import xyz.xiezc.ioc.starter.core.definition.MethodDefinition;
 import xyz.xiezc.ioc.starter.common.enums.BeanStatusEnum;
 import xyz.xiezc.ioc.starter.common.enums.BeanTypeEnum;
 import xyz.xiezc.ioc.starter.common.exception.CircularDependenceException;
@@ -29,8 +28,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
-
-import static xyz.xiezc.ioc.starter.common.enums.BeanStatusEnum.Original;
 
 /**
  * @author xiezc

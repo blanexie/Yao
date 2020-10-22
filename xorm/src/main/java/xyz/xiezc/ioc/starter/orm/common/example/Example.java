@@ -1,10 +1,9 @@
 package xyz.xiezc.ioc.starter.orm.common.example;
 
-import cn.hutool.db.Db;
 import cn.hutool.db.dialect.DriverUtil;
 import lombok.Getter;
 import xyz.xiezc.ioc.starter.Xioc;
-import xyz.xiezc.ioc.starter.common.definition.BeanDefinition;
+import xyz.xiezc.ioc.starter.core.definition.BeanDefinition;
 import xyz.xiezc.ioc.starter.orm.util.XormDbUtil;
 import xyz.xiezc.ioc.starter.orm.xml.MapperDefine;
 

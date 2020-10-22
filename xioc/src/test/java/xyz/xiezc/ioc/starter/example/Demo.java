@@ -4,10 +4,10 @@ package xyz.xiezc.ioc.starter.example;
 import lombok.Data;
 import xyz.xiezc.ioc.starter.ApplicationContextUtil;
 import xyz.xiezc.ioc.starter.Xioc;
-import xyz.xiezc.ioc.starter.annotation.Configuration;
-import xyz.xiezc.ioc.starter.annotation.Cron;
-import xyz.xiezc.ioc.starter.annotation.EnableCron;
-import xyz.xiezc.ioc.starter.common.definition.BeanDefinition;
+import xyz.xiezc.ioc.starter.annotation.core.Configuration;
+import xyz.xiezc.ioc.starter.annotation.cron.Cron;
+import xyz.xiezc.ioc.starter.annotation.cron.EnableCron;
+import xyz.xiezc.ioc.starter.core.definition.BeanDefinition;
 
 import java.time.LocalTime;
 

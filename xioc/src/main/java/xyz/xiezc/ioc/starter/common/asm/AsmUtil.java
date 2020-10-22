@@ -2,7 +2,7 @@ package xyz.xiezc.ioc.starter.common.asm;
 
 import cn.hutool.core.util.ClassUtil;
 import org.objectweb.asm.*;
-import xyz.xiezc.ioc.starter.common.definition.ParamDefinition;
+import xyz.xiezc.ioc.starter.core.definition.ParamDefinition;
 
 import java.io.IOException;
 import java.lang.reflect.Method;

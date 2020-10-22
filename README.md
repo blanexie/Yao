@@ -72,9 +72,9 @@ package xyz.xiezc.example;
 
 
 import xyz.xiezc.ioc.starter.Xioc;
-import xyz.xiezc.ioc.starter.annotation.Configuration;
-import xyz.xiezc.ioc.starter.annotation.Cron;
-import xyz.xiezc.ioc.starter.annotation.EnableCron;
+import xyz.xiezc.ioc.starter.annotation.core.Configuration;
+import xyz.xiezc.ioc.starter.annotation.cron.Cron;
+import xyz.xiezc.ioc.starter.annotation.cron.EnableCron;
 import xyz.xiezc.ioc.starter.orm.annotation.MapperScan;
 
 import java.time.LocalTime;
@@ -111,8 +111,8 @@ import xyz.xiezc.example.web.common.TestAopspect;
 import xyz.xiezc.example.web.entity.Album;
 import xyz.xiezc.example.web.mapper.AlbumMapper;
 import xyz.xiezc.example.web.service.TestService;
-import xyz.xiezc.ioc.starter.annotation.Aop;
-import xyz.xiezc.ioc.starter.annotation.Inject;
+import xyz.xiezc.ioc.starter.annotation.aop.Aop;
+import xyz.xiezc.ioc.starter.annotation.core.Autowire;
 import xyz.xiezc.ioc.starter.orm.common.example.Example;
 import xyz.xiezc.ioc.starter.starter.web.annotation.Controller;
 import xyz.xiezc.ioc.starter.starter.web.annotation.GetMapping;

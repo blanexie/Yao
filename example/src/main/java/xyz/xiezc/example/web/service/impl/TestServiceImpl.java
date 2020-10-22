@@ -2,12 +2,12 @@ package xyz.xiezc.example.web.service.impl;
 
 import xyz.xiezc.example.web.controller.TestController;
 import xyz.xiezc.example.web.service.TestService;
-import xyz.xiezc.ioc.starter.annotation.Component;
-import xyz.xiezc.ioc.starter.annotation.Inject;
+import xyz.xiezc.ioc.starter.annotation.core.Component;
+import xyz.xiezc.ioc.starter.annotation.core.Autowire;
 
 @Component
 public class TestServiceImpl implements TestService {
-    @Inject
+    @Autowire
     TestController testController;
 
     @Override

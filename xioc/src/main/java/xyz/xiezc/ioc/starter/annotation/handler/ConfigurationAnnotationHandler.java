@@ -8,10 +8,13 @@ import lombok.Data;
 import xyz.xiezc.ioc.starter.Xioc;
 import xyz.xiezc.ioc.starter.annotation.*;
 import xyz.xiezc.ioc.starter.ApplicationContextUtil;
+import xyz.xiezc.ioc.starter.annotation.core.Bean;
+import xyz.xiezc.ioc.starter.annotation.core.ComponentScan;
+import xyz.xiezc.ioc.starter.annotation.core.Configuration;
 import xyz.xiezc.ioc.starter.common.context.BeanDefinitionContext;
-import xyz.xiezc.ioc.starter.common.definition.BeanDefinition;
-import xyz.xiezc.ioc.starter.common.definition.FieldDefinition;
-import xyz.xiezc.ioc.starter.common.definition.MethodDefinition;
+import xyz.xiezc.ioc.starter.core.definition.BeanDefinition;
+import xyz.xiezc.ioc.starter.core.definition.FieldDefinition;
+import xyz.xiezc.ioc.starter.core.definition.MethodDefinition;
 import xyz.xiezc.ioc.starter.common.enums.BeanTypeEnum;
 
 import java.lang.annotation.Annotation;
@@ -25,7 +28,6 @@ import java.util.stream.Collectors;
  * 被configuration 注解的方法的处理逻辑
  */
 @Data
-@SystemLoad
 public class ConfigurationAnnotationHandler extends AnnotationHandler<Configuration> {
 
     @Override
@@ -65,16 +67,16 @@ public class ConfigurationAnnotationHandler extends AnnotationHandler<Configurat
                 });
         //处理@BeanScan注解
         Class<?> beanClass = beanDefinition.getBeanClass();
-        BeanScan beanScan = AnnotationUtil.getAnnotation(beanClass, BeanScan.class);
-        if (beanScan == null) {
+        ComponentScan componentScan = AnnotationUtil.getAnnotation(beanClass, ComponentScan.class);
+        if (componentScan == null) {
             return;
         }
-        Class<?>[] classes = beanScan.basePackageClasses();
+        Class<?>[] classes = componentScan.basePackageClasses();
         List<String> packages = CollUtil.newArrayList(classes)
                 .stream()
                 .map(ClassUtil::getPackage)
                 .collect(Collectors.toList());
-        String[] strings = beanScan.basePackages();
+        String[] strings = componentScan.basePackages();
         for (String string : strings) {
             packages.add(string);
         }

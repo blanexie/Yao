@@ -8,14 +8,13 @@ import lombok.Data;
 import xyz.xiezc.ioc.starter.ApplicationContextUtil;
 import xyz.xiezc.ioc.starter.Xioc;
 import xyz.xiezc.ioc.starter.annotation.AnnotationHandler;
-import xyz.xiezc.ioc.starter.annotation.Cron;
-import xyz.xiezc.ioc.starter.annotation.EnableCron;
-import xyz.xiezc.ioc.starter.annotation.SystemLoad;
+import xyz.xiezc.ioc.starter.annotation.cron.Cron;
+import xyz.xiezc.ioc.starter.annotation.cron.EnableCron;
 import xyz.xiezc.ioc.starter.common.cron.CronApplicationListener;
 import xyz.xiezc.ioc.starter.common.cron.CronDefinition;
-import xyz.xiezc.ioc.starter.common.definition.BeanDefinition;
-import xyz.xiezc.ioc.starter.common.definition.FieldDefinition;
-import xyz.xiezc.ioc.starter.common.definition.MethodDefinition;
+import xyz.xiezc.ioc.starter.core.definition.BeanDefinition;
+import xyz.xiezc.ioc.starter.core.definition.FieldDefinition;
+import xyz.xiezc.ioc.starter.core.definition.MethodDefinition;
 
 import java.lang.annotation.Annotation;
 
@@ -26,7 +25,6 @@ import java.lang.annotation.Annotation;
  * @Date 2020/6/5 11:54 上午
  **/
 @Data
-@SystemLoad
 public class CronAnnotationHandler extends AnnotationHandler<Cron> {
 
     Log log = LogFactory.get(CronAnnotationHandler.class);

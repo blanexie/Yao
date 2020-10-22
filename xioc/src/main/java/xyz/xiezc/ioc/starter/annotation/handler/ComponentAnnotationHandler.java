@@ -5,16 +5,14 @@ import lombok.Data;
 import xyz.xiezc.ioc.starter.ApplicationContextUtil;
 import xyz.xiezc.ioc.starter.Xioc;
 import xyz.xiezc.ioc.starter.annotation.AnnotationHandler;
-import xyz.xiezc.ioc.starter.annotation.Component;
-import xyz.xiezc.ioc.starter.annotation.SystemLoad;
-import xyz.xiezc.ioc.starter.common.definition.BeanDefinition;
-import xyz.xiezc.ioc.starter.common.definition.FieldDefinition;
-import xyz.xiezc.ioc.starter.common.definition.MethodDefinition;
+import xyz.xiezc.ioc.starter.annotation.core.Component;
+import xyz.xiezc.ioc.starter.core.definition.BeanDefinition;
+import xyz.xiezc.ioc.starter.core.definition.FieldDefinition;
+import xyz.xiezc.ioc.starter.core.definition.MethodDefinition;
 
 import java.lang.annotation.Annotation;
 
 @Data
-@SystemLoad
 public class ComponentAnnotationHandler extends AnnotationHandler<Component> {
 
     @Override

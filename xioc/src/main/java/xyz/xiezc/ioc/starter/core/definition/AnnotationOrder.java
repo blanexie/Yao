@@ -1,4 +1,4 @@
-package xyz.xiezc.ioc.starter.common.definition;
+package xyz.xiezc.ioc.starter.core.definition;
 
 import lombok.Data;
 

@@ -1,8 +1,7 @@
 package xyz.xiezc.ioc.starter.common.context;
 
-import xyz.xiezc.ioc.starter.common.definition.BeanDefinition;
+import xyz.xiezc.ioc.starter.core.definition.BeanDefinition;
 
-import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.List;
 

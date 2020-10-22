@@ -1,5 +1,6 @@
-package xyz.xiezc.ioc.starter.annotation;
+package xyz.xiezc.ioc.starter.annotation.aop;
 
+import xyz.xiezc.ioc.starter.annotation.core.Component;
 import xyz.xiezc.ioc.starter.common.AopAspect;
 
 import java.lang.annotation.ElementType;

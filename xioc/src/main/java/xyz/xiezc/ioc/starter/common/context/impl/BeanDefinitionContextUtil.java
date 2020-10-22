@@ -5,9 +5,8 @@ import cn.hutool.core.util.ClassUtil;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 import xyz.xiezc.ioc.starter.common.context.BeanDefinitionContext;
-import xyz.xiezc.ioc.starter.common.definition.BeanDefinition;
+import xyz.xiezc.ioc.starter.core.definition.BeanDefinition;
 
-import java.lang.annotation.Annotation;
 import java.util.*;
 import java.util.stream.Collectors;
 

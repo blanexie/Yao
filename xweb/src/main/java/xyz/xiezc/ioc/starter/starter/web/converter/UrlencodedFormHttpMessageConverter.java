@@ -3,9 +3,9 @@ package xyz.xiezc.ioc.starter.starter.web.converter;
 import cn.hutool.core.util.CharsetUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.http.QueryStringDecoder;
-import xyz.xiezc.ioc.starter.annotation.Component;
-import xyz.xiezc.ioc.starter.common.definition.MethodDefinition;
-import xyz.xiezc.ioc.starter.common.definition.ParamDefinition;
+import xyz.xiezc.ioc.starter.annotation.core.Component;
+import xyz.xiezc.ioc.starter.core.definition.MethodDefinition;
+import xyz.xiezc.ioc.starter.core.definition.ParamDefinition;
 import xyz.xiezc.ioc.starter.starter.web.common.ContentType;
 import xyz.xiezc.ioc.starter.starter.web.entity.HttpRequest;
 

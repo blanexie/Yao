@@ -1,4 +1,5 @@
-package xyz.xiezc.ioc.starter.orm.annotation;
+package xyz.xiezc.ioc.starter.annotation.listener;
+
 
 import xyz.xiezc.ioc.starter.annotation.core.Component;
 
@@ -8,13 +9,16 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 注解标示 mapper接口的位置. 默认mapper.xml和接口是在同一位置
+ * 事件处理器的注解
  */
-@Target(ElementType.TYPE)
+@Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Component
-public @interface MapperScan {
+public @interface EventListener {
 
-    String[] value() ;
-
+    /**
+     * 被注解的事件处理器需要处理的事件名称
+     * @return
+     */
+    String[] eventName();
 }

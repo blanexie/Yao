@@ -24,8 +24,8 @@ import cn.hutool.core.io.resource.ResourceUtil;
 import lombok.Data;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.ExecutorType;
-import xyz.xiezc.ioc.starter.annotation.Component;
-import xyz.xiezc.ioc.starter.annotation.Value;
+import xyz.xiezc.ioc.starter.annotation.core.Component;
+import xyz.xiezc.ioc.starter.annotation.core.Value;
 
 /**
  * Configuration properties for Mybatis.

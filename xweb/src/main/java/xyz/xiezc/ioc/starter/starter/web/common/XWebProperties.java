@@ -1,8 +1,8 @@
 package xyz.xiezc.ioc.starter.starter.web.common;
 
 import lombok.Data;
-import xyz.xiezc.ioc.starter.annotation.Component;
-import xyz.xiezc.ioc.starter.annotation.Value;
+import xyz.xiezc.ioc.starter.annotation.core.Component;
+import xyz.xiezc.ioc.starter.annotation.core.Value;
 
 @Component
 @Data

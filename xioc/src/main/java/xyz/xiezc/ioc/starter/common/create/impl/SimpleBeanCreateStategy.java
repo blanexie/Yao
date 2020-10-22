@@ -6,7 +6,7 @@ import cn.hutool.log.LogFactory;
 import lombok.Data;
 import lombok.SneakyThrows;
 import xyz.xiezc.ioc.starter.common.create.BeanCreateStrategy;
-import xyz.xiezc.ioc.starter.common.definition.BeanDefinition;
+import xyz.xiezc.ioc.starter.core.definition.BeanDefinition;
 import xyz.xiezc.ioc.starter.common.enums.BeanStatusEnum;
 import xyz.xiezc.ioc.starter.common.enums.BeanTypeEnum;
 

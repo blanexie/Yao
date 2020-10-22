@@ -22,7 +22,6 @@ import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.db.dialect.DriverUtil;
 import cn.hutool.db.ds.DSFactory;
 import cn.hutool.json.JSONUtil;
 import cn.hutool.log.Log;
@@ -36,11 +35,10 @@ import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.SqlSessionFactory;
 import xyz.xiezc.ioc.starter.ApplicationContextUtil;
 import xyz.xiezc.ioc.starter.Xioc;
-import xyz.xiezc.ioc.starter.annotation.EventListener;
-import xyz.xiezc.ioc.starter.annotation.SystemLoad;
+import xyz.xiezc.ioc.starter.annotation.listener.EventListener;
 import xyz.xiezc.ioc.starter.common.context.BeanCreateContext;
 import xyz.xiezc.ioc.starter.common.context.BeanDefinitionContext;
-import xyz.xiezc.ioc.starter.common.definition.BeanDefinition;
+import xyz.xiezc.ioc.starter.core.definition.BeanDefinition;
 import xyz.xiezc.ioc.starter.common.enums.BeanStatusEnum;
 import xyz.xiezc.ioc.starter.common.enums.BeanTypeEnum;
 import xyz.xiezc.ioc.starter.event.ApplicationEvent;
@@ -67,7 +65,6 @@ import static xyz.xiezc.ioc.starter.common.enums.EventNameConstant.loadBeanDefin
  * 事件监听器的 init方法会先于 doExecute方法 被触发
  */
 @Data
-@SystemLoad
 @EventListener(eventName = loadBeanDefinitions)
 public class MybatisAutoConfiguration implements ApplicationListener {
 

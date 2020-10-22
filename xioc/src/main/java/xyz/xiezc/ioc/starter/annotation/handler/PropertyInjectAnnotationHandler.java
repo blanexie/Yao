@@ -4,13 +4,13 @@ import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.convert.ConvertException;
 import cn.hutool.core.util.ReflectUtil;
-import cn.hutool.core.util.StrUtil;
 import xyz.xiezc.ioc.starter.Xioc;
 import xyz.xiezc.ioc.starter.annotation.*;
+import xyz.xiezc.ioc.starter.annotation.core.Configuration;
 import xyz.xiezc.ioc.starter.common.context.PropertiesContext;
-import xyz.xiezc.ioc.starter.common.definition.BeanDefinition;
-import xyz.xiezc.ioc.starter.common.definition.FieldDefinition;
-import xyz.xiezc.ioc.starter.common.definition.MethodDefinition;
+import xyz.xiezc.ioc.starter.core.definition.BeanDefinition;
+import xyz.xiezc.ioc.starter.core.definition.FieldDefinition;
+import xyz.xiezc.ioc.starter.core.definition.MethodDefinition;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -23,7 +23,6 @@ import java.util.Objects;
  * @Version 1.0
  * @Date 2020/6/29 11:37 上午
  **/
-@SystemLoad
 public class PropertyInjectAnnotationHandler extends AnnotationHandler<PropertyInject> {
     @Override
     public Class<PropertyInject> getAnnotationType() {

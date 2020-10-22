@@ -1,4 +1,4 @@
-package xyz.xiezc.ioc.starter.annotation;
+package xyz.xiezc.ioc.starter.annotation.core;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -15,7 +15,7 @@ import java.lang.annotation.Target;
  */
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface BeanScan {
+public @interface ComponentScan {
 
     /**
      * 扫描的包路径

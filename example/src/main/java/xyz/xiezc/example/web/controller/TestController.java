@@ -6,8 +6,8 @@ import xyz.xiezc.example.web.common.TestAopspect;
 import xyz.xiezc.example.web.entity.AlbumDO;
 import xyz.xiezc.example.web.mapper.AlbumMapper;
 import xyz.xiezc.example.web.service.TestService;
-import xyz.xiezc.ioc.starter.annotation.Aop;
-import xyz.xiezc.ioc.starter.annotation.Inject;
+import xyz.xiezc.ioc.starter.annotation.aop.Aop;
+import xyz.xiezc.ioc.starter.annotation.core.Autowire;
 import xyz.xiezc.ioc.starter.orm.common.example.Example;
 import xyz.xiezc.ioc.starter.starter.web.annotation.Controller;
 import xyz.xiezc.ioc.starter.starter.web.annotation.GetMapping;
@@ -20,12 +20,12 @@ import java.util.Map;
 @Controller("/")
 public class TestController {
 
-    @Inject
+    @Autowire
     AlbumMapper albumMapper;
-    @Inject
+    @Autowire
     TestService[] testServices;
 
-    @Inject
+    @Autowire
     PropertiesConfig propertiesConfig;
 
     @GetMapping("/get.json")

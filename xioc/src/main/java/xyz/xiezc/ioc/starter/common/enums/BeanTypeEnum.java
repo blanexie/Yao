@@ -5,12 +5,6 @@ public enum BeanTypeEnum {
      * 普通的bean， 单例
      */
     bean,
-
-    /**
-     * factoryBean
-     */
-    factoryBean,
-
     /**
      * methodBean
      */

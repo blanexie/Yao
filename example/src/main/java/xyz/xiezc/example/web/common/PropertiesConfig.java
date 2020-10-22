@@ -1,8 +1,7 @@
 package xyz.xiezc.example.web.common;
 
 import lombok.Data;
-import xyz.xiezc.ioc.starter.annotation.Configuration;
-import xyz.xiezc.ioc.starter.annotation.PropertyInject;
+import xyz.xiezc.ioc.starter.annotation.core.Configuration;
 
 /**
  * @Description TODO
@@ -12,7 +11,6 @@ import xyz.xiezc.ioc.starter.annotation.PropertyInject;
  **/
 @Data
 @Configuration
-@PropertyInject(prefix = "xweb.server")
 public class PropertiesConfig {
 
 

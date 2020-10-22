@@ -3,8 +3,8 @@ package xyz.xiezc.ioc.starter.starter.web.listener;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 import lombok.SneakyThrows;
-import xyz.xiezc.ioc.starter.annotation.EventListener;
-import xyz.xiezc.ioc.starter.annotation.Inject;
+import xyz.xiezc.ioc.starter.annotation.listener.EventListener;
+import xyz.xiezc.ioc.starter.annotation.core.Autowire;
 import xyz.xiezc.ioc.starter.event.ApplicationEvent;
 import xyz.xiezc.ioc.starter.event.ApplicationListener;
 import xyz.xiezc.ioc.starter.common.enums.EventNameConstant;
@@ -21,10 +21,10 @@ public class WebServerListener implements ApplicationListener {
         return Short.MAX_VALUE;
     }
 
-    @Inject
+    @Autowire
     WebServerBootstrap webServerBootstrap;
 
-    @Inject
+    @Autowire
     XWebProperties xWebProperties;
 
     @Override

@@ -1,6 +1,6 @@
 package xyz.xiezc.ioc.starter.common.context;
 
-import xyz.xiezc.ioc.starter.common.definition.BeanDefinition;
+import xyz.xiezc.ioc.starter.core.definition.BeanDefinition;
 
 /**
  * bean创建相关的接口， 包含创建时候的循环依赖的判断。

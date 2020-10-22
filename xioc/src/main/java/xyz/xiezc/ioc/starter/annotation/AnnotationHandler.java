@@ -10,7 +10,7 @@ import xyz.xiezc.ioc.starter.common.asm.AsmUtil;
 import xyz.xiezc.ioc.starter.common.context.AnnotationContext;
 import xyz.xiezc.ioc.starter.common.context.BeanDefinitionContext;
 import xyz.xiezc.ioc.starter.common.enums.BeanTypeEnum;
-import xyz.xiezc.ioc.starter.common.definition.*;
+import xyz.xiezc.ioc.starter.core.definition.*;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;

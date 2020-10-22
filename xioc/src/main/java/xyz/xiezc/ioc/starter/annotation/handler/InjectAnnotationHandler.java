@@ -7,13 +7,12 @@ import lombok.Data;
 import xyz.xiezc.ioc.starter.ApplicationContextUtil;
 import xyz.xiezc.ioc.starter.Xioc;
 import xyz.xiezc.ioc.starter.annotation.AnnotationHandler;
-import xyz.xiezc.ioc.starter.annotation.Inject;
-import xyz.xiezc.ioc.starter.annotation.SystemLoad;
+import xyz.xiezc.ioc.starter.annotation.core.Autowire;
 import xyz.xiezc.ioc.starter.common.context.BeanCreateContext;
 import xyz.xiezc.ioc.starter.common.context.BeanDefinitionContext;
-import xyz.xiezc.ioc.starter.common.definition.BeanDefinition;
-import xyz.xiezc.ioc.starter.common.definition.FieldDefinition;
-import xyz.xiezc.ioc.starter.common.definition.MethodDefinition;
+import xyz.xiezc.ioc.starter.core.definition.BeanDefinition;
+import xyz.xiezc.ioc.starter.core.definition.FieldDefinition;
+import xyz.xiezc.ioc.starter.core.definition.MethodDefinition;
 import xyz.xiezc.ioc.starter.common.enums.BeanStatusEnum;
 import xyz.xiezc.ioc.starter.common.enums.BeanTypeEnum;
 import xyz.xiezc.ioc.starter.common.enums.FieldOrParamTypeEnum;
@@ -28,8 +27,7 @@ import java.util.stream.Collectors;
 
 
 @Data
-@SystemLoad
-public class InjectAnnotationHandler extends AnnotationHandler<Inject> {
+public class InjectAnnotationHandler extends AnnotationHandler<Autowire> {
 
 
     @Override
@@ -38,8 +36,8 @@ public class InjectAnnotationHandler extends AnnotationHandler<Inject> {
     }
 
     @Override
-    public Class<Inject> getAnnotationType() {
-        return Inject.class;
+    public Class<Autowire> getAnnotationType() {
+        return Autowire.class;
     }
 
     @Override
@@ -66,7 +64,7 @@ public class InjectAnnotationHandler extends AnnotationHandler<Inject> {
 
         BeanDefinitionContext beanDefinitionContext = applicationContextUtil.getBeanDefinitionContext();
         BeanCreateContext beanCreateContext = applicationContextUtil.getBeanCreateContext();
-        String beanName = ((Inject) annotation).value();
+        String beanName = ((Autowire) annotation).value();
         if (StrUtil.isBlank(beanName)) {
             beanName = fieldDefinition.getFieldName();
         }

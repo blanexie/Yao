@@ -12,9 +12,9 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
-import xyz.xiezc.ioc.starter.annotation.BeanScan;
-import xyz.xiezc.ioc.starter.annotation.Configuration;
-import xyz.xiezc.ioc.starter.annotation.Inject;
+import xyz.xiezc.ioc.starter.annotation.core.Autowire;
+import xyz.xiezc.ioc.starter.annotation.core.ComponentScan;
+import xyz.xiezc.ioc.starter.annotation.core.Configuration;
 import xyz.xiezc.ioc.starter.starter.web.DispatcherHandler;
 import xyz.xiezc.ioc.starter.starter.web.WebServerBootstrap;
 import xyz.xiezc.ioc.starter.starter.web.common.XWebProperties;
@@ -23,12 +23,12 @@ import xyz.xiezc.ioc.starter.starter.web.netty.NettyWebServerInitializer;
 import java.io.File;
 
 @Configuration
-@BeanScan(basePackages = {"xyz.xiezc.ioc.starter.web"})
+@ComponentScan(basePackages = {"xyz.xiezc.ioc.starter.web"})
 public class WebConfiguration implements WebServerBootstrap {
 
     Log log = LogFactory.get(WebConfiguration.class);
 
-    @Inject
+    @Autowire
     DispatcherHandler dispatcherHandler;
 
 
