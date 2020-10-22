@@ -30,7 +30,6 @@ public class DefaultApplicationContext extends AbstractApplicationContext {
         this.singletonBeanDefinitionMap.put(beanDefinition.getBeanClass(), beanDefinition);
     }
 
-
     @Override
     public void addBean(BeanDefinition beanDefinition) {
         this.singletonBeanDefinitionMap.put(beanDefinition.getBeanClass(), beanDefinition);
@@ -86,6 +85,7 @@ public class DefaultApplicationContext extends AbstractApplicationContext {
                 BeanFactoryPostProcess bean = beanDefinition.getBean();
                 bean.process(this);
             });
+
         }
 
     }
