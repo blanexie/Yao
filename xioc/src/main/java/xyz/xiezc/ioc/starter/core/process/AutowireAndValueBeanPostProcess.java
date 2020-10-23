@@ -23,7 +23,8 @@ public class AutowireAndValueBeanPostProcess implements BeanPostProcess {
     @Override
     public boolean beforeInit(ApplicationContext applicationContext, BeanDefinition beanDefinition) {
         BeanCreateUtil instacne = BeanCreateUtil.getInstacne();
-        instacne.createAndInjectBean(beanDefinition, applicationContext);
+        //依赖注入
+        instacne.injectBean(beanDefinition, applicationContext);
         return true;
     }
 

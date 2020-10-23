@@ -1,5 +1,6 @@
 package xyz.xiezc.ioc.starter.core.definition;
 
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
@@ -23,7 +24,6 @@ import java.util.Set;
 @Getter
 public class BeanDefinition {
 
-    Log log = LogFactory.get(BeanDefinition.class);
 
     /**
      * bean的class
@@ -63,7 +63,22 @@ public class BeanDefinition {
      * @return
      */
     public <T> T getBean() {
+        Assert.isTrue(beanStatus == BeanStatusEnum.Completed, "容器中的bean还没有初始化，无法获取");
+        Assert.notNull(bean, "容器中的bean还没有初始化，无法获取");
         return (T) this.bean;
     }
 
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof BeanDefinition)) return false;
+        BeanDefinition that = (BeanDefinition) o;
+        return Objects.equals(getBeanClass(), that.getBeanClass());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getBeanClass());
+    }
 }

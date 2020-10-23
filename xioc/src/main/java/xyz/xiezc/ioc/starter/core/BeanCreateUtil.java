@@ -6,6 +6,7 @@ import cn.hutool.core.convert.ConvertException;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ReflectUtil;
 import xyz.xiezc.ioc.starter.annotation.core.Autowire;
+import xyz.xiezc.ioc.starter.annotation.core.Init;
 import xyz.xiezc.ioc.starter.annotation.core.Value;
 import xyz.xiezc.ioc.starter.common.asm.AsmUtil;
 import xyz.xiezc.ioc.starter.common.enums.BeanStatusEnum;
@@ -15,6 +16,7 @@ import xyz.xiezc.ioc.starter.core.definition.BeanDefinition;
 import xyz.xiezc.ioc.starter.core.definition.MethodDefinition;
 import xyz.xiezc.ioc.starter.core.definition.ParamDefinition;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.util.Collection;
 import java.util.List;
@@ -38,22 +40,27 @@ public final class BeanCreateUtil {
 
     }
 
-    public BeanDefinition createAndInjectBean(BeanDefinition beanDefinition, ApplicationContext applicationContext) {
-        //第一步实例化对象
-        if (beanDefinition.getBeanStatus() == BeanStatusEnum.Original) {
-            createBean(beanDefinition, applicationContext);
+
+    public void initBean(BeanDefinition beanDefinition, ApplicationContext applicationContext) {
+        Class<?> beanClass = beanDefinition.getBeanClass();
+        Object bean = beanDefinition.getBean();
+        Method[] publicMethods = ClassUtil.getPublicMethods(beanClass);
+        for (Method publicMethod : publicMethods) {
+            Init initAnnotation = AnnotationUtil.getAnnotation(publicMethod, Init.class);
+            int parameterCount = publicMethod.getParameterCount();
+            if (initAnnotation != null && parameterCount > 0) {
+                throw new RuntimeException("@Init 注解的方法必须是无参的， beanClass:" + beanClass.getName() + " ; method: " + publicMethod.getName());
+            }
+
+            if (initAnnotation != null) {
+                //主动调用初始化方法
+                ReflectUtil.invoke(bean, publicMethod);
+            }
         }
-        //第二步注入对象
-        if (beanDefinition.getBeanStatus() == BeanStatusEnum.HalfCooked) {
-            injectBean(beanDefinition, applicationContext);
-        }
-        if (beanDefinition.getBeanStatus() == BeanStatusEnum.injectField) {
-            return beanDefinition;
-        }
-        throw new RuntimeException("实例化和依赖注入类型失败");
     }
 
-    private void injectBean(BeanDefinition beanDefinition, ApplicationContext applicationContext) {
+
+    public void injectBean(BeanDefinition beanDefinition, ApplicationContext applicationContext) {
         Class<?> beanClass = beanDefinition.getBeanClass();
         Object bean = beanDefinition.getBean();
         Field[] fields = ReflectUtil.getFields(beanClass);
@@ -99,7 +106,7 @@ public final class BeanCreateUtil {
      * @param beanDefinition
      * @param applicationContext
      */
-    private void createBean(BeanDefinition beanDefinition, ApplicationContext applicationContext) {
+    public void createBean(BeanDefinition beanDefinition, ApplicationContext applicationContext) {
         if (beanDefinition.getBeanTypeEnum() == BeanTypeEnum.bean) {
             Object bean = ReflectUtil.newInstanceIfPossible(beanDefinition.getBeanClass());
             beanDefinition.setBean(bean);
@@ -108,7 +115,7 @@ public final class BeanCreateUtil {
 
         if (beanDefinition.getBeanTypeEnum() == BeanTypeEnum.methodBean) {
             MethodDefinition invokeMethodBean = beanDefinition.getInvokeMethodBean();
-            this.createAndInjectBean(invokeMethodBean.getBeanDefinition(), applicationContext);
+            this.createBean(invokeMethodBean.getBeanDefinition(), applicationContext);
             Object bean = invokeMethodBean.getBeanDefinition().getBean();
             Method method = invokeMethodBean.getMethod();
             ParamDefinition[] methodParamsAndAnnotaton = AsmUtil.getMethodParamsAndAnnotaton(method);
