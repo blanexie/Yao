@@ -12,7 +12,6 @@ import xyz.xiezc.ioc.starter.common.context.PropertiesContext;
 import xyz.xiezc.ioc.starter.core.definition.BeanDefinition;
 import xyz.xiezc.ioc.starter.core.definition.FieldDefinition;
 import xyz.xiezc.ioc.starter.core.definition.MethodDefinition;
-import xyz.xiezc.ioc.starter.common.enums.FieldOrParamTypeEnum;
 
 import java.lang.annotation.Annotation;
 

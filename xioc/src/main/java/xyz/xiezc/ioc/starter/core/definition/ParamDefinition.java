@@ -1,10 +1,8 @@
 package xyz.xiezc.ioc.starter.core.definition;
 
 import lombok.Data;
-import xyz.xiezc.ioc.starter.common.enums.FieldOrParamTypeEnum;
 
 import java.lang.reflect.Parameter;
-import java.util.Objects;
 
 @Data
 public class ParamDefinition {

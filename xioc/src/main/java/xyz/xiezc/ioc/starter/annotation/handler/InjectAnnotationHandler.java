@@ -14,7 +14,6 @@ import xyz.xiezc.ioc.starter.core.definition.FieldDefinition;
 import xyz.xiezc.ioc.starter.core.definition.MethodDefinition;
 import xyz.xiezc.ioc.starter.common.enums.BeanStatusEnum;
 import xyz.xiezc.ioc.starter.common.enums.BeanTypeEnum;
-import xyz.xiezc.ioc.starter.common.enums.FieldOrParamTypeEnum;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;

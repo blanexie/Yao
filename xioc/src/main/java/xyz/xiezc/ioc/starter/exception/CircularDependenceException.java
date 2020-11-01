@@ -1,4 +1,4 @@
-package xyz.xiezc.ioc.starter.common.exception;
+package xyz.xiezc.ioc.starter.exception;
 
 /**
  * 循环依赖异常

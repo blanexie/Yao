@@ -18,13 +18,17 @@ import xyz.xiezc.ioc.starter.core.definition.BeanDefinition;
 import xyz.xiezc.ioc.starter.core.definition.MethodDefinition;
 import xyz.xiezc.ioc.starter.core.definition.ParamDefinition;
 import xyz.xiezc.ioc.starter.core.process.BeanPostProcess;
+import xyz.xiezc.ioc.starter.exception.CircularDependenceException;
 
-import java.lang.reflect.*;
-import java.util.*;
-import java.util.logging.Logger;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.PriorityQueue;
+import java.util.Set;
 
 /**
- * @Description TODO
+ * @Description 单例的模式构建对象
  * @Author xiezc
  * @Version 1.0
  * @Date 2020/10/22 4:00 下午
@@ -43,7 +47,6 @@ public final class BeanCreateUtil {
      */
     Set<Class> buildingSet = new HashSet<>();
 
-
     /**
      * 容器对象
      */
@@ -51,11 +54,11 @@ public final class BeanCreateUtil {
     private final BeanFactory beanFactory;
 
 
-
-    public void clear(){
+    public void clear() {
         buildingSet.clear();
         beanPostProcessPriorityQueue.clear();
     }
+
     /**
      * 单例模式
      *
@@ -92,7 +95,7 @@ public final class BeanCreateUtil {
     public void createAndInitBeanDefinition(BeanDefinition beanDefinition) {
         if (beanDefinition.getBeanStatus() == BeanStatusEnum.Original) {
             if (!buildingSet.add(beanDefinition.getBeanClass())) {
-                throw new RuntimeException("class:{} 被循环依赖了");
+                throw new CircularDependenceException("class:{} 循环依赖了");
             }
 
             for (BeanPostProcess beanPostProcess : beanPostProcessPriorityQueue) {
