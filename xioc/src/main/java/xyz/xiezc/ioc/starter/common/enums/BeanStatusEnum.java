@@ -18,9 +18,15 @@ public enum BeanStatusEnum {
     /**
      * 注入了所有的依赖字段
      */
-    injectField,
+    Injected,
+
     /**
-     * 全部完成的
+     * 完成了初始化方法的调用
+     */
+    Inited,
+
+    /**
+     * 全部完成的， 初始化后的钩子方法也调用了的
      */
     Completed;
 

@@ -3,7 +3,6 @@ package xyz.xiezc.ioc.starter.common.context.impl;
 
 import cn.hutool.core.annotation.AnnotationUtil;
 import lombok.Data;
-import xyz.xiezc.ioc.starter.annotation.AnnotationHandler;
 import xyz.xiezc.ioc.starter.common.context.AnnotationContext;
 
 import java.lang.annotation.Annotation;

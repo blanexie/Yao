@@ -5,21 +5,23 @@ import cn.hutool.core.convert.Convert;
 import cn.hutool.core.convert.ConvertException;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ReflectUtil;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import xyz.xiezc.ioc.starter.annotation.core.Autowire;
 import xyz.xiezc.ioc.starter.annotation.core.Init;
 import xyz.xiezc.ioc.starter.annotation.core.Value;
 import xyz.xiezc.ioc.starter.common.asm.AsmUtil;
 import xyz.xiezc.ioc.starter.common.enums.BeanStatusEnum;
 import xyz.xiezc.ioc.starter.common.enums.BeanTypeEnum;
-import xyz.xiezc.ioc.starter.core.context.ApplicationContext;
+import xyz.xiezc.ioc.starter.core.context.BeanFactory;
 import xyz.xiezc.ioc.starter.core.definition.BeanDefinition;
 import xyz.xiezc.ioc.starter.core.definition.MethodDefinition;
 import xyz.xiezc.ioc.starter.core.definition.ParamDefinition;
+import xyz.xiezc.ioc.starter.core.process.BeanPostProcess;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
+import java.util.logging.Logger;
 
 /**
  * @Description TODO
@@ -27,21 +29,119 @@ import java.util.List;
  * @Version 1.0
  * @Date 2020/10/22 4:00 下午
  **/
+@Slf4j
 public final class BeanCreateUtil {
 
+    /**
+     * 用来装载各个BeanPostProcess的实体类的， 用于创建bean的时候
+     */
+    PriorityQueue<BeanPostProcess> beanPostProcessPriorityQueue = new PriorityQueue<>();
 
-    private final static BeanCreateUtil beanCreateUtil = new BeanCreateUtil();
+    private volatile static BeanCreateUtil beanCreateUtil;
+    /**
+     * 正在创建中的bean，用来解决循环依赖的问题
+     */
+    Set<Class> buildingSet = new HashSet<>();
 
-    public static BeanCreateUtil getInstacne() {
+
+    /**
+     * 容器对象
+     */
+    @Getter
+    private final BeanFactory beanFactory;
+
+
+
+    public void clear(){
+        buildingSet.clear();
+        beanPostProcessPriorityQueue.clear();
+    }
+    /**
+     * 单例模式
+     *
+     * @param beanFactory
+     * @return
+     */
+    public static BeanCreateUtil getInstacne(BeanFactory beanFactory) {
+        if (beanCreateUtil == null) {
+            synchronized (BeanCreateUtil.class) {
+                if (beanCreateUtil == null) {
+                    beanCreateUtil = new BeanCreateUtil(beanFactory);
+                }
+            }
+        } else {
+            BeanFactory beanFactory1 = beanCreateUtil.getBeanFactory();
+            if (Objects.equals(beanFactory1.beanFactoryId(), beanFactory.beanFactoryId())) {
+                return beanCreateUtil;
+            } else {
+                throw new RuntimeException("一个应用程序中目前只支持一个容器");
+            }
+        }
         return beanCreateUtil;
     }
 
-    private BeanCreateUtil() {
 
+    private BeanCreateUtil(BeanFactory beanFactory) {
+        this.beanFactory = beanFactory;
     }
 
 
-    public void initBean(BeanDefinition beanDefinition, ApplicationContext applicationContext) {
+    /**
+     * 创建并初始化bean
+     */
+    public void createAndInitBeanDefinition(BeanDefinition beanDefinition) {
+        if (beanDefinition.getBeanStatus() == BeanStatusEnum.Original) {
+            if (!buildingSet.add(beanDefinition.getBeanClass())) {
+                throw new RuntimeException("class:{} 被循环依赖了");
+            }
+
+            for (BeanPostProcess beanPostProcess : beanPostProcessPriorityQueue) {
+                if (!beanPostProcess.beforeInstance(beanFactory, beanDefinition)) {
+                    break;
+                }
+            }
+            createBean(beanDefinition, this.getBeanFactory());
+        }
+
+        if (beanDefinition.getBeanStatus() == BeanStatusEnum.HalfCooked) {
+            for (BeanPostProcess beanPostProcess : beanPostProcessPriorityQueue) {
+                if (!beanPostProcess.beforeInject(beanFactory, beanDefinition)) {
+                    break;
+                }
+            }
+            injectBean(beanDefinition, this.getBeanFactory());
+        }
+
+        if (beanDefinition.getBeanStatus() == BeanStatusEnum.Injected) {
+            for (BeanPostProcess beanPostProcess : beanPostProcessPriorityQueue) {
+                if (!beanPostProcess.beforeInit(beanFactory, beanDefinition)) {
+                    break;
+                }
+            }
+            initBean(beanDefinition, this.getBeanFactory());
+        }
+
+        if (beanDefinition.getBeanStatus() == BeanStatusEnum.Injected) {
+            for (BeanPostProcess beanPostProcess : beanPostProcessPriorityQueue) {
+                if (!beanPostProcess.afterInit(beanFactory, beanDefinition)) {
+                    break;
+                }
+            }
+            beanDefinition.setBeanStatus(BeanStatusEnum.Inited);
+        }
+
+        if (beanDefinition.getBeanStatus() == BeanStatusEnum.Inited) {
+            log.info("{} 初始化完成", beanDefinition.getBeanClass().getName());
+            beanDefinition.setBeanStatus(BeanStatusEnum.Completed);
+            Class<?> beanClass = beanDefinition.getBeanClass();
+            if (ClassUtil.isAssignable(BeanPostProcess.class, beanClass)) {
+                beanPostProcessPriorityQueue.offer(beanDefinition.getBean());
+            }
+        }
+    }
+
+
+    private void initBean(BeanDefinition beanDefinition, BeanFactory beanFactory) {
         Class<?> beanClass = beanDefinition.getBeanClass();
         Object bean = beanDefinition.getBean();
         Method[] publicMethods = ClassUtil.getPublicMethods(beanClass);
@@ -57,10 +157,11 @@ public final class BeanCreateUtil {
                 ReflectUtil.invoke(bean, publicMethod);
             }
         }
+
+        beanDefinition.setBeanStatus(BeanStatusEnum.Inited);
     }
 
-
-    public void injectBean(BeanDefinition beanDefinition, ApplicationContext applicationContext) {
+    private void injectBean(BeanDefinition beanDefinition, BeanFactory beanFactory) {
         Class<?> beanClass = beanDefinition.getBeanClass();
         Object bean = beanDefinition.getBean();
         Field[] fields = ReflectUtil.getFields(beanClass);
@@ -68,21 +169,21 @@ public final class BeanCreateUtil {
             Value valueAnnotation = AnnotationUtil.getAnnotation(field, Value.class);
             if (valueAnnotation != null) {
                 String name = valueAnnotation.value();
-                String property = applicationContext.getProperty(name);
+                String property = beanFactory.getProperty(name);
                 //进行基本的类型转换；
                 Object covert = this.covert(property, field.getType());
                 ReflectUtil.setFieldValue(bean, field, covert);
             }
             Autowire annotation = AnnotationUtil.getAnnotation(field, Autowire.class);
             if (annotation != null) {
-                Object value = this.getBeans(field, applicationContext);
+                Object value = beanFactory.getBean(field);
                 ReflectUtil.setFieldValue(bean, field, value);
             }
         }
+        beanDefinition.setBeanStatus(BeanStatusEnum.Injected);
     }
 
-
-    public <T> T covert(String value, Class<T> clazz) {
+    private <T> T covert(String value, Class<T> clazz) {
         try {
             return Convert.convert(clazz, value);
         } catch (ConvertException e) {
@@ -91,22 +192,13 @@ public final class BeanCreateUtil {
     }
 
 
-    public boolean isArray(Class<?> clazz) {
-        return clazz.isArray();
-    }
-
-    public boolean isCollection(Class<?> clazz) {
-        return ClassUtil.isAssignable(Collection.class, clazz);
-    }
-
-
     /**
      * 创建bean
      *
      * @param beanDefinition
-     * @param applicationContext
+     * @param beanFactory
      */
-    public void createBean(BeanDefinition beanDefinition, ApplicationContext applicationContext) {
+    private void createBean(BeanDefinition beanDefinition, BeanFactory beanFactory) {
         if (beanDefinition.getBeanTypeEnum() == BeanTypeEnum.bean) {
             Object bean = ReflectUtil.newInstanceIfPossible(beanDefinition.getBeanClass());
             beanDefinition.setBean(bean);
@@ -115,14 +207,14 @@ public final class BeanCreateUtil {
 
         if (beanDefinition.getBeanTypeEnum() == BeanTypeEnum.methodBean) {
             MethodDefinition invokeMethodBean = beanDefinition.getInvokeMethodBean();
-            this.createBean(invokeMethodBean.getBeanDefinition(), applicationContext);
+            this.createBean(invokeMethodBean.getBeanDefinition(), beanFactory);
             Object bean = invokeMethodBean.getBeanDefinition().getBean();
             Method method = invokeMethodBean.getMethod();
             ParamDefinition[] methodParamsAndAnnotaton = AsmUtil.getMethodParamsAndAnnotaton(method);
 
             for (ParamDefinition paramDefinition : methodParamsAndAnnotaton) {
                 //获取需要注入的参数
-                Object beans = this.getBeans(paramDefinition.getParameter(), applicationContext);
+                Object beans = beanFactory.getBean(paramDefinition.getParameter());
                 paramDefinition.setParam(beans);
             }
 
@@ -137,63 +229,5 @@ public final class BeanCreateUtil {
         }
     }
 
-    public Object getBeans(Field field, ApplicationContext applicationContext) {
-        Class<?> type = field.getType();
-        if (isArray(type)) {
-            //是数组
-            Class<?> componentType = type.getComponentType();
-            List<Object> params = applicationContext.getBeans(componentType);
-            Object[] obj = new Object[params.size()];
-            for (int i = 0; i < params.size(); i++) {
-                obj[i] = params.get(i);
-            }
-            return params;
-        } else if (isCollection(type)) {
-            //是集合
-            Type genericType = field.getGenericType();
-            if (genericType != null && genericType instanceof ParameterizedType) {
-                ParameterizedType pt = (ParameterizedType) genericType;
-                //得到泛型里的class类型对象
-                Class<?> genericClazz = (Class<?>) pt.getActualTypeArguments()[0];
-                List<Object> params = applicationContext.getBeans(genericClazz);
-                return params;
-            } else {
-                throw new RuntimeException("@Autowire注解的字段为Collection类型时，需要写明泛型类型才能注入");
-            }
-        } else {
-            //是常规类型
-            Object value = applicationContext.getBean(type);
-            return value;
-        }
-    }
 
-    public Object getBeans(Parameter parameter, ApplicationContext applicationContext) {
-        Class<?> type = parameter.getType();
-        if (isArray(type)) {
-            //是数组
-            Class<?> componentType = type.getComponentType();
-            List<Object> params = applicationContext.getBeans(componentType);
-            Object[] obj = new Object[params.size()];
-            for (int i = 0; i < params.size(); i++) {
-                obj[i] = params.get(i);
-            }
-            return params;
-        } else if (isCollection(type)) {
-            //是集合
-            Type genericType = parameter.getParameterizedType();
-            if (genericType != null && genericType instanceof ParameterizedType) {
-                ParameterizedType pt = (ParameterizedType) genericType;
-                //得到泛型里的class类型对象
-                Class<?> genericClazz = (Class<?>) pt.getActualTypeArguments()[0];
-                List<Object> params = applicationContext.getBeans(genericClazz);
-                return params;
-            } else {
-                throw new RuntimeException("@Autowire注解的字段为Collection类型时，需要写明泛型类型才能注入");
-            }
-        } else {
-            //是常规类型
-            Object value = applicationContext.getBean(type);
-            return value;
-        }
-    }
 }

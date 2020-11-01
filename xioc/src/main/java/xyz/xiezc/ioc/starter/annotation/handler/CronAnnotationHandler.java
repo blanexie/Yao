@@ -7,7 +7,6 @@ import cn.hutool.log.LogFactory;
 import lombok.Data;
 import xyz.xiezc.ioc.starter.ApplicationContextUtil;
 import xyz.xiezc.ioc.starter.Xioc;
-import xyz.xiezc.ioc.starter.annotation.AnnotationHandler;
 import xyz.xiezc.ioc.starter.annotation.cron.Cron;
 import xyz.xiezc.ioc.starter.annotation.cron.EnableCron;
 import xyz.xiezc.ioc.starter.common.cron.CronApplicationListener;

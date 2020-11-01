@@ -1,11 +1,17 @@
 package xyz.xiezc.ioc.starter.event;
 
-import cn.hutool.core.lang.Dict;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-@Setter
+import java.util.HashMap;
+import java.util.Map;
+
+
+/**
+ * 事件监听器中的事件对象
+ */
+
 @Getter
 @ToString
 public class ApplicationEvent {
@@ -14,14 +20,26 @@ public class ApplicationEvent {
         this.eventName = eventName;
     }
 
+    /**
+     * 事件的名称
+     */
     private final String eventName;
 
+    /**
+     * 事件对象的生成时间戳
+     */
     private final long timestamp = System.currentTimeMillis();
 
-    public final long getTimestamp() {
-        return this.timestamp;
-    }
+    /**
+     * 事件的类型
+     */
+    @Setter
+    private EventType eventType = EventType.Broadcast;
 
-    private Dict dict;
+    /**
+     * 事件锁携带的额外信息
+     */
+    private Map<String, Object> extra = new HashMap<>();
+
 
 }

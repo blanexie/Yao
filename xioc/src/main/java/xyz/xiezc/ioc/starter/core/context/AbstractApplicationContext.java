@@ -1,7 +1,10 @@
 package xyz.xiezc.ioc.starter.core.context;
 
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.convert.ConvertException;
 import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ReflectUtil;
@@ -11,13 +14,21 @@ import lombok.Setter;
 import xyz.xiezc.ioc.starter.annotation.core.Component;
 import xyz.xiezc.ioc.starter.annotation.core.Configuration;
 import xyz.xiezc.ioc.starter.common.enums.BeanStatusEnum;
+import xyz.xiezc.ioc.starter.common.enums.BeanTypeEnum;
 import xyz.xiezc.ioc.starter.core.BeanCreateUtil;
 import xyz.xiezc.ioc.starter.core.definition.BeanDefinition;
 import xyz.xiezc.ioc.starter.core.process.BeanFactoryPostProcess;
 import xyz.xiezc.ioc.starter.core.process.BeanPostProcess;
+import xyz.xiezc.ioc.starter.event.ApplicationListener;
+import xyz.xiezc.ioc.starter.event.DefaultEventDispatcher;
+import xyz.xiezc.ioc.starter.event.EventDispatcher;
 import xyz.xiezc.ioc.starter.exception.ManyBeanException;
 import xyz.xiezc.ioc.starter.exception.NoSuchBeanException;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Parameter;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -34,12 +45,8 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
     /**
      * 初始化完成的 beanDefinition, 依赖已经注入了，初始化方法已经调用了
      */
+    @Getter
     protected Map<Class<?>, BeanDefinition> singletonBeanDefinitionMap = new ConcurrentHashMap<>();
-
-    /**
-     * 正在创建的中bean， 主要用来解决循环依赖的问题
-     */
-    private Set<BeanDefinition> buildingSet = new HashSet<>();
 
     /**
      * 配置文件信息
@@ -48,11 +55,11 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
     @Getter
     protected Setting setting = new Setting();
 
-
-    @Override
-    public Map<Class<?>, BeanDefinition> getSingletonBeanDefinitionMap() {
-        return singletonBeanDefinitionMap;
-    }
+    /**
+     * 时间处理器
+     */
+    @Getter
+    EventDispatcher eventDispatcher;
 
 
     @Override
@@ -79,11 +86,11 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
 
     @Override
     public <T> List<T> getBeans(Class<?> clazz) {
-        BeanCreateUtil instacne = BeanCreateUtil.getInstacne();
+        BeanCreateUtil instacne = BeanCreateUtil.getInstacne(this);
         List<T> result = new ArrayList<>();
         singletonBeanDefinitionMap.forEach((k, v) -> {
             if (ClassUtil.isAssignable(clazz, k)) {
-                instacne.createAndInjectBean(v, this);
+                instacne.createAndInitBeanDefinition(v);
                 result.add(v.getBean());
             }
         });
@@ -104,23 +111,32 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
         invokeBeanFactoryPostProcess();
         initBeanPostProcess();
 
+        loadListener();
+
+        initAllBeans();
+
+        finish();
+
+        return this;
     }
 
 
     /**
      * 清除容器中的内容，方便重新启动
      */
-    protected void clearContext() {
+    @Override
+    public void clearContext() {
         singletonBeanDefinitionMap.clear();
         setting.clear();
-        buildingSet.clear();
+        BeanCreateUtil.getInstacne(this).clear();
     }
 
 
     /**
      * 加载配置信息
      */
-    protected void loadProperties() {
+    @Override
+    public void loadProperties() {
         URL resource = ResourceUtil.getResource("yao.properties");
         this.setting.addSetting(new Setting(resource, CharsetUtil.CHARSET_UTF_8, true));
     }
@@ -130,7 +146,8 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
      *
      * @param packageNames
      */
-    void loadBeanDefinition(String... packageNames) {
+    @Override
+    public void loadBeanDefinition(String... packageNames) {
         for (String packageName : packageNames) {
             Set<Class<?>> classConfiguration = ClassUtil.scanPackageByAnnotation(packageName, Configuration.class);
             Set<Class<?>> classComponent = ClassUtil.scanPackageByAnnotation(packageName, Component.class);
@@ -143,17 +160,14 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
         }
     }
 
-    /**
-     * 在正式启动之前进行一些操作， 这个方法一般留第三方扩展实现
-     */
-    abstract void beforeInvoke();
 
     /**
      * 调用所有的BeanFactoryPostProcess实现类的钩子方法
      * <p>
      * 会先实例化每个实现类(只是实例化，并不会注入依赖)， 再排序实现类， 最后逐个调用
      */
-    protected void invokeBeanFactoryPostProcess() {
+    @Override
+    public void invokeBeanFactoryPostProcess() {
         while (true) {
             //第一步, 筛选出来所有的BeanFactoryPostProcess的实现类
             Set<BeanDefinition> beanFactoryPostProcessSet = singletonBeanDefinitionMap.values().stream()
@@ -191,8 +205,8 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
     /**
      * 初始化BeanPostProcess的实现类， 这里是正常的初始化，会进行依赖注入和init方法的调用
      */
-    protected void initBeanPostProcess() {
-        List<BeanPostProcess> beanPostProcessList = new LinkedList<>();
+    @Override
+    public void initBeanPostProcess() {
         Collection<BeanDefinition> beanDefinitionCollection = singletonBeanDefinitionMap.values();
         //第一步， 先筛选出所有的BeanPostProcess 实现类
         Set<BeanDefinition> collect = beanDefinitionCollection.stream().filter(beanDefinition -> {
@@ -202,22 +216,9 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
         }).collect(Collectors.toSet());
         //逐个初始化BeanDefinition， 并调用其方法
 
-        BeanCreateUtil beanCreateUtil = BeanCreateUtil.getInstacne();
+        BeanCreateUtil beanCreateUtil = BeanCreateUtil.getInstacne(this);
         for (BeanDefinition beanDefinition : collect) {
-            //调用BeanPost 前的钩子方法beforeInstance
-            for (BeanPostProcess beanPostProcess : beanPostProcessList) {
-                beanPostProcess.beforeInstance(this, beanDefinition);
-            }
-            //实例化
-            beanCreateUtil.createBean(beanDefinition, this);
-            //调用beforeInit方法
-            for (BeanPostProcess beanPostProcess : beanPostProcessList) {
-                beanPostProcess.beforeInit(this, beanDefinition);
-            }
-            //调用afterInit 方法
-            for (BeanPostProcess beanPostProcess : beanPostProcessList) {
-                beanPostProcess.afterInit(this, beanDefinition);
-            }
+            beanCreateUtil.createAndInitBeanDefinition(beanDefinition);
         }
 
     }
@@ -227,18 +228,138 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
      * <p>
      * 会先查找容器中有无事件分发器， 如果没有则使用框架默认的事件分发器
      */
-    void loadListener();
+    @Override
+    public void loadListener() {
+        List<ApplicationListener> applicationListener;
+        try {
+            applicationListener = this.getBeans(ApplicationListener.class);
+        } catch (NoSuchBeanException e) {
+            applicationListener = new ArrayList<>(0);
+        }
+        try {
+            eventDispatcher = this.getBean(EventDispatcher.class);
+        } catch (NoSuchBeanException e) {
+            eventDispatcher = new DefaultEventDispatcher();
+            eventDispatcher.setThreadPool(ThreadUtil.newExecutor(5));
+        }
+
+        for (ApplicationListener listener : applicationListener) {
+            eventDispatcher.addListener(listener);
+        }
+    }
 
 
     /**
      * 初始化容器中所有的bean
      */
-    void initAllBeans();
+    @Override
+    public void initAllBeans() {
+        BeanCreateUtil instacne = BeanCreateUtil.getInstacne(this);
+        getSingletonBeanDefinitionMap().forEach((k, v) -> {
+            instacne.createAndInitBeanDefinition(v);
+        });
+    }
 
-    /**
-     * 最后结束的钩子方法
-     */
-    void finish();
+
+    @Override
+    public Object getBean(Field field) {
+        Class<?> type = field.getType();
+        if (isArray(type)) {
+            //是数组
+            Class<?> componentType = type.getComponentType();
+            List<Object> params = this.getBeans(componentType);
+            Object[] obj = new Object[params.size()];
+            for (int i = 0; i < params.size(); i++) {
+                obj[i] = params.get(i);
+            }
+            return params;
+        } else if (isCollection(type)) {
+            //是集合
+            Type genericType = field.getGenericType();
+            if (genericType != null && genericType instanceof ParameterizedType) {
+                ParameterizedType pt = (ParameterizedType) genericType;
+                //得到泛型里的class类型对象
+                Class<?> genericClazz = (Class<?>) pt.getActualTypeArguments()[0];
+                List<Object> params = this.getBeans(genericClazz);
+                return params;
+            } else {
+                throw new RuntimeException("@Autowire注解的字段为Collection类型时，需要写明泛型类型才能注入");
+            }
+        } else {
+            //是常规类型
+            Object value = this.getBean(type);
+            return value;
+        }
+    }
+
+    @Override
+    public Object getBean(Parameter parameter) {
+        Class<?> type = parameter.getType();
+        if (isArray(type)) {
+            //是数组
+            Class<?> componentType = type.getComponentType();
+            List<Object> params = this.getBeans(componentType);
+            Object[] obj = new Object[params.size()];
+            for (int i = 0; i < params.size(); i++) {
+                obj[i] = params.get(i);
+            }
+            return params;
+        } else if (isCollection(type)) {
+            //是集合
+            Type genericType = parameter.getParameterizedType();
+            if (genericType != null && genericType instanceof ParameterizedType) {
+                ParameterizedType pt = (ParameterizedType) genericType;
+                //得到泛型里的class类型对象
+                Class<?> genericClazz = (Class<?>) pt.getActualTypeArguments()[0];
+                List<Object> params = this.getBeans(genericClazz);
+                return params;
+            } else {
+                throw new RuntimeException("@Autowire注解的字段为Collection类型时，需要写明泛型类型才能注入");
+            }
+        } else {
+            //是常规类型
+            Object value = this.getBean(type);
+            return value;
+        }
+    }
 
 
+    @Override
+    public String getProperty(String propertyName) {
+        return setting.getStr(propertyName);
+    }
+
+    @Override
+    public void addBean(Class<?> clazz) {
+        BeanDefinition beanDefinition = new BeanDefinition();
+        beanDefinition.setBeanClass(clazz);
+        beanDefinition.setBeanTypeEnum(BeanTypeEnum.bean);
+        beanDefinition.setBeanStatus(BeanStatusEnum.Original);
+        this.getSingletonBeanDefinitionMap().put(clazz, beanDefinition);
+    }
+
+    @Override
+    public void addBean(BeanDefinition beanDefinition) {
+        Assert.notNull(beanDefinition.getBeanClass());
+        Assert.notNull(beanDefinition.getBeanStatus());
+        Assert.notNull(beanDefinition.getBeanTypeEnum());
+        this.getSingletonBeanDefinitionMap().put(beanDefinition.getBeanClass(), beanDefinition);
+    }
+
+    private <T> T covert(String value, Class<T> clazz) {
+        try {
+            return Convert.convert(clazz, value);
+        } catch (ConvertException e) {
+            throw e;
+        }
+    }
+
+
+    private boolean isArray(Class<?> clazz) {
+        return clazz.isArray();
+    }
+
+    private boolean isCollection(Class<?> clazz) {
+        return ClassUtil.isAssignable(Collection.class, clazz);
+    }
 }

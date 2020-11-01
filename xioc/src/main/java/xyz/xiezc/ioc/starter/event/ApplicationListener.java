@@ -1,15 +1,19 @@
 package xyz.xiezc.ioc.starter.event;
 
-import xyz.xiezc.ioc.starter.ApplicationContextUtil;
+import java.util.Set;
 
+/**
+ * 事件监听器
+ */
 public interface ApplicationListener {
 
+
     /**
-     * 事件的排序
+     * 这个监听器需要处理的事件
      *
      * @return
      */
-    int order();
+    Set<String> dealEventName();
 
     /**
      * 时间的处理逻辑
@@ -17,22 +21,6 @@ public interface ApplicationListener {
      * @param applicationEvent
      */
     void doExecute(ApplicationEvent applicationEvent);
-
-    /**
-     * 事件的前置处理逻辑
-     *
-     * @param applicationEvent
-     */
-    default void execute(ApplicationEvent applicationEvent) {
-        if (getSync()) {
-            doExecute(applicationEvent);
-        } else {
-            ApplicationContextUtil.executorService.execute(() -> {
-                doExecute(applicationEvent);
-            });
-        }
-    }
-
 
     /**
      * 是否同步调用事件， 默认是的

@@ -1,7 +1,6 @@
 package xyz.xiezc.ioc.starter.starter.web.annotation.handler;
 
 import xyz.xiezc.ioc.starter.starter.web.DispatcherHandler;
-import xyz.xiezc.ioc.starter.annotation.AnnotationHandler;
 import xyz.xiezc.ioc.starter.annotation.core.Component;
 import xyz.xiezc.ioc.starter.core.definition.BeanDefinition;
 import xyz.xiezc.ioc.starter.core.definition.FieldDefinition;

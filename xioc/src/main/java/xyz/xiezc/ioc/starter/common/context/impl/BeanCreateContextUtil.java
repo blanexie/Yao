@@ -6,7 +6,6 @@ import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 import lombok.Getter;
 import lombok.Setter;
-import xyz.xiezc.ioc.starter.annotation.AnnotationHandler;
 import xyz.xiezc.ioc.starter.ApplicationContextUtil;
 import xyz.xiezc.ioc.starter.annotation.aop.Aop;
 import xyz.xiezc.ioc.starter.common.context.AnnotationContext;
@@ -85,7 +84,7 @@ public class BeanCreateContextUtil implements BeanCreateContext {
             if (beanDefinition.getBeanStatus() == BeanStatusEnum.HalfCooked) {
                 //设置字段的属性值
                 dealAnnotationHandler(beanDefinition);
-                beanDefinition.setBeanStatus(BeanStatusEnum.injectField);
+                beanDefinition.setBeanStatus(BeanStatusEnum.Injected);
             }
             //4 处理切面类
             //处理类上的切面
@@ -104,7 +103,7 @@ public class BeanCreateContextUtil implements BeanCreateContext {
                     classAnnotationHandler.processMethod(methodDefinition, aop1, beanDefinition);
                 }
             }
-            if (beanDefinition.getBeanStatus() == BeanStatusEnum.injectField) {
+            if (beanDefinition.getBeanStatus() == BeanStatusEnum.Injected) {
                 beanDefinition.setBeanStatus(BeanStatusEnum.Completed);
             }
 

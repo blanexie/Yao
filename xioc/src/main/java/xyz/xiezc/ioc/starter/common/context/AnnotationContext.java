@@ -1,7 +1,5 @@
 package xyz.xiezc.ioc.starter.common.context;
 
-import xyz.xiezc.ioc.starter.annotation.AnnotationHandler;
-
 import java.lang.annotation.Annotation;
 
 public interface AnnotationContext {

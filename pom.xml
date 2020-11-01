@@ -104,7 +104,6 @@
                 <artifactId>druid</artifactId>
                 <version>1.1.22</version>
             </dependency>
-            <!-- https://mvnrepository.com/artifact/org.ow2.asm/asm -->
             <dependency>
                 <groupId>org.ow2.asm</groupId>
                 <artifactId>asm</artifactId>
@@ -120,6 +119,7 @@
                 <artifactId>netty-all</artifactId>
                 <version>4.1.49.Final</version>
             </dependency>
+
         </dependencies>
     </dependencyManagement>
 

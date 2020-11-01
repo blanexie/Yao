@@ -1,7 +1,6 @@
 package xyz.xiezc.ioc.starter.annotation.handler;
 
 import lombok.Data;
-import xyz.xiezc.ioc.starter.annotation.AnnotationHandler;
 import xyz.xiezc.ioc.starter.annotation.core.Bean;
 import xyz.xiezc.ioc.starter.core.definition.BeanDefinition;
 import xyz.xiezc.ioc.starter.core.definition.FieldDefinition;
