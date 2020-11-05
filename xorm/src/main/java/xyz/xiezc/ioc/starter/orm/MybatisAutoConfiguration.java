@@ -92,7 +92,7 @@ public class MybatisAutoConfiguration implements ApplicationListener {
 
         BeanDefinition beanDefinition = beanDefinitionContext.getBeanDefinition(MybatisProperties.class);
         beanCreateContext.createBean(beanDefinition);
-        properties = beanDefinition.getBean();
+        properties = beanDefinition.getCompletedBean();
 
         //1. 扫描mapper接口，获取实体类和对应表格的关系。
         //获取注解中配置的信息

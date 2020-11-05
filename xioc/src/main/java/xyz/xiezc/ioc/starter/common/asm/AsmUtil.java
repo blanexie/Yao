@@ -1,6 +1,5 @@
 package xyz.xiezc.ioc.starter.common.asm;
 
-import cn.hutool.core.util.ClassUtil;
 import org.objectweb.asm.*;
 import xyz.xiezc.ioc.starter.core.definition.ParamDefinition;
 
@@ -48,11 +47,12 @@ public class AsmUtil {
                         if (Modifier.isStatic(method.getModifiers())) {
                             i = index;
                         }
+                        Parameter[] parameters = method.getParameters();
+
                         ParamDefinition paramDefinition = new ParamDefinition();
                         if (i >= 0 && i < paramNames.length) {
                             paramDefinition.setParamName(name);
-                            String className = Type.getType(desc).getClassName();
-                            paramDefinition.setParamType(ClassUtil.loadClass(className));
+                            paramDefinition.setParameter(parameters[i]);
                             paramNames[i] = paramDefinition;
                         }
                         super.visitLocalVariable(name, desc, signature, start, end, index);

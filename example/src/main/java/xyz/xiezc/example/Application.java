@@ -1,7 +1,6 @@
 package xyz.xiezc.example;
 
 
-import xyz.xiezc.ioc.starter.Xioc;
 import xyz.xiezc.ioc.starter.annotation.core.Configuration;
 import xyz.xiezc.ioc.starter.annotation.cron.Cron;
 import xyz.xiezc.ioc.starter.annotation.cron.EnableCron;
@@ -24,7 +23,5 @@ public class Application {
         System.out.println("定时任务执行: " + LocalTime.now());
     }
 
-    public static void main(String[] args) {
-        Xioc.run(Application.class);
-    }
+
 }

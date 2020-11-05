@@ -61,5 +61,5 @@ public interface ApplicationContext extends BeanFactory {
     /**
      * 最后结束的钩子方法
      */
-    abstract void finish();
+     void finish();
 }

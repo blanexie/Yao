@@ -5,6 +5,7 @@ import xyz.xiezc.ioc.starter.core.definition.BeanDefinition;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Parameter;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -15,11 +16,10 @@ public interface BeanFactory {
 
     /**
      * 每个容器都有一个唯一ID来区分
+     *
      * @return
      */
-    default String beanFactoryId() {
-        return IdUtil.simpleUUID();
-    }
+    String beanFactoryId();
 
 
     /**
@@ -57,25 +57,11 @@ public interface BeanFactory {
      * @param <T>
      * @return
      */
-    <T> List<T> getBeans(Class<?> clazz);
+    <T> Collection<T> getBeans(Class<?> clazz);
 
-    /**
-     * 获取可注入次字段的直接bean对象
-     *
-     * @param field
-     * @param <T>
-     * @return
-     */
-    <T> T getBean(Field field);
 
-    /**
-     * 获取可以注入指定参数的bean类。  会自动根据参数的类型调整注入的bean
-     *
-     * @param parameter
-     * @param <T>
-     * @return
-     */
-    <T> T getBean(Parameter parameter);
+
+
 
     /**
      * 加载bean

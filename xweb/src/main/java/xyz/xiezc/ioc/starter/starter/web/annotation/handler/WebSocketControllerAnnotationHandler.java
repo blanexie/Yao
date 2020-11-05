@@ -21,7 +21,7 @@ public class WebSocketControllerAnnotationHandler extends AnnotationHandler<WebS
     @Override
     public void processClass(Annotation annotation, Class clazz, BeanDefinition beanDefinition) {
         String path = ((WebSockerController) annotation).value();
-        DispatcherHandler.webSocketFrameHandlerMap.put(path, beanDefinition.getBean());
+        DispatcherHandler.webSocketFrameHandlerMap.put(path, beanDefinition.getCompletedBean());
     }
 
     @Override

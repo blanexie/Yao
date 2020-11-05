@@ -62,12 +62,16 @@ public class BeanDefinition {
      * @param <T>
      * @return
      */
-    public <T> T getBean() {
+    public <T> T getCompletedBean() {
         Assert.isTrue(beanStatus == BeanStatusEnum.Completed, "容器中的bean还没有初始化，无法获取");
         Assert.notNull(bean, "容器中的bean还没有初始化，无法获取");
         return (T) this.bean;
     }
 
+
+    public <T> T getBean() {
+        return (T) this.bean;
+    }
 
     @Override
     public boolean equals(Object o) {
