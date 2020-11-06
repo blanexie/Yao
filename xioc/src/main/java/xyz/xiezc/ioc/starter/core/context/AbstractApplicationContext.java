@@ -69,46 +69,6 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
     EventDispatcher eventDispatcher;
 
 
-    @Override
-    public <T> T getBean(Class<?> clazz) {
-        BeanDefinition beanDefinition = singletonBeanDefinitionMap.get(clazz);
-        if (beanDefinition != null) {
-            if (beanDefinition.getBeanStatus() != BeanStatusEnum.Completed) {
-                BeanCreateUtil.getInstacne(this).createAndInitBeanDefinition(beanDefinition);
-            }
-            return beanDefinition.getCompletedBean();
-        }
-        Set<Class<?>> collect = singletonBeanDefinitionMap.keySet().stream()
-                .filter(clazzss -> ClassUtil.isAssignable(clazz, clazzss))
-                .collect(Collectors.toSet());
-        if (collect.isEmpty()) {
-            throw new NoSuchBeanException("容器中未找到符合要求的bean");
-        }
-        if (collect.size() > 1) {
-            throw new ManyBeanException("容器中找到多个符合要求的bean");
-        }
-        for (Class<?> aClass : collect) {
-            BeanDefinition beanDefinition1 = singletonBeanDefinitionMap.get(aClass);
-            return beanDefinition1.getCompletedBean();
-        }
-        throw new NoSuchBeanException("容器中未找到符合要求的bean");
-    }
-
-    @Override
-    public <T> List<T> getBeans(Class<?> clazz) {
-        BeanCreateUtil instacne = BeanCreateUtil.getInstacne(this);
-        List<T> result = new ArrayList<>();
-        singletonBeanDefinitionMap.forEach((k, v) -> {
-            if (ClassUtil.isAssignable(clazz, k)) {
-                instacne.createAndInitBeanDefinition(v);
-                result.add(v.getCompletedBean());
-            }
-        });
-        if (result.isEmpty()) {
-            throw new NoSuchBeanException("容器中未找到符合要求的bean");
-        }
-        return result;
-    }
 
     @Override
     public ApplicationContext run(Class clazz) {

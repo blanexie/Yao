@@ -20,9 +20,9 @@ public class Yao {
 
     public static void main(String[] args) {
         ApplicationContext run = Yao.run(Yao.class);
-        A a = run.getBean(A.class);
-        B b = run.getBean(B.class);
-        C c = run.getBean(C.class);
+        A a = run.getBeanDefinition(A.class).getCompletedBean();
+        B b = run.getBeanDefinition(B.class).getCompletedBean();
+        C c = run.getBeanDefinition(C.class).getCompletedBean();
         a.print();
         b.print();
         c.print();

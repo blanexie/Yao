@@ -85,4 +85,14 @@ public class BeanDefinition {
     public int hashCode() {
         return Objects.hash(getBeanClass());
     }
+
+    @Override
+    public String toString() {
+        return "BeanDefinition{" +
+                "beanClass=" + beanClass +
+                ", invokeMethodBean=" + invokeMethodBean +
+                ", beanTypeEnum=" + beanTypeEnum +
+                ", beanStatus=" + beanStatus +
+                '}';
+    }
 }
