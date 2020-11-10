@@ -31,13 +31,6 @@ public class BeanDefinition {
     private Class<?> beanClass;
 
     /**
-     * methodBean 的类型的 bean调用的方法
-     *
-     * @Bean
-     */
-    private MethodDefinition invokeMethodBean;
-
-    /**
      * bean ： 类上的注解，放入容器的bean
      * factoryBean,
      * methodBean

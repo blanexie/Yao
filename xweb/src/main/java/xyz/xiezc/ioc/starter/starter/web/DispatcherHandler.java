@@ -22,7 +22,6 @@ import xyz.xiezc.ioc.starter.starter.web.netty.websocket.WebSocketFrameHandler;
 import xyz.xiezc.ioc.starter.annotation.core.Component;
 import xyz.xiezc.ioc.starter.annotation.core.Init;
 import xyz.xiezc.ioc.starter.core.definition.BeanDefinition;
-import xyz.xiezc.ioc.starter.core.definition.MethodDefinition;
 
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;

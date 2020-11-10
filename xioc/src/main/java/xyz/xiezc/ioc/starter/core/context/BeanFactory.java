@@ -1,12 +1,8 @@
 package xyz.xiezc.ioc.starter.core.context;
 
-import cn.hutool.core.util.IdUtil;
 import xyz.xiezc.ioc.starter.core.definition.BeanDefinition;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Parameter;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,15 +26,12 @@ public interface BeanFactory {
     Map<Class<?>, BeanDefinition> getSingletonBeanDefinitionMap();
 
     /**
-     * 获取bean,
-     * 1. 先获取符合这个类型的bean . 如果有多个符合的，会抛出异常。
-     * 2. 获取这个类型的子类等符合注入要求的bean， 如果有多个符合的，会抛出异常。
+     * 获取容器中 bean的definition
      *
      * @param clazz
-     * @param <T>
      * @return
      */
-    <T> T getBean(Class<?> clazz);
+    BeanDefinition getBeanDefinition(Class<?> clazz);
 
     /**
      * 获取配置文件中的配置信息
@@ -54,14 +47,9 @@ public interface BeanFactory {
      * 2. 获取这个类型的子类等符合注入要求的bean， 如果有多个符合的，会抛出异常。
      *
      * @param clazz
-     * @param <T>
      * @return
      */
-    <T> Collection<T> getBeans(Class<?> clazz);
-
-
-
-
+    Collection<BeanDefinition> getBeanDefinitions(Class<?> clazz);
 
     /**
      * 加载bean

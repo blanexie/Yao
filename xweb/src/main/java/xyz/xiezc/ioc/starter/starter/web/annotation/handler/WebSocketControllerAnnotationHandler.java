@@ -4,7 +4,6 @@ import xyz.xiezc.ioc.starter.starter.web.DispatcherHandler;
 import xyz.xiezc.ioc.starter.annotation.core.Component;
 import xyz.xiezc.ioc.starter.core.definition.BeanDefinition;
 import xyz.xiezc.ioc.starter.core.definition.FieldDefinition;
-import xyz.xiezc.ioc.starter.core.definition.MethodDefinition;
 import xyz.xiezc.ioc.starter.starter.web.annotation.WebSockerController;
 
 import java.lang.annotation.Annotation;

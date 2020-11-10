@@ -26,9 +26,6 @@ import xyz.xiezc.ioc.starter.event.EventDispatcher;
 import xyz.xiezc.ioc.starter.exception.ManyBeanException;
 import xyz.xiezc.ioc.starter.exception.NoSuchBeanException;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -70,13 +67,10 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
 
 
     @Override
-    public <T> T getBean(Class<?> clazz) {
+    public BeanDefinition getBeanDefinition(Class<?> clazz) {
         BeanDefinition beanDefinition = singletonBeanDefinitionMap.get(clazz);
         if (beanDefinition != null) {
-            if (beanDefinition.getBeanStatus() != BeanStatusEnum.Completed) {
-                BeanCreateUtil.getInstacne(this).createAndInitBeanDefinition(beanDefinition);
-            }
-            return beanDefinition.getCompletedBean();
+            return beanDefinition;
         }
         Set<Class<?>> collect = singletonBeanDefinitionMap.keySet().stream()
                 .filter(clazzss -> ClassUtil.isAssignable(clazz, clazzss))
@@ -89,19 +83,18 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
         }
         for (Class<?> aClass : collect) {
             BeanDefinition beanDefinition1 = singletonBeanDefinitionMap.get(aClass);
-            return beanDefinition1.getCompletedBean();
+            return beanDefinition1;
         }
         throw new NoSuchBeanException("容器中未找到符合要求的bean");
     }
 
+
     @Override
-    public <T> List<T> getBeans(Class<?> clazz) {
-        BeanCreateUtil instacne = BeanCreateUtil.getInstacne(this);
-        List<T> result = new ArrayList<>();
+    public Collection<BeanDefinition> getBeanDefinitions(Class<?> clazz) {
+        List<BeanDefinition> result = new ArrayList<>();
         singletonBeanDefinitionMap.forEach((k, v) -> {
             if (ClassUtil.isAssignable(clazz, k)) {
-                instacne.createAndInitBeanDefinition(v);
-                result.add(v.getCompletedBean());
+                result.add(v);
             }
         });
         if (result.isEmpty()) {
@@ -233,7 +226,7 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
 
         BeanCreateUtil beanCreateUtil = BeanCreateUtil.getInstacne(this);
         for (BeanDefinition beanDefinition : collect) {
-            beanCreateUtil.createAndInitBeanDefinition(beanDefinition);
+            beanCreateUtil.createAndInject(beanDefinition);
         }
 
     }
@@ -245,14 +238,24 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
      */
     @Override
     public void loadListener() {
-        List<ApplicationListener> applicationListener;
+        List<ApplicationListener> applicationListener = new ArrayList<>();
+        BeanCreateUtil instacne = BeanCreateUtil.getInstacne(this);
+
         try {
-            applicationListener = this.getBeans(ApplicationListener.class);
+            Collection<BeanDefinition> beanDefinitions = this.getBeanDefinitions(ApplicationListener.class);
+            for (BeanDefinition beanDefinition : beanDefinitions) {
+                instacne.createAndInject(beanDefinition);
+                applicationListener.add(beanDefinition.getCompletedBean());
+            }
         } catch (NoSuchBeanException e) {
-            applicationListener = new ArrayList<>(0);
+
         }
+
+
         try {
-            eventDispatcher = this.getBean(EventDispatcher.class);
+            BeanDefinition beanDefinition = this.getBeanDefinition(EventDispatcher.class);
+            instacne.createAndInject(beanDefinition);
+            eventDispatcher = beanDefinition.getCompletedBean();
         } catch (NoSuchBeanException e) {
             eventDispatcher = new DefaultEventDispatcher();
             eventDispatcher.setThreadPool(ThreadUtil.newExecutor(5));
@@ -271,10 +274,14 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
     public void initAllBeans() {
         BeanCreateUtil instacne = BeanCreateUtil.getInstacne(this);
         getSingletonBeanDefinitionMap().forEach((k, v) -> {
-            instacne.createAndInitBeanDefinition(v);
+            instacne.createAndInject(v);
+        });
+
+        //逐个调用初始化方法
+        getSingletonBeanDefinitionMap().forEach((k, v) -> {
+            instacne.initAndComplete(v);
         });
     }
-
 
 
     @Override

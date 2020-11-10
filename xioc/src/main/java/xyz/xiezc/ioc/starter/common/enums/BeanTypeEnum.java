@@ -6,11 +6,6 @@ public enum BeanTypeEnum {
      */
     bean,
     /**
-     * methodBean
-     */
-    methodBean,
-
-    /**
      * 使用method的方式生成的bean
      */
     properties;

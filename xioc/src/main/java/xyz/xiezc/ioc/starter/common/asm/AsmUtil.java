@@ -1,12 +1,10 @@
 package xyz.xiezc.ioc.starter.common.asm;
 
 import org.objectweb.asm.*;
-import xyz.xiezc.ioc.starter.core.definition.ParamDefinition;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.Parameter;
 
 import static org.objectweb.asm.Opcodes.ASM8;
 
@@ -17,8 +15,8 @@ public class AsmUtil {
      *
      * @return
      */
-    public static ParamDefinition[] getMethodParamsAndAnnotaton(Method method) {
-        final ParamDefinition[] paramNames = new ParamDefinition[method.getParameterTypes().length];
+    public static String[] getMethodParamsAndAnnotaton(Method method) {
+        final String[] paramNames = new String[method.getParameterTypes().length];
         final String n = method.getDeclaringClass().getName();
 
         ClassReader cr;
@@ -47,13 +45,8 @@ public class AsmUtil {
                         if (Modifier.isStatic(method.getModifiers())) {
                             i = index;
                         }
-                        Parameter[] parameters = method.getParameters();
-
-                        ParamDefinition paramDefinition = new ParamDefinition();
                         if (i >= 0 && i < paramNames.length) {
-                            paramDefinition.setParamName(name);
-                            paramDefinition.setParameter(parameters[i]);
-                            paramNames[i] = paramDefinition;
+                            paramNames[i] = name;
                         }
                         super.visitLocalVariable(name, desc, signature, start, end, index);
                     }
@@ -65,11 +58,6 @@ public class AsmUtil {
                 };
             }
         }, 0);
-
-        Parameter[] parameters = method.getParameters();
-        for (int i = 0; i < parameters.length; i++) {
-            paramNames[i].setParameter(parameters[i]);
-        }
 
         return paramNames;
     }

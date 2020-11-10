@@ -1,8 +1,6 @@
 package xyz.xiezc.ioc.starter.starter.web.converter;
 
 import xyz.xiezc.ioc.starter.annotation.core.Component;
-import xyz.xiezc.ioc.starter.core.definition.MethodDefinition;
-import xyz.xiezc.ioc.starter.core.definition.ParamDefinition;
 import xyz.xiezc.ioc.starter.starter.web.common.ContentType;
 import xyz.xiezc.ioc.starter.starter.web.entity.HttpRequest;
 
