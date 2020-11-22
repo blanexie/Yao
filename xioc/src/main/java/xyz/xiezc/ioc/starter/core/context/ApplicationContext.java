@@ -1,6 +1,6 @@
 package xyz.xiezc.ioc.starter.core.context;
 
-import xyz.xiezc.ioc.starter.event.EventDispatcher;
+import xyz.xiezc.ioc.starter.eventListener.EventDispatcher;
 
 /**
  * @Description

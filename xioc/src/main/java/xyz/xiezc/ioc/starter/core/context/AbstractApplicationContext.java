@@ -20,9 +20,9 @@ import xyz.xiezc.ioc.starter.core.BeanCreateUtil;
 import xyz.xiezc.ioc.starter.core.definition.BeanDefinition;
 import xyz.xiezc.ioc.starter.core.process.BeanFactoryPostProcess;
 import xyz.xiezc.ioc.starter.core.process.BeanPostProcess;
-import xyz.xiezc.ioc.starter.event.ApplicationListener;
-import xyz.xiezc.ioc.starter.event.DefaultEventDispatcher;
-import xyz.xiezc.ioc.starter.event.EventDispatcher;
+import xyz.xiezc.ioc.starter.eventListener.ApplicationListener;
+import xyz.xiezc.ioc.starter.eventListener.DefaultEventDispatcher;
+import xyz.xiezc.ioc.starter.eventListener.EventDispatcher;
 import xyz.xiezc.ioc.starter.exception.ManyBeanException;
 import xyz.xiezc.ioc.starter.exception.NoSuchBeanException;
 
@@ -109,6 +109,7 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
         clearContext();
         //
         loadProperties();
+        loadBeanDefinition("xyz.xiezc.ioc.starter");
         loadBeanDefinition(clazz.getPackageName());
         beforeInvoke();
         invokeBeanFactoryPostProcess();
@@ -223,12 +224,12 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
             return assignable;
         }).collect(Collectors.toSet());
         //逐个初始化BeanDefinition， 并调用其方法
-
         BeanCreateUtil beanCreateUtil = BeanCreateUtil.getInstacne(this);
+        PriorityQueue<BeanPostProcess> beanPostProcessPriorityQueue = beanCreateUtil.getBeanPostProcessPriorityQueue();
         for (BeanDefinition beanDefinition : collect) {
             beanCreateUtil.createAndInject(beanDefinition);
+            beanPostProcessPriorityQueue.add(beanDefinition.getBean());
         }
-
     }
 
     /**
@@ -250,7 +251,6 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
         } catch (NoSuchBeanException e) {
 
         }
-
 
         try {
             BeanDefinition beanDefinition = this.getBeanDefinition(EventDispatcher.class);

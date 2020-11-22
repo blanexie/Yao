@@ -1,4 +1,4 @@
-package xyz.xiezc.ioc.starter;
+package xyz.xiezc.ioc.example;
 
 import xyz.xiezc.ioc.starter.annotation.core.Component;
 
@@ -6,7 +6,7 @@ import xyz.xiezc.ioc.starter.annotation.core.Component;
 public class C {
 
     public void print() {
-        System.out.println("print B");
+        System.out.println("print C");
         System.out.println("--------");
 
     }

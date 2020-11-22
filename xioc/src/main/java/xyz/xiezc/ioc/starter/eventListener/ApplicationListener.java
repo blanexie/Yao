@@ -1,4 +1,4 @@
-package xyz.xiezc.ioc.starter.event;
+package xyz.xiezc.ioc.starter.eventListener;
 
 import java.util.Set;
 
@@ -6,7 +6,6 @@ import java.util.Set;
  * 事件监听器
  */
 public interface ApplicationListener {
-
 
     /**
      * 这个监听器需要处理的事件

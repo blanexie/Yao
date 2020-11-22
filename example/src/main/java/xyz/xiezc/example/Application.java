@@ -3,14 +3,12 @@ package xyz.xiezc.example;
 
 import xyz.xiezc.ioc.starter.annotation.core.Configuration;
 import xyz.xiezc.ioc.starter.annotation.cron.Cron;
-import xyz.xiezc.ioc.starter.annotation.cron.EnableCron;
 import xyz.xiezc.ioc.starter.orm.annotation.MapperScan;
 
 import java.time.LocalTime;
 
 @MapperScan({"xyz.xiezc.example.web.mapper"})
 @Configuration
-@EnableCron
 public class Application {
 
     /**

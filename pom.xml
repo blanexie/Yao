@@ -35,7 +35,6 @@
 
 
     <dependencies>
-
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
@@ -82,6 +81,7 @@
                 <artifactId>hutool-all</artifactId>
                 <version>5.5.1</version>
             </dependency>
+
             <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>

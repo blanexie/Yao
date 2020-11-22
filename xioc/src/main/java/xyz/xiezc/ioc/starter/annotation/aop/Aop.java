@@ -1,6 +1,8 @@
 package xyz.xiezc.ioc.starter.annotation.aop;
 
+import cn.hutool.aop.aspects.Aspect;
 import xyz.xiezc.ioc.starter.annotation.core.Component;
+import xyz.xiezc.ioc.starter.aop.XAspect;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -9,7 +11,6 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@Component
 public @interface Aop {
 
   /**
@@ -17,7 +18,7 @@ public @interface Aop {
    *
    * @return
    */
-  Class<?> value();
+  Class<? extends XAspect> value();
 
 
 }

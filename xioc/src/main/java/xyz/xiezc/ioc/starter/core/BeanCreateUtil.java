@@ -5,7 +5,6 @@ import cn.hutool.core.convert.Convert;
 import cn.hutool.core.convert.ConvertException;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ReflectUtil;
-import cn.hutool.log.Log;
 import lombok.Getter;
 import xyz.xiezc.ioc.starter.annotation.core.Autowire;
 import xyz.xiezc.ioc.starter.annotation.core.Init;
@@ -15,9 +14,11 @@ import xyz.xiezc.ioc.starter.common.enums.BeanTypeEnum;
 import xyz.xiezc.ioc.starter.core.context.BeanFactory;
 import xyz.xiezc.ioc.starter.core.definition.BeanDefinition;
 import xyz.xiezc.ioc.starter.core.process.BeanPostProcess;
-import xyz.xiezc.ioc.starter.exception.CircularDependenceException;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -29,17 +30,13 @@ import java.util.stream.Collectors;
  **/
 public final class BeanCreateUtil {
 
-    Log log = Log.get(BeanCreateUtil.class);
     /**
      * 用来装载各个BeanPostProcess的实体类的， 用于创建bean的时候
      */
-    PriorityQueue<BeanPostProcess> beanPostProcessPriorityQueue = new PriorityQueue<>();
+    @Getter
+    PriorityQueue<BeanPostProcess> beanPostProcessPriorityQueue = new PriorityQueue<>(Comparator.comparingInt(BeanPostProcess::order));
 
     private volatile static BeanCreateUtil beanCreateUtil;
-    /**
-     * 正在创建中的bean，用来解决循环依赖的问题
-     */
-    Set<Class> buildingSet = new HashSet<>();
 
     /**
      * 容器对象
@@ -49,7 +46,6 @@ public final class BeanCreateUtil {
 
 
     public void clear() {
-        buildingSet.clear();
         beanPostProcessPriorityQueue.clear();
     }
 
@@ -111,7 +107,7 @@ public final class BeanCreateUtil {
     }
 
 
-    public void initAndComplete(BeanDefinition beanDefinition){
+    public void initAndComplete(BeanDefinition beanDefinition) {
         if (beanDefinition.getBeanStatus() == BeanStatusEnum.Injected) {
             for (BeanPostProcess beanPostProcess : beanPostProcessPriorityQueue) {
                 if (!beanPostProcess.beforeInit(beanFactory, beanDefinition)) {
@@ -182,7 +178,7 @@ public final class BeanCreateUtil {
                 }
                 if (realType.paramTypeEnum == ParamTypeEnum.base) {
                     BeanDefinition beanDefinition1 = beanFactory.getBeanDefinition(realType.baseType);
-                    if(beanDefinition1.getBean()==null){
+                    if (beanDefinition1.getBean() == null) {
                         createAndInject(beanDefinition1);
                     }
                     ReflectUtil.setFieldValue(bean, field, beanDefinition1.getBean());
@@ -199,7 +195,7 @@ public final class BeanCreateUtil {
         }
         Collection<Object> collect = beanDefinitions.stream()
                 .map(definition -> {
-                    if(definition.getBean()==null){
+                    if (definition.getBean() == null) {
                         createAndInject(definition);
                     }
                     return definition.getBean();

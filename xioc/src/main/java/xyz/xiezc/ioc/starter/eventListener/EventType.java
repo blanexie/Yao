@@ -1,4 +1,4 @@
-package xyz.xiezc.ioc.starter.event;
+package xyz.xiezc.ioc.starter.eventListener;
 
 /**
  * 事件的类型

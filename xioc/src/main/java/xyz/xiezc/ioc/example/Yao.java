@@ -1,4 +1,4 @@
-package xyz.xiezc.ioc.starter;
+package xyz.xiezc.ioc.example;
 
 import xyz.xiezc.ioc.starter.core.context.ApplicationContext;
 import xyz.xiezc.ioc.starter.core.context.DefaultApplicationContext;
@@ -24,7 +24,9 @@ public class Yao {
         B b = run.getBeanDefinition(B.class).getCompletedBean();
         C c = run.getBeanDefinition(C.class).getCompletedBean();
         a.print();
+        a.print2();
         b.print();
+        b.print2();
         c.print();
 
     }

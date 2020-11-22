@@ -1,15 +1,13 @@
-package xyz.xiezc.ioc.starter.example;
+package xyz.xiezc.ioc.example;
 
 
 import lombok.Data;
 import xyz.xiezc.ioc.starter.annotation.core.Configuration;
 import xyz.xiezc.ioc.starter.annotation.cron.Cron;
-import xyz.xiezc.ioc.starter.annotation.cron.EnableCron;
 
 import java.time.LocalTime;
 
 @Data
-@EnableCron
 @Configuration
 public class Demo {
 

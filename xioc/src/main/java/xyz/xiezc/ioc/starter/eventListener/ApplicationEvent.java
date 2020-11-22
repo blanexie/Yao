@@ -1,4 +1,4 @@
-package xyz.xiezc.ioc.starter.event;
+package xyz.xiezc.ioc.starter.eventListener;
 
 import lombok.Getter;
 import lombok.Setter;
