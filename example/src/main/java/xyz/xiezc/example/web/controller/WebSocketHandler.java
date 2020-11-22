@@ -4,7 +4,7 @@ import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import xyz.xiezc.ioc.starter.starter.web.annotation.WebSockerController;
-import xyz.xiezc.ioc.starter.starter.web.netty.websocket.WebSocketFrameHandler;
+import xyz.xiezc.ioc.starter.web.netty.websocket.WebSocketFrameHandler;
 
 @WebSockerController("/websocket")
 public class WebSocketHandler implements WebSocketFrameHandler {

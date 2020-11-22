@@ -6,8 +6,8 @@ import java.io.Serializable;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import xyz.xiezc.ioc.starter.orm.annotation.Id;
-import xyz.xiezc.ioc.starter.orm.annotation.Table;
+import xyz.xiezc.ioc.orm.annotation.Id;
+import xyz.xiezc.ioc.orm.annotation.Table;
 
 /**
  * 相册集表(Album)实体类

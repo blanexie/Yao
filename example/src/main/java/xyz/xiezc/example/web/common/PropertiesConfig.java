@@ -1,7 +1,7 @@
 package xyz.xiezc.example.web.common;
 
 import lombok.Data;
-import xyz.xiezc.ioc.starter.annotation.core.Configuration;
+import xyz.xiezc.ioc.annotation.core.Configuration;
 
 /**
  * @Description TODO

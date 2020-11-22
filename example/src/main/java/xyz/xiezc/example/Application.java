@@ -1,9 +1,9 @@
 package xyz.xiezc.example;
 
 
-import xyz.xiezc.ioc.starter.annotation.core.Configuration;
-import xyz.xiezc.ioc.starter.annotation.cron.Cron;
-import xyz.xiezc.ioc.starter.orm.annotation.MapperScan;
+import xyz.xiezc.ioc.annotation.core.Configuration;
+import xyz.xiezc.ioc.annotation.cron.Cron;
+import xyz.xiezc.ioc.orm.annotation.MapperScan;
 
 import java.time.LocalTime;
 

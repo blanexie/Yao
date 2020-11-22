@@ -6,12 +6,12 @@ import xyz.xiezc.example.web.common.TestAopspect;
 import xyz.xiezc.example.web.entity.AlbumDO;
 import xyz.xiezc.example.web.mapper.AlbumMapper;
 import xyz.xiezc.example.web.service.TestService;
-import xyz.xiezc.ioc.starter.annotation.aop.Aop;
-import xyz.xiezc.ioc.starter.annotation.core.Autowire;
-import xyz.xiezc.ioc.starter.orm.common.example.Example;
-import xyz.xiezc.ioc.starter.starter.web.annotation.Controller;
-import xyz.xiezc.ioc.starter.starter.web.annotation.GetMapping;
-import xyz.xiezc.ioc.starter.starter.web.entity.WebContext;
+import xyz.xiezc.ioc.annotation.aop.Aop;
+import xyz.xiezc.ioc.annotation.core.Autowire;
+import xyz.xiezc.ioc.orm.common.example.Example;
+import xyz.xiezc.ioc.starter.web.annotation.Controller;
+import xyz.xiezc.ioc.starter.web.annotation.GetMapping;
+import xyz.xiezc.ioc.starter.web.entity.WebContext;
 
 import java.util.List;
 import java.util.Map;
