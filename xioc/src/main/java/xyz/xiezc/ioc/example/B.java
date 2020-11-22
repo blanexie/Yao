@@ -3,11 +3,17 @@ package xyz.xiezc.ioc.example;
 import xyz.xiezc.ioc.starter.annotation.aop.Aop;
 import xyz.xiezc.ioc.starter.annotation.core.Autowire;
 import xyz.xiezc.ioc.starter.annotation.core.Component;
+import xyz.xiezc.ioc.starter.annotation.core.Init;
 import xyz.xiezc.ioc.starter.aop.TimeIntervalAspect;
 
 @Aop(TimeIntervalAspect.class)
 @Component
 public class B {
+
+    @Init
+    public void init() {
+        System.out.println("print B init init init init init ");
+    }
 
     public void print() {
         System.out.println("print B");

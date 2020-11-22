@@ -9,10 +9,7 @@ package xyz.xiezc.ioc.starter.core.context;
 public class DefaultApplicationContext extends AbstractApplicationContext {
 
 
-    @Override
-    public void beforeInvoke() {
 
-    }
 
     @Override
     public void finish() {

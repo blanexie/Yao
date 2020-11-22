@@ -16,6 +16,11 @@ import java.util.Set;
 @Component
 public class AopBeanPostProcess implements BeanPostProcess {
 
+    @Override
+    public int order() {
+        return -100;
+    }
+
     private Set<Method> notAopMethods = new HashSet<>() {{
         Object o = new Object();
         //o.wait();
@@ -65,8 +70,8 @@ public class AopBeanPostProcess implements BeanPostProcess {
         Aop aop = AnnotationUtil.getAnnotation(beanClass, Aop.class);
         //查找切面方法
         Set<XAspect> xAspectSet = new HashSet<>();
-        Method[] declaredMethods = ClassUtil.getPublicMethods(beanClass);
-        for (Method declaredMethod : declaredMethods) {
+        Method[] publicMethods = ClassUtil.getPublicMethods(beanClass);
+        for (Method declaredMethod : publicMethods) {
             if (notAopMethods.contains(declaredMethod)) {
                 continue;
             }

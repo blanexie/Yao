@@ -12,14 +12,18 @@ import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.setting.Setting;
 import lombok.Getter;
 import lombok.Setter;
+import xyz.xiezc.ioc.example.A;
 import xyz.xiezc.ioc.starter.annotation.core.Component;
 import xyz.xiezc.ioc.starter.annotation.core.Configuration;
 import xyz.xiezc.ioc.starter.common.enums.BeanStatusEnum;
 import xyz.xiezc.ioc.starter.common.enums.BeanTypeEnum;
+import xyz.xiezc.ioc.starter.common.enums.EventNameConstant;
 import xyz.xiezc.ioc.starter.core.BeanCreateUtil;
 import xyz.xiezc.ioc.starter.core.definition.BeanDefinition;
 import xyz.xiezc.ioc.starter.core.process.BeanFactoryPostProcess;
 import xyz.xiezc.ioc.starter.core.process.BeanPostProcess;
+import xyz.xiezc.ioc.starter.core.process.ConfigurationBeanFactoryPostProcess;
+import xyz.xiezc.ioc.starter.eventListener.ApplicationEvent;
 import xyz.xiezc.ioc.starter.eventListener.ApplicationListener;
 import xyz.xiezc.ioc.starter.eventListener.DefaultEventDispatcher;
 import xyz.xiezc.ioc.starter.eventListener.EventDispatcher;
@@ -60,11 +64,53 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
     protected Setting setting = new Setting();
 
     /**
-     * 时间处理器
+     * 事件处理器
      */
     @Getter
     EventDispatcher eventDispatcher;
 
+    @Override
+    public ApplicationContext run(Class clazz) {
+        //清除
+        clearContext();
+        addApplictionEvent(new ApplicationEvent(EventNameConstant.clearContextEvent));
+
+        loadProperties();
+        addApplictionEvent(new ApplicationEvent(EventNameConstant.loadPropertiesEvent));
+
+        loadBeanDefinition("xyz.xiezc.ioc.starter");
+        loadBeanDefinition(clazz.getPackageName());
+        addApplictionEvent(new ApplicationEvent(EventNameConstant.loadBeanDefinitionEvent));
+
+        beforeInvoke();
+        addApplictionEvent(new ApplicationEvent(EventNameConstant.beforeInvokeEvent));
+
+        invokeBeanFactoryPostProcess();
+        addApplictionEvent(new ApplicationEvent(EventNameConstant.invokeBeanFactoryPostProcessEvent));
+
+        initBeanPostProcess();
+        addApplictionEvent(new ApplicationEvent(EventNameConstant.initBeanPostProcessEvent));
+
+        initAllBeans();
+        addApplictionEvent(new ApplicationEvent(EventNameConstant.initAllBeansEvent));
+
+        loadListener();
+        addApplictionEvent(new ApplicationEvent(EventNameConstant.loadListenerEvent));
+
+        finish();
+        addApplictionEvent(new ApplicationEvent(EventNameConstant.finishEvent));
+
+        return this;
+    }
+
+    @Override
+    public void addApplictionEvent(ApplicationEvent applicationEvent) {
+        if (eventDispatcher == null) {
+            EventDispatcher.waitEvents.add(applicationEvent);
+        } else {
+            eventDispatcher.execute(applicationEvent);
+        }
+    }
 
     @Override
     public BeanDefinition getBeanDefinition(Class<?> clazz) {
@@ -101,27 +147,6 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
             throw new NoSuchBeanException("容器中未找到符合要求的bean");
         }
         return result;
-    }
-
-    @Override
-    public ApplicationContext run(Class clazz) {
-        //清除
-        clearContext();
-        //
-        loadProperties();
-        loadBeanDefinition("xyz.xiezc.ioc.starter");
-        loadBeanDefinition(clazz.getPackageName());
-        beforeInvoke();
-        invokeBeanFactoryPostProcess();
-        initBeanPostProcess();
-
-        loadListener();
-
-        initAllBeans();
-
-        finish();
-
-        return this;
     }
 
 
@@ -166,6 +191,16 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
         }
     }
 
+    @Override
+    public void beforeInvoke() {
+        BeanDefinition beanDefinition = getBeanDefinition(ConfigurationBeanFactoryPostProcess.class);
+        Class<?> beanClass = beanDefinition.getBeanClass();
+        Object bean = ReflectUtil.newInstanceIfPossible(beanClass);
+        beanDefinition.setBean(bean);
+        beanDefinition.setBeanStatus(BeanStatusEnum.HalfCooked);
+        BeanFactoryPostProcess beanFactoryPostProcess = beanDefinition.getBean();
+        beanFactoryPostProcess.process(this);
+    }
 
     /**
      * 调用所有的BeanFactoryPostProcess实现类的钩子方法
@@ -177,6 +212,7 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
         while (true) {
             //第一步, 筛选出来所有的BeanFactoryPostProcess的实现类
             Set<BeanDefinition> beanFactoryPostProcessSet = singletonBeanDefinitionMap.values().stream()
+                    .filter(beanDefinition -> beanDefinition.getBean() != ConfigurationBeanFactoryPostProcess.class)
                     .filter(beanDefinition -> beanDefinition.getBeanStatus() == BeanStatusEnum.Original)
                     .filter(beanDefinition -> {
                         Class<?> beanClass = beanDefinition.getBeanClass();

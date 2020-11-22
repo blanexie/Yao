@@ -39,7 +39,14 @@ public class DefaultEventDispatcher implements EventDispatcher {
     }
 
     @Override
-    public void dispatcher(ApplicationEvent applicationEvent) {
+    public void execute(ApplicationEvent applicationEvent) {
+        executeOne(applicationEvent);
+        for (ApplicationEvent waitEvent : waitEvents) {
+            executeOne(waitEvent);
+        }
+    }
+
+    private void executeOne(ApplicationEvent applicationEvent) {
         List<ApplicationListener> listener = this.getListener(applicationEvent.getEventName());
         for (ApplicationListener applicationListener : listener) {
             if (applicationListener.getSync()) {

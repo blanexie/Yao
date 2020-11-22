@@ -1,6 +1,7 @@
 package xyz.xiezc.ioc.starter.eventListener;
 
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 
@@ -9,11 +10,8 @@ import java.util.concurrent.ExecutorService;
  */
 public interface EventDispatcher {
 
-    /**
-     * 设置线程池
-     */
-    void setThreadPool(ExecutorService executorService);
 
+    List<ApplicationEvent> waitEvents = new ArrayList<>();
 
     /**
      * 增加事件处理器
@@ -23,8 +21,12 @@ public interface EventDispatcher {
 
     List<ApplicationListener> getListener(String eventName);
 
+    /**
+     * 设置线程池
+     */
+    void setThreadPool(ExecutorService executorService);
 
 
-    void dispatcher(ApplicationEvent applicationEvent);
+    void execute(ApplicationEvent applicationEvent);
 
 }

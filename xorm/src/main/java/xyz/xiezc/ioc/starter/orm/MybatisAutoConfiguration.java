@@ -257,10 +257,7 @@ public class MybatisAutoConfiguration implements ApplicationListener {
         return factory.getObject();
     }
 
-    @Override
-    public int order() {
-        return 0;
-    }
+
 
 
 }
