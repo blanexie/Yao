@@ -1,7 +1,6 @@
 package xyz.xiezc.ioc.starter.aop;
 
 import cn.hutool.aop.ProxyUtil;
-import cn.hutool.aop.aspects.Aspect;
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.util.ClassUtil;
 import xyz.xiezc.ioc.starter.annotation.aop.Aop;
@@ -10,7 +9,6 @@ import xyz.xiezc.ioc.starter.core.context.BeanFactory;
 import xyz.xiezc.ioc.starter.core.definition.BeanDefinition;
 import xyz.xiezc.ioc.starter.core.process.BeanPostProcess;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
@@ -18,32 +16,31 @@ import java.util.Set;
 @Component
 public class AopBeanPostProcess implements BeanPostProcess {
 
-    private  Set<Method> notAopMethods=new HashSet<>(){{
-        Object o =new Object();
+    private Set<Method> notAopMethods = new HashSet<>() {{
+        Object o = new Object();
         //o.wait();
         Method wait = ClassUtil.getPublicMethod(Object.class, "wait");
         add(wait);
         //o.wait(1);
-        Method wait1 = ClassUtil.getPublicMethod(Object.class, "wait",long.class);
+        Method wait1 = ClassUtil.getPublicMethod(Object.class, "wait", long.class);
         add(wait1);
-         //o.wait(0,1);
-        Method wait2 = ClassUtil.getPublicMethod(Object.class, "wait",long.class,int.class);
+        //o.wait(0,1);
+        Method wait2 = ClassUtil.getPublicMethod(Object.class, "wait", long.class, int.class);
         add(wait2);
         //  o.getClass();
-        Method wait3 = ClassUtil.getPublicMethod(Object.class, "getClass" );
+        Method wait3 = ClassUtil.getPublicMethod(Object.class, "getClass");
         add(wait3);
         //o.toString();
-        Method wait4 = ClassUtil.getPublicMethod(Object.class, "toString" );
+        Method wait4 = ClassUtil.getPublicMethod(Object.class, "toString");
         add(wait4);
-        Method wait5 = ClassUtil.getPublicMethod(Object.class, "equals" ,Object.class);
+        Method wait5 = ClassUtil.getPublicMethod(Object.class, "equals", Object.class);
         add(wait5);
-        Method wait6 = ClassUtil.getPublicMethod(Object.class, "notifyAll"  );
+        Method wait6 = ClassUtil.getPublicMethod(Object.class, "notifyAll");
         add(wait6);
-        Method wait7 = ClassUtil.getPublicMethod(Object.class, "hashCode"  );
+        Method wait7 = ClassUtil.getPublicMethod(Object.class, "hashCode");
         add(wait7);
-        Method wait8 = ClassUtil.getPublicMethod(Object.class, "notify"  );
+        Method wait8 = ClassUtil.getPublicMethod(Object.class, "notify");
         add(wait8);
-
     }};
 
 
@@ -67,10 +64,10 @@ public class AopBeanPostProcess implements BeanPostProcess {
         Class<?> beanClass = beanDefinition.getBeanClass();
         Aop aop = AnnotationUtil.getAnnotation(beanClass, Aop.class);
         //查找切面方法
-        Set<XAspect> xAspectSet=new HashSet<>();
+        Set<XAspect> xAspectSet = new HashSet<>();
         Method[] declaredMethods = ClassUtil.getPublicMethods(beanClass);
         for (Method declaredMethod : declaredMethods) {
-            if(notAopMethods.contains(declaredMethod)){
+            if (notAopMethods.contains(declaredMethod)) {
                 continue;
             }
             Aop aopMethod = AnnotationUtil.getAnnotation(declaredMethod, Aop.class);
