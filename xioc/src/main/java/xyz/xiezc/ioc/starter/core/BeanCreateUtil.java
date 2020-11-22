@@ -121,13 +121,13 @@ public final class BeanCreateUtil {
             initBean(beanDefinition, this.getBeanFactory());
         }
 
-        if (beanDefinition.getBeanStatus() == BeanStatusEnum.Injected) {
+        if (beanDefinition.getBeanStatus() == BeanStatusEnum.Inited) {
             for (BeanPostProcess beanPostProcess : beanPostProcessPriorityQueue) {
                 if (!beanPostProcess.afterInit(beanFactory, beanDefinition)) {
                     break;
                 }
             }
-            beanDefinition.setBeanStatus(BeanStatusEnum.Inited);
+            beanDefinition.setBeanStatus(BeanStatusEnum.Completed);
         }
     }
 
