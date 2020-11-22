@@ -18,6 +18,35 @@ import java.util.Set;
 @Component
 public class AopBeanPostProcess implements BeanPostProcess {
 
+    private  Set<Method> notAopMethods=new HashSet<>(){{
+        Object o =new Object();
+        //o.wait();
+        Method wait = ClassUtil.getPublicMethod(Object.class, "wait");
+        add(wait);
+        //o.wait(1);
+        Method wait1 = ClassUtil.getPublicMethod(Object.class, "wait",long.class);
+        add(wait1);
+         //o.wait(0,1);
+        Method wait2 = ClassUtil.getPublicMethod(Object.class, "wait",long.class,int.class);
+        add(wait2);
+        //  o.getClass();
+        Method wait3 = ClassUtil.getPublicMethod(Object.class, "getClass" );
+        add(wait3);
+        //o.toString();
+        Method wait4 = ClassUtil.getPublicMethod(Object.class, "toString" );
+        add(wait4);
+        Method wait5 = ClassUtil.getPublicMethod(Object.class, "equals" ,Object.class);
+        add(wait5);
+        Method wait6 = ClassUtil.getPublicMethod(Object.class, "notifyAll"  );
+        add(wait6);
+        Method wait7 = ClassUtil.getPublicMethod(Object.class, "hashCode"  );
+        add(wait7);
+        Method wait8 = ClassUtil.getPublicMethod(Object.class, "notify"  );
+        add(wait8);
+
+    }};
+
+
     @Override
     public boolean beforeInstance(BeanFactory beanFactory, BeanDefinition beanDefinition) {
         return false;
@@ -41,6 +70,9 @@ public class AopBeanPostProcess implements BeanPostProcess {
         Set<XAspect> xAspectSet=new HashSet<>();
         Method[] declaredMethods = ClassUtil.getPublicMethods(beanClass);
         for (Method declaredMethod : declaredMethods) {
+            if(notAopMethods.contains(declaredMethod)){
+                continue;
+            }
             Aop aopMethod = AnnotationUtil.getAnnotation(declaredMethod, Aop.class);
             Class<? extends XAspect> value = null;
             if (aop != null) {
