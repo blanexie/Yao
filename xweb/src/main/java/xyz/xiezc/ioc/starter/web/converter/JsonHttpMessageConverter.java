@@ -6,18 +6,12 @@ import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONUtil;
-import io.netty.buffer.ByteBuf;
 import xyz.xiezc.ioc.starter.annotation.core.Component;
 import xyz.xiezc.ioc.starter.web.annotation.RequestBody;
 import xyz.xiezc.ioc.starter.web.common.ContentType;
-import xyz.xiezc.ioc.starter.web.common.XWebException;
-import xyz.xiezc.ioc.starter.web.entity.HttpRequest;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
+import java.lang.reflect.Parameter;
+import java.util.*;
 
 @Component
 public class JsonHttpMessageConverter implements HttpMessageConverter {
@@ -32,50 +26,43 @@ public class JsonHttpMessageConverter implements HttpMessageConverter {
     }
 
     @Override
-    public Object[] doRead(MethodDefinition methodDefinition, ContentType contentType, HttpRequest request) {
-        ParamDefinition[] paramDefinitions = methodDefinition.getParamDefinitions();
+    public Object[] parseParamaters(byte[] bodyByte, LinkedHashMap<String, Parameter> paramMap) {
+        String body = new String(bodyByte, CharsetUtil.CHARSET_UTF_8);
+        Set<Map.Entry<String, Parameter>> entries = paramMap.entrySet();
+        Object[] result = new Object[entries.size()];
+        int index = -1;
+        boolean isContinue = false;
+        for (Map.Entry<String, Parameter> entry : entries) {
+            index++;
+            if (isContinue) {
+                continue;
+            }
+            Parameter value = entry.getValue();
+            RequestBody requestBody = AnnotationUtil.getAnnotation(value, RequestBody.class);
+            if (requestBody == null) {
+                result[index] = null;
+            } else {
+                Object param = null;
+                Class<?> paramType = entry.getValue().getType();
+                if (ClassUtil.isSimpleValueType(paramType)) {
 
-        //参数只有一个， 则必须有RequestBody注解。
-        if (paramDefinitions.length == 1) {
-            ParamDefinition paramDefinition = paramDefinitions[0];
-            return getInvokeParams(request, paramDefinition);
-        }
-        //如果存在多个参数， 找到有RequestBody注解的参数
-        Optional<ParamDefinition> first = Stream.of(paramDefinitions)
-                .filter(paramDefinition -> {
-                    RequestBody annotation = AnnotationUtil.getAnnotation(paramDefinition.getParameter(), RequestBody.class);
-                    return annotation != null;
-                }).findFirst();
-        if (first.isPresent()) {
-            return getInvokeParams(request, first.get());
-        }
-        //走到这里就是注解没有配置
-        throw new XWebException(methodDefinition.getMethod().getName() + "需要一个@RequestBody注解 ");
-    }
+                } else if (paramType.isArray()) {
+                    JSONArray objects = JSONUtil.parseArray(body);
+                    param = objects.toArray();
+                } else if (ClassUtil.isAssignable(Collection.class, paramType)) {
+                    JSONArray objects = JSONUtil.parseArray(body);
+                    param = CollUtil.toCollection(objects);
+                } else {
+                    //其他类型
+                    param = JSONUtil.toBean(body, paramType);
+                }
+                result[index] = param;
+                isContinue = true;
+            }
 
-    private Object[] getInvokeParams(HttpRequest request, ParamDefinition paramDefinition) {
-        RequestBody requestBody = AnnotationUtil.getAnnotation(paramDefinition.getParameter(), RequestBody.class);
-        if (requestBody == null) {
-            throw new XWebException("Application/json类型的请求需要配置@RequestBody注解");
         }
-        ByteBuf body = request.getBody();
-        CharSequence charSequence = body.readCharSequence(body.readableBytes(), CharsetUtil.CHARSET_UTF_8);
-        String bodyStr = charSequence.toString();
-        Class paramType = paramDefinition.getParamType();
-        Object param = null;
-        if (ClassUtil.isSimpleValueType(paramType)) {
 
-        } else if (paramType.isArray()) {
-            JSONArray objects = JSONUtil.parseArray(bodyStr);
-            param = objects.toArray();
-        } else if (ClassUtil.isAssignable(Collection.class, paramType)) {
-            JSONArray objects = JSONUtil.parseArray(bodyStr);
-            param = CollUtil.toCollection(objects);
-        } else {
-            //其他类型
-            param = JSONUtil.toBean(bodyStr, paramType);
-        }
-        return new Object[]{param};
+        return result;
     }
 
 }

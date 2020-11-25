@@ -23,7 +23,9 @@ import xyz.xiezc.ioc.starter.web.common.ContentType;
 import xyz.xiezc.ioc.starter.web.entity.FileItem;
 import xyz.xiezc.ioc.starter.web.entity.HttpRequest;
 
+import java.lang.reflect.Parameter;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -42,7 +44,7 @@ public interface HttpMessageConverter {
     /**
      *
      */
-    Object[] doRead(MethodDefinition methodDefinition, ContentType contentType, HttpRequest request);
+    Object[] parseParamaters(byte[]  content, LinkedHashMap<String, Parameter> paramMap);
 
 
     default Object[] parseFormData(Map<String, FileItem> fileItems, ParamDefinition[] paramDefinitions, Map<String, List<String>> paramMap) {

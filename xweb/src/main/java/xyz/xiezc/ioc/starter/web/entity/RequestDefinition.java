@@ -8,6 +8,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Data
@@ -22,8 +23,10 @@ public class RequestDefinition {
 
     Method invokeMethod;
 
-
-    Map<String, Parameter> parameterMap=new HashMap<>();
+    /**
+     * 参数
+     */
+    LinkedHashMap<String, Parameter> parameterMap=new LinkedHashMap<>();
 
 
 }

@@ -17,6 +17,7 @@ import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import xyz.xiezc.ioc.starter.annotation.core.Autowire;
 import xyz.xiezc.ioc.starter.annotation.core.Configuration;
+import xyz.xiezc.ioc.starter.common.asm.AsmUtil;
 import xyz.xiezc.ioc.starter.common.enums.EventNameConstant;
 import xyz.xiezc.ioc.starter.core.context.ApplicationContext;
 import xyz.xiezc.ioc.starter.core.definition.BeanDefinition;
@@ -33,11 +34,9 @@ import xyz.xiezc.ioc.starter.web.netty.NettyWebServerInitializer;
 
 import java.io.File;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Configuration
 public class WebConfiguration implements BeanFactoryPostProcess, ApplicationListener {
@@ -69,6 +68,12 @@ public class WebConfiguration implements BeanFactoryPostProcess, ApplicationList
                     String path = "/" + controllerPath + "/" + getMapping.value();
                     Path of = Path.of(path);
                     requestDefinition.setPath(of.toString());
+                    //获取参数的名称
+                    String[] paramNames = AsmUtil.getMethodParamsAndAnnotaton(publicMethod);
+                    Parameter[] parameters = publicMethod.getParameters();
+                    for (int i = 0; i < parameters.length; i++) {
+                        requestDefinition.getParameterMap().put(paramNames[i], parameters[i]);
+                    }
                 }
                 PostMapping postMapping = publicMethod.getAnnotation(PostMapping.class);
                 if (postMapping != null) {
@@ -80,6 +85,12 @@ public class WebConfiguration implements BeanFactoryPostProcess, ApplicationList
                     String path = "/" + controllerPath + "/" + postMapping.value();
                     Path of = Path.of(path);
                     requestDefinition.setPath(of.toString());
+                    //获取参数的名称
+                    String[] paramNames = AsmUtil.getMethodParamsAndAnnotaton(publicMethod);
+                    Parameter[] parameters = publicMethod.getParameters();
+                    for (int i = 0; i < parameters.length; i++) {
+                        requestDefinition.getParameterMap().put(paramNames[i], parameters[i]);
+                    }
                 }
             }
         }

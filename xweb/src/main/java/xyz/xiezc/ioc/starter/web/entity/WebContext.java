@@ -2,16 +2,18 @@ package xyz.xiezc.ioc.starter.web.entity;
 
 import cn.hutool.cache.impl.TimedCache;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.StrUtil;
+import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.cookie.Cookie;
 import io.netty.handler.codec.http.cookie.DefaultCookie;
+import io.netty.handler.codec.http.cookie.ServerCookieDecoder;
 import io.netty.util.concurrent.FastThreadLocal;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.*;
 
-@Getter
-@Setter
 public class WebContext {
 
     static FastThreadLocal<WebContext> fastThreadLocal = new FastThreadLocal<>();
@@ -27,7 +29,7 @@ public class WebContext {
         return webContext;
     }
 
-    public static WebContext build(HttpRequest httpRequest) {
+    public static WebContext build(FullHttpRequest httpRequest) {
         WebContext webContext = fastThreadLocal.get();
         if (webContext == null) {
             webContext = new WebContext();
@@ -37,34 +39,58 @@ public class WebContext {
         return webContext;
     }
 
-    public Map<String, Object> getSession() {
-        Set<Cookie> cookies = httpRequest.getCookies();
-        for (Cookie cookie : cookies) {
-            String name = cookie.name();
-            String value = cookie.value();
-            if (Objects.equals("session_id", name)) {
-                Map<String, Object> stringObjectMap = sessionCache.get(cookie.domain() + value);
-                if (stringObjectMap == null) {
-                    stringObjectMap = new HashMap<>();
-                    sessionCache.put(cookie.domain() + value, stringObjectMap);
-                }
-                return stringObjectMap;
-            }
+
+    public Set<Cookie> getCookies() {
+        HttpHeaders headers = httpRequest.headers();
+        String cookieStr = headers.get("Cookie");
+        if (StrUtil.isEmpty(cookieStr)) {
+            cookieStr = headers.get("cookie");
         }
-        String host = httpRequest.getNettyHttpRequest().headers().get("host");
-        Cookie cookie = new DefaultCookie("session_id", IdUtil.fastSimpleUUID());
-        cookie.setDomain(host);
-        cookie.setHttpOnly(true);
-        respCookies.add(cookie);
-        Map<String, Object> objectObjectHashMap = new HashMap<>();
+        Set<Cookie> cookies = ServerCookieDecoder.LAX.decode(cookieStr);
 
-        sessionCache.put(cookie.domain() + cookie.value(), objectObjectHashMap);
-
-        return objectObjectHashMap;
+        return cookies;
     }
 
+    public Cookie getCookie(String name) {
+        HttpHeaders headers = httpRequest.headers();
+        String cookieStr = headers.get("Cookie");
+        if (StrUtil.isEmpty(cookieStr)) {
+            cookieStr = headers.get("cookie");
+        }
+        Set<Cookie> cookies = ServerCookieDecoder.LAX.decode(cookieStr);
+        for (Cookie cookie : cookies) {
+            if (Objects.equals(cookie.name(), name)) {
+                return cookie;
+            }
+        }
+        return null;
+    }
 
-    HttpRequest httpRequest;
+    public Map<String, Object> getSession() {
+        Cookie cookie = getCookie("session_id");
+        if (cookie == null) {
+            HttpHeaders headers = httpRequest.headers();
+            String host = headers.get("host");
+            if (StrUtil.isEmpty(host)) {
+                host = headers.get("Host");
+            }
+            cookie = new DefaultCookie("session_id", IdUtil.fastSimpleUUID());
+            cookie.setDomain(host);
+            cookie.setHttpOnly(true);
+            sessionCookie.add(cookie);
+        }
+        Map<String, Object> stringObjectMap = sessionCache.get(cookie.domain() + cookie.value());
+        if (stringObjectMap == null) {
+            stringObjectMap = new HashMap<>();
+            sessionCache.put(cookie.domain() + cookie.value(), stringObjectMap);
+        }
+        return stringObjectMap;
+    }
 
-    Set<Cookie> respCookies = new HashSet<>();
+    @Setter
+    FullHttpRequest httpRequest;
+
+    Set<Cookie> sessionCookie;
+
+
 }
