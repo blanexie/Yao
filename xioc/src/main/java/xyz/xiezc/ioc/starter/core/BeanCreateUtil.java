@@ -158,9 +158,15 @@ public final class BeanCreateUtil {
             if (valueAnnotation != null) {
                 String name = valueAnnotation.value();
                 String property = beanFactory.getProperty(name);
-                //进行基本的类型转换；
-                Object covert = this.covert(property, field.getType());
-                ReflectUtil.setFieldValue(bean, field, covert);
+                if (property == null) {
+                    if (valueAnnotation.require()) {
+                        throw new RuntimeException(beanClass.getName() + "中字段" + field.getName() + "未找到配置文件中的值， 配置:" + name);
+                    }
+                } else {
+                    //进行基本的类型转换；
+                    Object covert = this.covert(property, field.getType());
+                    ReflectUtil.setFieldValue(bean, field, covert);
+                }
             }
             Autowire annotation = AnnotationUtil.getAnnotation(field, Autowire.class);
             if (annotation != null) {

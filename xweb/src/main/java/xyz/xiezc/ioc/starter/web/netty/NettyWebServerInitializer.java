@@ -30,7 +30,6 @@ import io.netty.handler.ssl.SslContext;
 import io.netty.handler.stream.ChunkedWriteHandler;
 import lombok.Data;
 import xyz.xiezc.ioc.starter.web.DispatcherHandler;
-import xyz.xiezc.ioc.starter.web.netty.controller.HttpServerHandler;
 import xyz.xiezc.ioc.starter.web.netty.file.HttpStaticFileServerHandler;
 import xyz.xiezc.ioc.starter.web.netty.websocket.WebSocketServerHandler;
 
@@ -81,16 +80,15 @@ public class NettyWebServerInitializer extends ChannelInitializer<SocketChannel>
         pipeline.addLast(new CorsHandler(CorsConfigBuilder.forAnyOrigin().allowNullOrigin().allowCredentials().build()));
 
         //WebSocket
-        pipeline.addLast(new WebSocketServerHandler(DispatcherHandler.webSocketFrameHandlerMap, sslCtx != null));
+       // pipeline.addLast(new WebSocketServerHandler(DispatcherHandler.webSocketFrameHandlerMap, sslCtx != null));
 
         //解析FullRequest成HttpRequest
-        pipeline.addLast(parseRequestHandler);
-
+       // pipeline.addLast(parseRequestHandler);
 
         //业务逻辑
         pipeline.addLast(httpServerHandler);
         //静态文件下载
-        pipeline.addLast(httpStaticFileServerHandler);
+      //  pipeline.addLast(httpStaticFileServerHandler);
 
     }
 }

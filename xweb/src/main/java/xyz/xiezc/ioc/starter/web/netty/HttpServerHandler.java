@@ -13,21 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package xyz.xiezc.ioc.starter.web.netty.controller;
+package xyz.xiezc.ioc.starter.web.netty;
 
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 import io.netty.channel.*;
-import io.netty.handler.codec.http.DefaultFullHttpResponse;
-import io.netty.handler.codec.http.FullHttpResponse;
-import io.netty.handler.codec.http.HttpMethod;
-import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.*;
 import xyz.xiezc.ioc.starter.web.DispatcherHandler;
 import xyz.xiezc.ioc.starter.web.common.XWebException;
 import xyz.xiezc.ioc.starter.web.common.XWebUtil;
-import xyz.xiezc.ioc.starter.web.entity.HttpRequest;
 
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
@@ -40,7 +35,7 @@ import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
  * 2018/10/15
  */
 @ChannelHandler.Sharable
-public class HttpServerHandler extends SimpleChannelInboundHandler<HttpRequest> {
+public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
 
     Log log = LogFactory.get(HttpServerHandler.class);
 
@@ -56,19 +51,12 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<HttpRequest> 
     }
 
     @Override
-    public void channelRead0(ChannelHandlerContext ctx, HttpRequest httpRequest) {
-        log.info("进入HttpServerHandler：{}", httpRequest.getPath());
-        CompletableFuture<HttpRequest> future = CompletableFuture.completedFuture(httpRequest);
+    public void channelRead0(ChannelHandlerContext ctx, FullHttpRequest httpRequest) {
+        log.info("进入HttpServerHandler：{}", httpRequest.uri());
+        CompletableFuture<FullHttpRequest> future = CompletableFuture.completedFuture(httpRequest);
         Executor executor = ctx.executor();
         future.thenAcceptAsync(request -> {
             try {
-                String method = request.getMethod();
-                String uri = request.getPath();
-                //静态文件， 交给下个handler处理
-                if (isStaticFile(method, uri)) {
-                    ctx.fireChannelRead(request);
-                    return;
-                }
                 FullHttpResponse fullHttpResponse = dispatcherHandler.doRequest(request);
                 writeResponse(ctx, future, fullHttpResponse);
             } catch (Exception e) {
@@ -80,7 +68,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<HttpRequest> 
     }
 
 
-    private void writeResponse(ChannelHandlerContext ctx, CompletableFuture<HttpRequest> future, FullHttpResponse msg) {
+    private void writeResponse(ChannelHandlerContext ctx, CompletableFuture<FullHttpRequest> future, FullHttpResponse msg) {
         ctx.writeAndFlush(msg);
         future.complete(null);
     }
@@ -94,16 +82,6 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<HttpRequest> 
         }
     }
 
-    /**
-     * 非post请求，并且请求的路径不在get请求的controller路径中。 则默认是进行静态文件下载
-     */
-    private boolean isStaticFile(String method, String path) {
-        Set<String> getPaths = DispatcherHandler.getMethods.keySet();
-        if (HttpMethod.POST.name().equals(method) || getPaths.contains(path)) {
-            return false;
-        }
-        return true;
-    }
 
 
     boolean isResetByPeer(Throwable e) {

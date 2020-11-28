@@ -21,17 +21,4 @@ public class Yao {
         return defaultApplicationContext.run(clazz);
     }
 
-    public static void main(String[] args) {
-        ApplicationContext run = Yao.run(Yao.class);
-        A a = run.getBeanDefinition(A.class).getCompletedBean();
-        B b = run.getBeanDefinition(B.class).getCompletedBean();
-        C c = run.getBeanDefinition(C.class).getCompletedBean();
-        a.print();
-        a.print2();
-        b.print();
-        b.print2();
-        c.print();
-    }
-
-
 }

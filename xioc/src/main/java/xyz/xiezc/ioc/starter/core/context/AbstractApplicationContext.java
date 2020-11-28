@@ -182,12 +182,23 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
         for (String packageName : packageNames) {
             Set<Class<?>> classConfiguration = ClassUtil.scanPackageByAnnotation(packageName, Configuration.class);
             Set<Class<?>> classComponent = ClassUtil.scanPackageByAnnotation(packageName, Component.class);
-            classConfiguration.stream()
-                    .filter(clazz -> !ClassUtil.isAssignable(Annotation.class, clazz))
-                    .forEach(clazz -> {
-                        this.addBean(clazz);
-                    });
-            classComponent.stream()
+            Set<Class<?>> componentSet = new HashSet<>();
+            componentSet.addAll(classConfiguration);
+            componentSet.addAll(classComponent);
+            //筛选注解的注解
+            List<Class> collect = classConfiguration.stream().filter(clazz -> ClassUtil.isAssignable(Annotation.class, clazz))
+                    .collect(Collectors.toList());
+            List<Class> collect1 = classComponent.stream().filter(clazz -> ClassUtil.isAssignable(Annotation.class, clazz))
+                    .collect(Collectors.toList());
+            Set<Class> annotationSet = new HashSet<>();
+            annotationSet.addAll(collect);
+            annotationSet.addAll(collect1);
+
+            for (Class aClass : annotationSet) {
+                componentSet.addAll(ClassUtil.scanPackageByAnnotation(packageName, aClass));
+            }
+
+            componentSet.stream()
                     .filter(clazz -> !ClassUtil.isAssignable(Annotation.class, clazz))
                     .forEach(clazz -> {
                         this.addBean(clazz);

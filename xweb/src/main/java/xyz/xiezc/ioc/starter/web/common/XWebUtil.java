@@ -29,7 +29,7 @@ public class XWebUtil {
         return response;
     }
 
-    public static FullHttpResponse getErrorResponse(XWebException xWebException, HttpRequest httpRequest) {
+    public static FullHttpResponse getErrorResponse(XWebException xWebException, FullHttpRequest httpRequest) {
         int code = xWebException.getCode();
         HttpResponseStatus httpResponseStatus = HttpResponseStatus.valueOf(code);
         FullHttpResponse response = new DefaultFullHttpResponse(
@@ -39,8 +39,10 @@ public class XWebUtil {
         );
 
         // Tell the client we're going to close the connection.
-        if (httpRequest.isKeepAlive()) {
-            if (!httpRequest.getHttpVersion().isKeepAliveDefault()) {
+
+        boolean keepAlive = HttpUtil.isKeepAlive(httpRequest);
+        if (keepAlive) {
+            if (!httpRequest.protocolVersion().isKeepAliveDefault()) {
                 response.headers().set(CONNECTION, true);
             }
         } else {

@@ -16,6 +16,9 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Value {
 
-    String value()  ;
+    String value();
+
+    boolean require() default false;
+
 
 }

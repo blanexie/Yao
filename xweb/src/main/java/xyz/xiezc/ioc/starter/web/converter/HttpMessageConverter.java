@@ -19,6 +19,7 @@ package xyz.xiezc.ioc.starter.web.converter;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ClassUtil;
+import io.netty.handler.codec.http.FullHttpRequest;
 import xyz.xiezc.ioc.starter.web.common.ContentType;
 import xyz.xiezc.ioc.starter.web.entity.FileItem;
 import xyz.xiezc.ioc.starter.web.entity.HttpRequest;
@@ -44,50 +45,6 @@ public interface HttpMessageConverter {
     /**
      *
      */
-    Object[] parseParamaters(byte[]  content, LinkedHashMap<String, Parameter> paramMap);
+    Object[] parseParamaters(FullHttpRequest request, LinkedHashMap<String, Parameter> paramMap);
 
-
-    default Object[] parseFormData(Map<String, FileItem> fileItems, ParamDefinition[] paramDefinitions, Map<String, List<String>> paramMap) {
-        Object[] res = new Object[paramDefinitions.length];
-        for (int i = 0; i < paramDefinitions.length; i++) {
-            ParamDefinition paramDefinition = paramDefinitions[i];
-            String name = paramDefinition.getParamName();
-            if (ClassUtil.isAssignable(FileItem.class, paramDefinition.getParamType())) {
-                if (fileItems == null) {
-                    res[i] = null;
-                } else {
-                    res[i] = fileItems.get(name);
-                }
-                continue;
-            }
-            List<String> collect = paramMap.get(name);
-            if (collect == null) {
-                res[i] = null;
-                continue;
-            }
-            res[i] = paramMapping(collect, paramDefinition);
-        }
-        return res;
-    }
-
-    default Object paramMapping(List<String> params, ParamDefinition paramDefinition) {
-        Class paramType = paramDefinition.getParamType();
-        //如果是基本类型， 则把list中的第一个值转换类型，赋值进去
-        if (ClassUtil.isSimpleValueType(paramType)) {
-            return Convert.convert(paramType, params.get(0));
-        }
-        //如果是数组类型，
-        if (paramType.isArray()) {
-            return params.toArray();
-        }
-        //如果是集合类型
-        if (ClassUtil.isAssignable(Collection.class, paramType)) {
-            return CollUtil.toCollection(params);
-        }
-        //如果是其他类型
-        if (params.size() == 1) {
-            return Convert.convert(paramType, params.get(0));
-        }
-        return Convert.convert(paramType, params);
-    }
 }

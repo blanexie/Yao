@@ -43,7 +43,7 @@ public class CronApplicationListener implements ApplicationListener {
         });
         // 支持秒级别定时任务
         CronUtil.setMatchSecond(true);
-        CronUtil.start();
+        CronUtil.start(true);
     }
 
     @Override

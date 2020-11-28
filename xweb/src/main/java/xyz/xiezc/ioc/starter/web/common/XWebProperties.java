@@ -1,8 +1,9 @@
 package xyz.xiezc.ioc.starter.web.common;
 
 import lombok.Data;
-import xyz.xiezc.ioc.annotation.core.Component;
-import xyz.xiezc.ioc.annotation.core.Value;
+import xyz.xiezc.ioc.starter.annotation.core.Component;
+import xyz.xiezc.ioc.starter.annotation.core.Value;
+
 
 @Component
 @Data
@@ -25,8 +26,11 @@ public class XWebProperties {
 
     @Value("xweb.server.port")
     int port = 8443;
+
     @Value("xweb.static.path")
     String staticPath = "/static";
+
+
     @Value("xweb.websocket.path")
     String websocketPath = "/websocket";
 

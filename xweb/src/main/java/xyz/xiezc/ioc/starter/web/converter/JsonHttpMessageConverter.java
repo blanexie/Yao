@@ -6,6 +6,9 @@ import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONUtil;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufUtil;
+import io.netty.handler.codec.http.FullHttpRequest;
 import xyz.xiezc.ioc.starter.annotation.core.Component;
 import xyz.xiezc.ioc.starter.web.annotation.RequestBody;
 import xyz.xiezc.ioc.starter.web.common.ContentType;
@@ -26,8 +29,9 @@ public class JsonHttpMessageConverter implements HttpMessageConverter {
     }
 
     @Override
-    public Object[] parseParamaters(byte[] bodyByte, LinkedHashMap<String, Parameter> paramMap) {
-        String body = new String(bodyByte, CharsetUtil.CHARSET_UTF_8);
+    public Object[] parseParamaters(FullHttpRequest httpRequest, LinkedHashMap<String, Parameter> paramMap) {
+        ByteBuf content = httpRequest.content();
+        String body = new String(ByteBufUtil.getBytes(content), CharsetUtil.CHARSET_UTF_8);
         Set<Map.Entry<String, Parameter>> entries = paramMap.entrySet();
         Object[] result = new Object[entries.size()];
         int index = -1;

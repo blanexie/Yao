@@ -11,6 +11,7 @@ import io.netty.handler.codec.http.cookie.ServerCookieDecoder;
 import io.netty.util.concurrent.FastThreadLocal;
 import lombok.Getter;
 import lombok.Setter;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -36,29 +37,37 @@ public class WebContext {
             fastThreadLocal.set(webContext);
         }
         webContext.setHttpRequest(httpRequest);
+
+        HttpHeaders headers = httpRequest.headers();
+        String cookieStr = headers.get("Cookie");
+        if (StrUtil.isEmpty(cookieStr)) {
+            cookieStr = headers.get("cookie");
+        }
+        if (StrUtil.isEmpty(cookieStr)) {
+            String host = headers.get("host");
+            if (StrUtil.isEmpty(host)) {
+                host = headers.get("Host");
+            }
+            Cookie cookie = new DefaultCookie("session_id", IdUtil.fastSimpleUUID());
+            cookie.setDomain(host);
+            cookie.setHttpOnly(true);
+            webContext.sessionCookie.add(cookie);
+        } else {
+            Set<Cookie> cookies = ServerCookieDecoder.LAX.decode(cookieStr);
+            webContext.sessionCookie.addAll(cookies);
+        }
+
+
         return webContext;
     }
 
 
     public Set<Cookie> getCookies() {
-        HttpHeaders headers = httpRequest.headers();
-        String cookieStr = headers.get("Cookie");
-        if (StrUtil.isEmpty(cookieStr)) {
-            cookieStr = headers.get("cookie");
-        }
-        Set<Cookie> cookies = ServerCookieDecoder.LAX.decode(cookieStr);
-
-        return cookies;
+        return this.sessionCookie;
     }
 
     public Cookie getCookie(String name) {
-        HttpHeaders headers = httpRequest.headers();
-        String cookieStr = headers.get("Cookie");
-        if (StrUtil.isEmpty(cookieStr)) {
-            cookieStr = headers.get("cookie");
-        }
-        Set<Cookie> cookies = ServerCookieDecoder.LAX.decode(cookieStr);
-        for (Cookie cookie : cookies) {
+        for (Cookie cookie : this.sessionCookie) {
             if (Objects.equals(cookie.name(), name)) {
                 return cookie;
             }
@@ -69,15 +78,7 @@ public class WebContext {
     public Map<String, Object> getSession() {
         Cookie cookie = getCookie("session_id");
         if (cookie == null) {
-            HttpHeaders headers = httpRequest.headers();
-            String host = headers.get("host");
-            if (StrUtil.isEmpty(host)) {
-                host = headers.get("Host");
-            }
-            cookie = new DefaultCookie("session_id", IdUtil.fastSimpleUUID());
-            cookie.setDomain(host);
-            cookie.setHttpOnly(true);
-            sessionCookie.add(cookie);
+            return new HashMap<>();
         }
         Map<String, Object> stringObjectMap = sessionCache.get(cookie.domain() + cookie.value());
         if (stringObjectMap == null) {
@@ -90,7 +91,7 @@ public class WebContext {
     @Setter
     FullHttpRequest httpRequest;
 
-    Set<Cookie> sessionCookie;
+    Set<Cookie> sessionCookie = new HashSet<>();
 
 
 }
