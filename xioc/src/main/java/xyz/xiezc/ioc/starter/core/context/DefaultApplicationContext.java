@@ -9,11 +9,4 @@ package xyz.xiezc.ioc.starter.core.context;
 public class DefaultApplicationContext extends AbstractApplicationContext {
 
 
-
-
-    @Override
-    public void finish() {
-
-    }
-
 }

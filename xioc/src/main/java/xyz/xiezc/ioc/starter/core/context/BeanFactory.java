@@ -4,6 +4,7 @@ import xyz.xiezc.ioc.starter.core.definition.BeanDefinition;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * 真正的容器接口
@@ -17,6 +18,11 @@ public interface BeanFactory {
      */
     String beanFactoryId();
 
+    /**
+     * 获取启动类
+     * @return
+     */
+    Class getAppRunClass();
 
     /**
      * 获取容器中的bean集合
@@ -40,6 +46,12 @@ public interface BeanFactory {
      * @return
      */
     <T> T getProperty(String propertyName);
+
+    /**
+     * 获取所有的配置信息
+     * @return
+     */
+    Properties getProperties();
 
     /**
      * 获取bean,

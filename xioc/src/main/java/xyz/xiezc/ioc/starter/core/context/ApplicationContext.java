@@ -10,6 +10,11 @@ import xyz.xiezc.ioc.starter.eventListener.ApplicationEvent;
  **/
 public interface ApplicationContext extends BeanFactory {
     /**
+     *
+     * @param applicationContext
+     */
+    void setApplicationContext(ApplicationContext applicationContext);
+    /**
      * 整个框架的核心启动方法
      *
      * @param clazz 启动类

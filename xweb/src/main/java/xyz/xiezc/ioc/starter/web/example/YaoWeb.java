@@ -1,6 +1,6 @@
 package xyz.xiezc.ioc.starter.web.example;
 
-import xyz.xiezc.ioc.starter.example.Yao;
+import xyz.xiezc.ioc.starter.Yao;
 import xyz.xiezc.ioc.starter.web.DispatcherHandler;
 
 /**

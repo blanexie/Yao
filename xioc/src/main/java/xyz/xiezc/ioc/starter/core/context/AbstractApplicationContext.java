@@ -57,6 +57,11 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
     protected Map<Class<?>, BeanDefinition> singletonBeanDefinitionMap = new ConcurrentHashMap<>();
 
     /**
+     * 启动类
+     */
+    private Class appRunClass;
+
+    /**
      * 配置文件信息
      */
     @Setter
@@ -69,8 +74,17 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
     @Getter
     EventDispatcher eventDispatcher;
 
+
+    List<ApplicationContext> applicationContexts=new ArrayList<>();
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) {
+        applicationContexts.add(applicationContext);
+    }
+
     @Override
     public ApplicationContext run(Class clazz) {
+        this.appRunClass = clazz;
         //清除
         clearContext();
         addApplictionEvent(new ApplicationEvent(EventNameConstant.clearContextEvent));
@@ -78,8 +92,7 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
         loadProperties();
         addApplictionEvent(new ApplicationEvent(EventNameConstant.loadPropertiesEvent));
 
-        loadBeanDefinition("xyz.xiezc.ioc.starter");
-        loadBeanDefinition(clazz.getPackageName());
+        loadBeanDefinition("xyz.xiezc.ioc.starter",clazz.getPackageName());
         addApplictionEvent(new ApplicationEvent(EventNameConstant.loadBeanDefinitionEvent));
 
         beforeInvoke();
@@ -158,6 +171,9 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
         singletonBeanDefinitionMap.clear();
         setting.clear();
         BeanCreateUtil.getInstacne(this).clear();
+        for (ApplicationContext applicationContext : applicationContexts) {
+            applicationContext.clearContext();
+        }
     }
 
 
@@ -170,6 +186,9 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
         if (resource != null) {
             this.setting.addSetting(new Setting(resource, CharsetUtil.CHARSET_UTF_8, true));
         }
+        for (ApplicationContext applicationContext : applicationContexts) {
+            applicationContext.loadProperties();
+        }
     }
 
     /**
@@ -179,6 +198,13 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
      */
     @Override
     public void loadBeanDefinition(String... packageNames) {
+        BeanDefinition rootBeanDefinition = new BeanDefinition();
+        rootBeanDefinition.setBean(this);
+        rootBeanDefinition.setBeanClass(this.getClass());
+        rootBeanDefinition.setBeanStatus(BeanStatusEnum.Completed);
+        rootBeanDefinition.setBeanTypeEnum(BeanTypeEnum.bean);
+        this.addBean(rootBeanDefinition);
+
         for (String packageName : packageNames) {
             Set<Class<?>> classConfiguration = ClassUtil.scanPackageByAnnotation(packageName, Configuration.class);
             Set<Class<?>> classComponent = ClassUtil.scanPackageByAnnotation(packageName, Component.class);
@@ -204,11 +230,22 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
                         this.addBean(clazz);
                     });
         }
+
+        for (ApplicationContext applicationContext : applicationContexts) {
+            applicationContext.loadBeanDefinition(packageNames);
+        }
     }
 
     @Override
     public void beforeInvoke() {
+        for (ApplicationContext applicationContext : applicationContexts) {
+            applicationContext.beforeInvoke();
+        }
+    }
 
+    @Override
+    public Class getAppRunClass() {
+        return appRunClass;
     }
 
     /**
@@ -261,6 +298,11 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
                         beanFactoryPostProcessSet.add(beanDefinition);
                     });
         }
+
+
+        for (ApplicationContext applicationContext : applicationContexts) {
+            applicationContext.invokeBeanFactoryPostProcess();
+        }
     }
 
     void invokeConfigurationProcess() {
@@ -292,6 +334,10 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
         for (BeanDefinition beanDefinition : collect) {
             beanCreateUtil.createAndInject(beanDefinition);
             beanPostProcessPriorityQueue.add(beanDefinition.getBean());
+        }
+
+        for (ApplicationContext applicationContext : applicationContexts) {
+            applicationContext.initBeanPostProcess();
         }
     }
 
@@ -327,6 +373,9 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
         for (ApplicationListener listener : applicationListener) {
             eventDispatcher.addListener(listener);
         }
+        for (ApplicationContext applicationContext : applicationContexts) {
+            applicationContext.loadListener();
+        }
     }
 
 
@@ -344,12 +393,22 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
         getSingletonBeanDefinitionMap().forEach((k, v) -> {
             instacne.initAndComplete(v);
         });
+
+        for (ApplicationContext applicationContext : applicationContexts) {
+            applicationContext.initAllBeans();
+        }
     }
 
 
     @Override
     public String getProperty(String propertyName) {
         return setting.getStr(propertyName);
+    }
+
+
+    @Override
+    public Properties getProperties() {
+        return setting.toProperties();
     }
 
     @Override
@@ -369,20 +428,10 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
         this.getSingletonBeanDefinitionMap().put(beanDefinition.getBeanClass(), beanDefinition);
     }
 
-    private <T> T covert(String value, Class<T> clazz) {
-        try {
-            return Convert.convert(clazz, value);
-        } catch (ConvertException e) {
-            throw e;
+    @Override
+    public void finish() {
+        for (ApplicationContext applicationContext : applicationContexts) {
+            applicationContext.finish();
         }
-    }
-
-
-    private boolean isArray(Class<?> clazz) {
-        return clazz.isArray();
-    }
-
-    private boolean isCollection(Class<?> clazz) {
-        return ClassUtil.isAssignable(Collection.class, clazz);
     }
 }
