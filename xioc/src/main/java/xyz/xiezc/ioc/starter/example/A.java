@@ -5,6 +5,9 @@ import xyz.xiezc.ioc.starter.annotation.core.Component;
 import xyz.xiezc.ioc.starter.aop.TimeIntervalAspect;
 
 
+/**
+ * @author xiezc
+ */
 @Component
 public class A {
 

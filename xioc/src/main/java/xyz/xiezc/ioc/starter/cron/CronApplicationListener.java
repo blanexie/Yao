@@ -2,6 +2,7 @@ package xyz.xiezc.ioc.starter.cron;
 
 import cn.hutool.cron.CronUtil;
 import cn.hutool.cron.task.Task;
+import cn.hutool.log.Log;
 import xyz.xiezc.ioc.starter.annotation.core.Component;
 import xyz.xiezc.ioc.starter.common.enums.EventNameConstant;
 import xyz.xiezc.ioc.starter.eventListener.ApplicationEvent;
@@ -11,6 +12,8 @@ import java.util.*;
 
 @Component
 public class CronApplicationListener implements ApplicationListener {
+
+    Log log= Log.get(CronApplicationListener.class);
 
     Set<String> eventNames = new HashSet<>() {{
         add(EventNameConstant.finishEvent);
@@ -44,6 +47,7 @@ public class CronApplicationListener implements ApplicationListener {
         // 支持秒级别定时任务
         CronUtil.setMatchSecond(true);
         CronUtil.start(true);
+        log.info("定时任务启动完成......");
     }
 
     @Override

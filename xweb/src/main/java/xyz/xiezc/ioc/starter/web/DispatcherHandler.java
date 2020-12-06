@@ -1,11 +1,9 @@
 package xyz.xiezc.ioc.starter.web;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.io.file.PathUtil;
-import cn.hutool.core.util.CharsetUtil;
-import cn.hutool.core.util.ReflectUtil;
-import cn.hutool.core.util.StrUtil;
-import cn.hutool.core.util.URLUtil;
+import cn.hutool.core.util.*;
 import cn.hutool.json.JSONUtil;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
@@ -36,12 +34,13 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 /**
  * 所有http请求的分发器
+ *
+ * @author xiezc
  */
 @Component
 public class DispatcherHandler {
 
     static Log log = LogFactory.get(DispatcherHandler.class);
-
 
     public static Map<String, RequestDefinition> requestDefinitionMap = new HashMap<>();
 
@@ -65,17 +64,24 @@ public class DispatcherHandler {
             WebContext.build(httpRequest);
             String uri = httpRequest.uri();
             HttpMethod httpMethod = httpRequest.method();
-            log.info("url:{} method:{} ",uri,httpMethod);
+            log.info("url:{} method:{} ", uri, httpMethod);
             RequestDefinition requestDefinition = requestDefinitionMap.get(Helper.normalizeUrl(URLUtil.getPath(uri)));
+            if (requestDefinition == null) {
+                ByteBuf byteBuf = Unpooled.wrappedBuffer(StrUtil.bytes(HttpResponseStatus.NOT_FOUND.toString()));
+                return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.NOT_FOUND, byteBuf);
+
+            }
             if (requestDefinition.getHttpMethod() != httpMethod) {
-                return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.METHOD_NOT_ALLOWED);
+                ByteBuf byteBuf = Unpooled.wrappedBuffer(StrUtil.bytes(HttpResponseStatus.METHOD_NOT_ALLOWED.toString()));
+                return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.METHOD_NOT_ALLOWED, byteBuf);
             }
 
             HttpHeaders headers = httpRequest.headers();
             ContentType contentType = getContentType(headers, httpMethod);
             HttpMessageConverter httpMessageConverter = httpMessageConverterMap.get(contentType);
             if (httpMessageConverter == null) {
-                return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.UNSUPPORTED_MEDIA_TYPE);
+                ByteBuf byteBuf = Unpooled.wrappedBuffer(StrUtil.bytes(HttpResponseStatus.UNSUPPORTED_MEDIA_TYPE.toString()));
+                return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.UNSUPPORTED_MEDIA_TYPE, byteBuf);
             }
             //获取请求的body
             LinkedHashMap<String, Parameter> parameterMap = requestDefinition.getParameterMap();
@@ -111,6 +117,9 @@ public class DispatcherHandler {
         if (StrUtil.isBlank(contentTypeStr)) {
             contentTypeStr = headers.get("content-type");
         }
+        if (contentTypeStr == null) {
+            return null;
+        }
         ContentType contentType;
         if (StrUtil.equalsIgnoreCase(httpMethod.name(), "post")) {
             contentType = ContentType.getByValue(contentTypeStr);
@@ -125,10 +134,17 @@ public class DispatcherHandler {
         if (result == null) {
             result = "";
         }
-        HttpVersion httpVersion = httpRequest.protocolVersion();
 
+        String respStr = "";
+        if (ClassUtil.isSimpleValueType(result.getClass())) {
+            respStr = Convert.toStr(result);
+        } else {
+            respStr = JSONUtil.toJsonStr(result);
+        }
+
+        HttpVersion httpVersion = httpRequest.protocolVersion();
         FullHttpResponse response = new DefaultFullHttpResponse(httpVersion, OK,
-                Unpooled.wrappedBuffer(JSONUtil.toJsonStr(result).getBytes(CharsetUtil.UTF_8)));
+                Unpooled.wrappedBuffer(StrUtil.bytes(respStr, CharsetUtil.UTF_8)));
         response.headers()
                 .set(CONTENT_TYPE, ContentType.JSON.getValue())
                 .setInt(CONTENT_LENGTH, response.content().readableBytes());

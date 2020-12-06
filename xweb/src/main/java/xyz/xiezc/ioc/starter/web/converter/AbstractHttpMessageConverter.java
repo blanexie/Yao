@@ -12,8 +12,10 @@ import java.lang.reflect.Type;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * @author xiezc
+ */
 public abstract class AbstractHttpMessageConverter implements HttpMessageConverter {
-
 
 
     @NotNull

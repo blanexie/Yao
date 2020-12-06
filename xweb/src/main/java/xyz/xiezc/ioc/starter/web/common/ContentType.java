@@ -12,7 +12,7 @@ import java.nio.charset.Charset;
  */
 public enum ContentType {
 
-    Default("application/json"),
+    Default( "get"),
     /**
      * text/html编码
      */

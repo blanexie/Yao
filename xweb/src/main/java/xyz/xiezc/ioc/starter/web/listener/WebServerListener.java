@@ -49,6 +49,11 @@ public class WebServerListener implements ApplicationListener {
     }
 
     @Override
+    public boolean getSync() {
+        return false;
+    }
+
+    @Override
     public void doExecute(ApplicationEvent applicationEvent) {
         this.startWebServer(xWebProperties);
     }

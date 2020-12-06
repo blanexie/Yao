@@ -15,8 +15,11 @@
  */
 package xyz.xiezc.ioc.starter.web.netty;
 
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.handler.codec.http.*;
 import xyz.xiezc.ioc.starter.web.DispatcherHandler;
@@ -35,7 +38,7 @@ import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
  * 2018/10/15
  */
 @ChannelHandler.Sharable
-public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
+public class HttpServerHandler extends  ChannelInboundHandlerAdapter {
 
     Log log = LogFactory.get(HttpServerHandler.class);
 
@@ -46,12 +49,8 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
     }
 
     @Override
-    public void channelReadComplete(ChannelHandlerContext ctx) {
-        ctx.flush();
-    }
-
-    @Override
-    public void channelRead0(ChannelHandlerContext ctx, FullHttpRequest httpRequest) {
+    public void channelRead (ChannelHandlerContext ctx,  Object msg) {
+        FullHttpRequest httpRequest=(FullHttpRequest)msg;
         log.info("进入HttpServerHandler：{}", httpRequest.uri());
         CompletableFuture<FullHttpRequest> future = CompletableFuture.completedFuture(httpRequest);
         Executor executor = ctx.executor();
@@ -77,7 +76,8 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         log.error(cause.getMessage(), cause);
         if (!isResetByPeer(cause)) {
-            FullHttpResponse response = new DefaultFullHttpResponse(HTTP_1_1, HttpResponseStatus.valueOf(500));
+            ByteBuf byteBuf = Unpooled.wrappedBuffer(StrUtil.bytes(HttpResponseStatus.NOT_FOUND.toString()));
+            FullHttpResponse response = new DefaultFullHttpResponse(HTTP_1_1, HttpResponseStatus.INTERNAL_SERVER_ERROR,byteBuf);
             ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
         }
     }

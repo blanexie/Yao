@@ -3,6 +3,8 @@ package xyz.xiezc.ioc.starter.cron;
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ReflectUtil;
+import cn.hutool.log.Log;
+import lombok.extern.slf4j.Slf4j;
 import xyz.xiezc.ioc.starter.annotation.core.Autowire;
 import xyz.xiezc.ioc.starter.annotation.core.Component;
 import xyz.xiezc.ioc.starter.annotation.cron.Cron;
@@ -12,9 +14,12 @@ import xyz.xiezc.ioc.starter.core.process.BeanPostProcess;
 
 import java.lang.reflect.Method;
 
+
 @Component
 public class CronBeanPostProcess implements BeanPostProcess {
 
+
+    Log log=Log.get(CronBeanPostProcess.class);
     @Override
     public int order() {
         return 90;
@@ -54,6 +59,7 @@ public class CronBeanPostProcess implements BeanPostProcess {
                 throw new RuntimeException("cron 注解的方法不能有参数, method:" + declaredMethod);
             }
             String cronStr = cron.value();
+            log.info("扫描到定时任务， cron:{}  method:{}",cronStr,declaredMethod.getName());
             cronApplicationListener.addCronTask(cronStr, () -> ReflectUtil.invoke(beanDefinition.getCompletedBean(), declaredMethod));
         }
         return true;

@@ -9,6 +9,10 @@ import cn.hutool.json.JSONUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.multipart.DefaultHttpDataFactory;
+import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder;
+import io.netty.handler.codec.http.multipart.InterfaceHttpData;
+import io.netty.handler.codec.http.multipart.MemoryAttribute;
 import xyz.xiezc.ioc.starter.annotation.core.Component;
 import xyz.xiezc.ioc.starter.web.annotation.RequestBody;
 import xyz.xiezc.ioc.starter.web.common.ContentType;
@@ -28,10 +32,11 @@ public class JsonHttpMessageConverter implements HttpMessageConverter {
         return contentTypes;
     }
 
+
     @Override
     public Object[] parseParamaters(FullHttpRequest httpRequest, LinkedHashMap<String, Parameter> paramMap) {
         ByteBuf content = httpRequest.content();
-        String body = new String(ByteBufUtil.getBytes(content), CharsetUtil.CHARSET_UTF_8);
+        String body = new String(  ByteBufUtil.getBytes(content), CharsetUtil.CHARSET_UTF_8);
         Set<Map.Entry<String, Parameter>> entries = paramMap.entrySet();
         Object[] result = new Object[entries.size()];
         int index = -1;
