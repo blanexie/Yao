@@ -204,6 +204,7 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
         rootBeanDefinition.setBeanStatus(BeanStatusEnum.Completed);
         rootBeanDefinition.setBeanTypeEnum(BeanTypeEnum.bean);
         this.addBean(rootBeanDefinition);
+        Set<Class> annotationSet = new HashSet<>();
 
         for (String packageName : packageNames) {
             Set<Class<?>> classConfiguration = ClassUtil.scanPackageByAnnotation(packageName, Configuration.class);
@@ -216,14 +217,12 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
                     .collect(Collectors.toList());
             List<Class> collect1 = classComponent.stream().filter(clazz -> ClassUtil.isAssignable(Annotation.class, clazz))
                     .collect(Collectors.toList());
-            Set<Class> annotationSet = new HashSet<>();
+
             annotationSet.addAll(collect);
             annotationSet.addAll(collect1);
-
             for (Class aClass : annotationSet) {
                 componentSet.addAll(ClassUtil.scanPackageByAnnotation(packageName, aClass));
             }
-
             componentSet.stream()
                     .filter(clazz -> !ClassUtil.isAssignable(Annotation.class, clazz))
                     .forEach(clazz -> {
