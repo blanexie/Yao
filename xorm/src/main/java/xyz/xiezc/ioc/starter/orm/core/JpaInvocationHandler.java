@@ -23,6 +23,8 @@ import java.util.stream.Collectors;
  */
 public class JpaInvocationHandler implements InvocationHandler {
 
+    private final EntityManagerFactory entityManagerFactory;
+
     ThreadLocal<TranslationEntityManager> threadLocal = ThreadUtil.createThreadLocal(false);
     /**
      * 方法sql
@@ -31,13 +33,11 @@ public class JpaInvocationHandler implements InvocationHandler {
 
 
     public JpaInvocationHandler(Class clazz, EntityManagerFactory entityManagerFactory) {
-        threadLocal.set(new TranslationEntityManager(entityManagerFactory));
-
+        this.entityManagerFactory = entityManagerFactory;
         Method[] declaredMethods = ClassUtil.getDeclaredMethods(clazz);
         for (Method declaredMethod : declaredMethods) {
             Query query = AnnotationUtil.getAnnotation(declaredMethod, Query.class);
             if (query == null) {
-
                 continue;
             }
             JpaMethod jpaMethod = new JpaMethod();
@@ -67,20 +67,15 @@ public class JpaInvocationHandler implements InvocationHandler {
         if (jpaMethod == null) {
             throw new IllegalArgumentException("method: " + method.getName() + " 没有对应的Hql语句");
         }
-
         TranslationEntityManager translationEntityManager = threadLocal.get();
+        if (translationEntityManager == null) {
+            translationEntityManager = new TranslationEntityManager(entityManagerFactory);
+            threadLocal.set(translationEntityManager);
+        }
         EntityManager entityManager = translationEntityManager.getEntityManager();
         try {
             if (jpaMethod.isSave) {
-                Object arg = args[0];
-                if (ClassUtil.isAssignable(List.class, arg.getClass())) {
-                    List list = (List) arg;
-                    for (Object o : list) {
-                        entityManager.persist(o);
-                    }
-                } else {
-                    entityManager.persist(arg);
-                }
+                save(args[0], entityManager);
                 translationEntityManager.commit();
                 return null;
             }
@@ -136,6 +131,23 @@ public class JpaInvocationHandler implements InvocationHandler {
             translationEntityManager.rollback();
             throw e;
         }
+    }
 
+    /**
+     * 特定的save方法
+     *
+     * @param arg1
+     * @param entityManager
+     */
+    private void save(Object arg1, EntityManager entityManager) {
+        Object arg = arg1;
+        if (ClassUtil.isAssignable(List.class, arg.getClass())) {
+            List list = (List) arg;
+            for (Object o : list) {
+                entityManager.persist(o);
+            }
+        } else {
+            entityManager.persist(arg);
+        }
     }
 }
