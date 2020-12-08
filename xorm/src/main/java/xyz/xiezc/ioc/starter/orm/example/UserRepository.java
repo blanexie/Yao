@@ -10,7 +10,6 @@ import java.util.List;
 @Repository
 public interface UserRepository extends BasicRepository<UserTest> {
 
-
     @Query("from UserTest")
     List<UserTest> find( );
 

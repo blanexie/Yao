@@ -4,6 +4,7 @@ import xyz.xiezc.ioc.starter.Yao;
 import xyz.xiezc.ioc.starter.core.context.ApplicationContext;
 import xyz.xiezc.ioc.starter.core.definition.BeanDefinition;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class JpaApp {
@@ -15,7 +16,14 @@ public class JpaApp {
         UserRepository userRepository = beanDefinition.getBean();
         UserTest userTest= new UserTest();
         userTest.setName("xzc");
-        userRepository.save(userTest);
+        userRepository.save(Arrays.asList(userTest));
+        userTest.setId(null);
+        userRepository.save(Arrays.asList(userTest));
+        userTest.setId(null);
+        userRepository.save(Arrays.asList(userTest));
+        userTest.setId(null);
+        userRepository.save(Arrays.asList(userTest));
+
         List<UserTest> userTests = userRepository.find();
         for (UserTest test : userTests) {
             System.out.println(test);

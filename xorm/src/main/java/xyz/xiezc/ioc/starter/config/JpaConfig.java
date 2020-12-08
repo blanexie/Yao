@@ -12,9 +12,12 @@ import lombok.Setter;
 import lombok.Synchronized;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.boot.registry.BootstrapServiceRegistry;
 import org.hibernate.boot.registry.BootstrapServiceRegistryBuilder;
+import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.jpa.HibernatePersistenceProvider;
 import org.hibernate.service.ServiceRegistry;
 import xyz.xiezc.ioc.starter.annotation.core.Autowire;
 import xyz.xiezc.ioc.starter.annotation.core.Component;
@@ -55,10 +58,10 @@ public class JpaConfig implements ApplicationContext {
             factory.close();
             factory = null;
         }
-
         Properties properties = applicationContext.getProperties();
+//        HibernatePersistenceProvider hibernatePersistenceProvider=new HibernatePersistenceProvider();
+//        factory = hibernatePersistenceProvider.createEntityManagerFactory("PersistenceUnit", properties);
         factory = Persistence.createEntityManagerFactory("PersistenceUnit", properties);
-        EntityManager entityManager = factory.createEntityManager();
         //找到所有的接口类， 生成代理类
         Class appRunClass = applicationContext.getAppRunClass();
         //获取
@@ -69,7 +72,7 @@ public class JpaConfig implements ApplicationContext {
         //扫描到的接口
         Set<Class<?>> classes = ClassUtil.scanPackageByAnnotation(property, Repository.class);
         for (Class<?> aClass : classes) {
-            Object proxy = ProxyUtil.newProxyInstance(new JpaInvocationHandler(aClass, entityManager), aClass);
+            Object proxy = ProxyUtil.newProxyInstance(new JpaInvocationHandler(aClass, factory), aClass);
             BeanDefinition beanDefinition = new BeanDefinition();
             beanDefinition.setBeanTypeEnum(BeanTypeEnum.bean);
             beanDefinition.setBean(proxy);
