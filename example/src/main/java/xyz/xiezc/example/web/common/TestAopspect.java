@@ -1,8 +1,8 @@
 package xyz.xiezc.example.web.common;
 
-import cn.hutool.json.JSONUtil;
-import xyz.xiezc.ioc.annotation.core.Component;
-import xyz.xiezc.ioc.starter.common.AopAspect;
+import lombok.extern.slf4j.Slf4j;
+import xyz.xiezc.ioc.starter.annotation.core.Component;
+import xyz.xiezc.ioc.starter.aop.XAspect;
 
 import java.lang.reflect.Method;
 
@@ -13,21 +13,25 @@ import java.lang.reflect.Method;
  * @Date 2020/6/4 10:13 上午
  **/
 @Component
-public class TestAopspect extends AopAspect {
+@Slf4j
+public class TestAopspect extends XAspect {
+
+
     @Override
-    public boolean doBefore(Object target, Method method, Object[] args) {
-        System.out.println("TestAopspect doBefore " + method.getName() + " args:" + JSONUtil.toJsonStr(args));
+    public boolean beforeMethod(Object target, Method method, Object[] args) {
+        log.info("TestAopspect beforeMethod， method:{}", method.getName());
         return true;
     }
 
     @Override
-    public boolean doAfter(Object target, Method method, Object[] args, Object returnVal) {
-        System.out.println("TestAopspect doAfter " + method.getName() + " args:" + JSONUtil.toJsonStr(args) + " returnVal:" + JSONUtil.toJsonStr(returnVal));
+    public boolean afterMethod(Object target, Method method, Object[] args) {
+        log.info("TestAopspect afterMethod, method:{}", method.getName());
         return true;
     }
 
     @Override
-    public boolean doAfterException(Object target, Method method, Object[] args, Throwable e) {
+    public boolean afterMethodException(Object target, Method method, Object[] args) {
+        log.info("TestAopspect afterMethodException, method:{}", method.getName());
         return true;
     }
 }

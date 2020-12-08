@@ -18,6 +18,7 @@ import xyz.xiezc.ioc.starter.annotation.core.Init;
 import xyz.xiezc.ioc.starter.core.definition.BeanDefinition;
 import xyz.xiezc.ioc.starter.web.common.ContentType;
 import xyz.xiezc.ioc.starter.web.common.Helper;
+import xyz.xiezc.ioc.starter.web.common.XWebUtil;
 import xyz.xiezc.ioc.starter.web.converter.HttpMessageConverter;
 import xyz.xiezc.ioc.starter.web.entity.RequestDefinition;
 import xyz.xiezc.ioc.starter.web.entity.WebContext;
@@ -67,21 +68,17 @@ public class DispatcherHandler {
             log.info("url:{} method:{} ", uri, httpMethod);
             RequestDefinition requestDefinition = requestDefinitionMap.get(Helper.normalizeUrl(URLUtil.getPath(uri)));
             if (requestDefinition == null) {
-                ByteBuf byteBuf = Unpooled.wrappedBuffer(StrUtil.bytes(HttpResponseStatus.NOT_FOUND.toString()));
-                return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.NOT_FOUND, byteBuf);
-
+                return XWebUtil.getErrorResponse(HttpResponseStatus.NOT_FOUND, httpRequest);
             }
             if (requestDefinition.getHttpMethod() != httpMethod) {
-                ByteBuf byteBuf = Unpooled.wrappedBuffer(StrUtil.bytes(HttpResponseStatus.METHOD_NOT_ALLOWED.toString()));
-                return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.METHOD_NOT_ALLOWED, byteBuf);
+                return XWebUtil.getErrorResponse(HttpResponseStatus.METHOD_NOT_ALLOWED, httpRequest);
             }
 
             HttpHeaders headers = httpRequest.headers();
             ContentType contentType = getContentType(headers, httpMethod);
             HttpMessageConverter httpMessageConverter = httpMessageConverterMap.get(contentType);
             if (httpMessageConverter == null) {
-                ByteBuf byteBuf = Unpooled.wrappedBuffer(StrUtil.bytes(HttpResponseStatus.UNSUPPORTED_MEDIA_TYPE.toString()));
-                return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.UNSUPPORTED_MEDIA_TYPE, byteBuf);
+                return XWebUtil.getErrorResponse(HttpResponseStatus.UNSUPPORTED_MEDIA_TYPE, httpRequest);
             }
             //获取请求的body
             LinkedHashMap<String, Parameter> parameterMap = requestDefinition.getParameterMap();
@@ -103,8 +100,7 @@ public class DispatcherHandler {
             return fullHttpResponse;
         } catch (Exception e) {
             log.error("服务器异常", e);
-            ByteBuf byteBuf = Unpooled.wrappedBuffer(StrUtil.bytes(e.getMessage()));
-            return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.INTERNAL_SERVER_ERROR, byteBuf);
+            return XWebUtil.getErrorResponse(HttpResponseStatus.INTERNAL_SERVER_ERROR, e.getMessage(), httpRequest);
         }
     }
 

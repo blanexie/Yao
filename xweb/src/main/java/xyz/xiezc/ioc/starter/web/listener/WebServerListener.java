@@ -1,5 +1,7 @@
 package xyz.xiezc.ioc.starter.web.listener;
 
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 import io.netty.bootstrap.ServerBootstrap;
@@ -16,10 +18,10 @@ import lombok.SneakyThrows;
 import xyz.xiezc.ioc.starter.annotation.core.Autowire;
 import xyz.xiezc.ioc.starter.annotation.core.Component;
 import xyz.xiezc.ioc.starter.common.enums.EventNameConstant;
+import xyz.xiezc.ioc.starter.core.context.ApplicationContext;
 import xyz.xiezc.ioc.starter.eventListener.ApplicationEvent;
 import xyz.xiezc.ioc.starter.eventListener.ApplicationListener;
 import xyz.xiezc.ioc.starter.web.DispatcherHandler;
-import xyz.xiezc.ioc.starter.web.common.XWebProperties;
 import xyz.xiezc.ioc.starter.web.netty.NettyWebServerInitializer;
 
 import java.io.File;
@@ -33,18 +35,16 @@ import java.util.Set;
 @Component
 public class WebServerListener implements ApplicationListener {
 
-
     Log log = LogFactory.get(WebServerListener.class);
 
     Set<String> set = new HashSet<>() {{
         add(EventNameConstant.loadListenerEvent);
     }};
 
-
     @Autowire
     DispatcherHandler dispatcherHandler;
     @Autowire
-    XWebProperties xWebProperties;
+    ApplicationContext applicationContext;
 
     @Override
     public Set<String> dealEventName() {
@@ -58,20 +58,20 @@ public class WebServerListener implements ApplicationListener {
 
     @Override
     public void doExecute(ApplicationEvent applicationEvent) {
-        this.startWebServer(xWebProperties);
+        this.startWebServer( );
     }
 
     @SneakyThrows
-    private void startWebServer(XWebProperties xWebProperties) {
-        boolean ssl = xWebProperties.isSsl();
-        int port = xWebProperties.getPort();
-        String staticPath = xWebProperties.getStaticPath();
-        String websocketPath = xWebProperties.getWebsocketPath();
+    private void startWebServer( ) {
+        String sslEnable = applicationContext.getProperty("server.ssl.enable");
+        String port = applicationContext.getProperty("server.port");
         // Configure SSL.
         final SslContext sslCtx;
-        if (ssl) {
-            File certChainFile = new File(xWebProperties.getCertChainFilePath());
-            File privateKeyFile = new File(xWebProperties.getPrivatekeyFilePath());
+        if (StrUtil.equalsIgnoreCase(sslEnable,"true")) {
+            String certChainFilePath = applicationContext.getProperty("server.ssl.certChainFilePath");
+            File certChainFile = new File(certChainFilePath);
+            String privateKeyFilePath = applicationContext.getProperty("server.ssl.privateKeyFilePath");
+            File privateKeyFile = new File(privateKeyFilePath);
             if (!certChainFile.exists() || !privateKeyFile.exists()) {
                 throw new RuntimeException("启用了SSL, 请配置证书文件路径");
             }
@@ -89,19 +89,16 @@ public class WebServerListener implements ApplicationListener {
             b.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
                     .handler(new LoggingHandler(LogLevel.DEBUG))
-                    .childHandler(new NettyWebServerInitializer(sslCtx, dispatcherHandler, staticPath, websocketPath));
-
-            Channel ch = b.bind(port).sync().channel();
+                    .childHandler(new NettyWebServerInitializer(sslCtx, dispatcherHandler));
+            Channel ch = b.bind(Convert.toInt(port,8016)).sync().channel();
 
             log.info("Open your web browser and navigate to " +
-                    (ssl ? "https" : "http") + "://127.0.0.1:" + port + '/');
-
+                    (StrUtil.equalsIgnoreCase(sslEnable,"true") ? "https" : "http") + "://127.0.0.1:" + port + '/');
             ch.closeFuture().sync();
         } finally {
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
         }
     }
-
 
 }

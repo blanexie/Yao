@@ -3,7 +3,6 @@ package xyz.xiezc.ioc.starter.web.converter;
 import io.netty.handler.codec.http.FullHttpRequest;
 import xyz.xiezc.ioc.starter.annotation.core.Component;
 import xyz.xiezc.ioc.starter.web.common.ContentType;
-import xyz.xiezc.ioc.starter.web.entity.HttpRequest;
 
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
@@ -13,6 +12,7 @@ import java.util.Map;
 
 /**
  * multipart/form-data 类型的请求解析
+ * @author xiezc
  */
 @Component
 public class MultipartFormHttpMessageConverter extends AbstractPostHttpMessageConverter {

@@ -1,7 +1,8 @@
 package xyz.xiezc.example.web.common;
 
 import lombok.Data;
-import xyz.xiezc.ioc.annotation.core.Configuration;
+import xyz.xiezc.ioc.starter.annotation.core.Configuration;
+import xyz.xiezc.ioc.starter.annotation.core.Value;
 
 /**
  * @Description TODO
@@ -14,8 +15,8 @@ import xyz.xiezc.ioc.annotation.core.Configuration;
 public class PropertiesConfig {
 
 
+    @Value("server.port")
     private String port;
-    private String path;
 
 
 }

@@ -30,32 +30,24 @@ import io.netty.handler.ssl.SslContext;
 import io.netty.handler.stream.ChunkedWriteHandler;
 import lombok.Data;
 import xyz.xiezc.ioc.starter.web.DispatcherHandler;
-import xyz.xiezc.ioc.starter.web.netty.file.HttpStaticFileServerHandler;
-import xyz.xiezc.ioc.starter.web.netty.websocket.WebSocketServerHandler;
 
+/**
+ * @author xiezc
+ */
 @Data
 public class NettyWebServerInitializer extends ChannelInitializer<SocketChannel> {
 
-    private String WEBSOCKET_PATH;
 
     private SslContext sslCtx;
     private HttpServerHandler httpServerHandler;
-    public HttpStaticFileServerHandler httpStaticFileServerHandler;
-    public ParseRequestHandler parseRequestHandler;
 
 
     public NettyWebServerInitializer(SslContext sslCtx,
-                                     DispatcherHandler dispatcherHandler,
-                                     String staticPath,
-                                     String webSocketPath
+                                     DispatcherHandler dispatcherHandler
     ) {
         this.sslCtx = sslCtx;
         this.httpServerHandler = new HttpServerHandler(dispatcherHandler);
-        httpStaticFileServerHandler = new HttpStaticFileServerHandler(staticPath);
-        parseRequestHandler = new ParseRequestHandler();
-        WEBSOCKET_PATH = webSocketPath;
     }
-
 
     @Override
     public void initChannel(SocketChannel ch) {
@@ -67,7 +59,6 @@ public class NettyWebServerInitializer extends ChannelInitializer<SocketChannel>
         pipeline.addLast(new LoggingHandler(LogLevel.DEBUG));
         //编码
         pipeline.addLast(new HttpServerCodec());
-
         //100状态码处理
         pipeline.addLast(new HttpServerExpectContinueHandler());
         //拼装FullHttpRequest
@@ -78,17 +69,8 @@ public class NettyWebServerInitializer extends ChannelInitializer<SocketChannel>
         pipeline.addLast(new ChunkedWriteHandler());
         //防止cors
         pipeline.addLast(new CorsHandler(CorsConfigBuilder.forAnyOrigin().allowNullOrigin().allowCredentials().build()));
-
-        //WebSocket
-       // pipeline.addLast(new WebSocketServerHandler(DispatcherHandler.webSocketFrameHandlerMap, sslCtx != null));
-
-        //解析FullRequest成HttpRequest
-       // pipeline.addLast(parseRequestHandler);
-
         //业务逻辑
         pipeline.addLast(httpServerHandler);
-        //静态文件下载
-      //  pipeline.addLast(httpStaticFileServerHandler);
 
     }
 }

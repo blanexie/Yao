@@ -16,19 +16,12 @@
 
 package xyz.xiezc.ioc.starter.web.converter;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.convert.Convert;
-import cn.hutool.core.util.ClassUtil;
 import io.netty.handler.codec.http.FullHttpRequest;
 import xyz.xiezc.ioc.starter.web.common.ContentType;
-import xyz.xiezc.ioc.starter.web.entity.FileItem;
-import xyz.xiezc.ioc.starter.web.entity.HttpRequest;
 
 import java.lang.reflect.Parameter;
-import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Strategy interface that specifies a converter that can convert from and to HTTP requests and responses.

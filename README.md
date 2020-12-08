@@ -110,7 +110,7 @@ import cn.hutool.json.JSONUtil;
 import xyz.xiezc.example.web.common.TestAopspect;
 import xyz.xiezc.example.web.entity.Album;
 import xyz.xiezc.example.web.mapper.AlbumMapper;
-import xyz.xiezc.example.web.service.TestService;
+import xyz.xiezc.example.web.service.UserService;
 import Aop;
 import Autowire;
 import Example;

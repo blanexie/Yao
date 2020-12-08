@@ -27,11 +27,13 @@ import java.lang.reflect.Parameter;
 import java.nio.file.Path;
 import java.util.Collection;
 
+/**
+ * @author xiezc
+ */
 @Configuration
 public class WebBeanFactoryPostProcess implements BeanFactoryPostProcess {
 
     Log log = LogFactory.get(WebBeanFactoryPostProcess.class);
-
 
     @Override
     public void process(ApplicationContext applicationContext) {
@@ -60,6 +62,7 @@ public class WebBeanFactoryPostProcess implements BeanFactoryPostProcess {
                     for (int i = 0; i < parameters.length; i++) {
                         requestDefinition.getParameterMap().put(paramNames[i], parameters[i]);
                     }
+                    log.info("scan GET request path:{}",requestDefinition.getPath());
                     DispatcherHandler.requestDefinitionMap.put(requestDefinition.getPath(), requestDefinition);
                 }
                 PostMapping postMapping = publicMethod.getAnnotation(PostMapping.class);
@@ -77,6 +80,7 @@ public class WebBeanFactoryPostProcess implements BeanFactoryPostProcess {
                     for (int i = 0; i < parameters.length; i++) {
                         requestDefinition.getParameterMap().put(paramNames[i], parameters[i]);
                     }
+                    log.info("scan POST request path:{}",requestDefinition.getPath());
                     DispatcherHandler.requestDefinitionMap.put(requestDefinition.getPath(), requestDefinition);
                 }
             }

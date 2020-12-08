@@ -38,7 +38,7 @@ import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
  * 2018/10/15
  */
 @ChannelHandler.Sharable
-public class HttpServerHandler extends  ChannelInboundHandlerAdapter {
+public class HttpServerHandler extends ChannelInboundHandlerAdapter {
 
     Log log = LogFactory.get(HttpServerHandler.class);
 
@@ -49,8 +49,8 @@ public class HttpServerHandler extends  ChannelInboundHandlerAdapter {
     }
 
     @Override
-    public void channelRead (ChannelHandlerContext ctx,  Object msg) {
-        FullHttpRequest httpRequest=(FullHttpRequest)msg;
+    public void channelRead(ChannelHandlerContext ctx, Object msg) {
+        FullHttpRequest httpRequest = (FullHttpRequest) msg;
         log.info("进入HttpServerHandler：{}", httpRequest.uri());
         CompletableFuture<FullHttpRequest> future = CompletableFuture.completedFuture(httpRequest);
         Executor executor = ctx.executor();
@@ -60,7 +60,7 @@ public class HttpServerHandler extends  ChannelInboundHandlerAdapter {
                 writeResponse(ctx, future, fullHttpResponse);
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
-                FullHttpResponse errorResponse = XWebUtil.getErrorResponse(new XWebException(e), httpRequest);
+                FullHttpResponse errorResponse = XWebUtil.getErrorResponse(HttpResponseStatus.INTERNAL_SERVER_ERROR, e.getMessage(), httpRequest);
                 writeResponse(ctx, future, errorResponse);
             }
         }, executor);
@@ -77,11 +77,10 @@ public class HttpServerHandler extends  ChannelInboundHandlerAdapter {
         log.error(cause.getMessage(), cause);
         if (!isResetByPeer(cause)) {
             ByteBuf byteBuf = Unpooled.wrappedBuffer(StrUtil.bytes(HttpResponseStatus.NOT_FOUND.toString()));
-            FullHttpResponse response = new DefaultFullHttpResponse(HTTP_1_1, HttpResponseStatus.INTERNAL_SERVER_ERROR,byteBuf);
+            FullHttpResponse response = new DefaultFullHttpResponse(HTTP_1_1, HttpResponseStatus.INTERNAL_SERVER_ERROR, byteBuf);
             ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
         }
     }
-
 
 
     boolean isResetByPeer(Throwable e) {

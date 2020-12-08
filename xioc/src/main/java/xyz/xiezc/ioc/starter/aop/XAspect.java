@@ -6,6 +6,9 @@ import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * @author xiezc
+ */
 public abstract class XAspect implements Aspect {
 
     private Set<Method> aopMethods = new HashSet<>();
