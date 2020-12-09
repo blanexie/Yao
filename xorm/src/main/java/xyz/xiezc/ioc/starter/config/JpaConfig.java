@@ -18,6 +18,7 @@ import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.jpa.HibernatePersistenceProvider;
+import org.hibernate.jpa.internal.PersistenceUnitUtilImpl;
 import org.hibernate.service.ServiceRegistry;
 import xyz.xiezc.ioc.starter.annotation.core.Autowire;
 import xyz.xiezc.ioc.starter.annotation.core.Component;
@@ -31,12 +32,11 @@ import xyz.xiezc.ioc.starter.eventListener.ApplicationEvent;
 import xyz.xiezc.ioc.starter.eventListener.ApplicationListener;
 import xyz.xiezc.ioc.starter.orm.annotation.Query;
 import xyz.xiezc.ioc.starter.orm.annotation.Repository;
+import xyz.xiezc.ioc.starter.orm.core.BasicRepository;
+import xyz.xiezc.ioc.starter.orm.core.HibernateUtil;
 import xyz.xiezc.ioc.starter.orm.core.JpaInvocationHandler;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import javax.persistence.TypedQuery;
+import javax.persistence.*;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -49,7 +49,6 @@ import java.util.stream.Collectors;
  */
 public class JpaConfig implements ApplicationContext {
 
-    private static EntityManagerFactory factory;
 
     ApplicationContext applicationContext;
 
@@ -78,37 +77,41 @@ public class JpaConfig implements ApplicationContext {
 
     @Override
     public void loadBeanDefinition(String... packageNames) {
-        if (factory != null) {
-            factory.close();
-            factory = null;
-        }
-
-        Properties properties = applicationContext.getProperties();
-        HibernatePersistenceProvider hibernatePersistenceProvider=new HibernatePersistenceProvider();
-        factory = hibernatePersistenceProvider.createEntityManagerFactory("PersistenceUnit", properties);
-        //factory = Persistence.createEntityManagerFactory("PersistenceUnit", properties);
         //获取
-        String property = applicationContext.getProperty("jpa.repository.package");
-        if (StrUtil.isNotEmpty(property)) {
+        String repositoryPackage = applicationContext.getProperty("jpa.repository.package");
+        if (StrUtil.isNotEmpty(repositoryPackage)) {
             //扫描到的接口
-            scanRepository(property);
+            scanRepository(repositoryPackage);
         } else {
-            for (String packageName : packageNames) {
-                //扫描到的接口
-                scanRepository(packageName);
-            }
+            //扫描到的接口
+            scanRepository(packageNames);
         }
     }
 
     /**
      * 扫描Repository 注解的类到容器中
      *
-     * @param property
+     * @param repositoryPackages
      */
-    private void scanRepository(String property) {
-        Set<Class<?>> classes = ClassUtil.scanPackageByAnnotation(property, Repository.class);
-        for (Class<?> aClass : classes) {
-            Object proxy = ProxyUtil.newProxyInstance(new JpaInvocationHandler(aClass, factory), aClass);
+    private void scanRepository(String... repositoryPackages) {
+        Properties properties = applicationContext.getProperties();
+        Set<Class<?>> classSet = new HashSet<>();
+        for (String repositoryPackage : repositoryPackages) {
+            Set<Class<?>> classes = ClassUtil.scanPackageByAnnotation(repositoryPackage, Repository.class);
+            List<Class<?>> collect = classes.stream()
+                    .filter(clazz -> {
+
+
+                    } )
+                    .collect(Collectors.toList());
+            classSet.addAll(collect);
+        }
+        classSet.stream().map(clazz->{
+
+        })
+        HibernateUtil.init(properties, classSet.toArray(new Class[0]));
+        for (Class<?> aClass : classSet) {
+            Object proxy = ProxyUtil.newProxyInstance(new JpaInvocationHandler(aClass), aClass);
             BeanDefinition beanDefinition = new BeanDefinition();
             beanDefinition.setBeanTypeEnum(BeanTypeEnum.bean);
             beanDefinition.setBean(proxy);

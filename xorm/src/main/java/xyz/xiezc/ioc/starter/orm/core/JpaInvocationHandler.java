@@ -3,14 +3,13 @@ package xyz.xiezc.ioc.starter.orm.core;
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.ClassUtil;
+import org.hibernate.Session;
 import org.jetbrains.annotations.NotNull;
 import xyz.xiezc.ioc.starter.common.asm.AsmUtil;
-import xyz.xiezc.ioc.starter.config.JpaConfig;
 import xyz.xiezc.ioc.starter.orm.annotation.Query;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
 import javax.persistence.TypedQuery;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -24,17 +23,13 @@ import java.util.stream.Collectors;
  */
 public class JpaInvocationHandler implements InvocationHandler {
 
-    private final EntityManagerFactory entityManagerFactory;
-
-    ThreadLocal<TranslationEntityManager> threadLocal = ThreadUtil.createThreadLocal(false);
     /**
      * 方法sql
      */
     Map<Method, JpaMethod> methodQueryMap = new HashMap<>();
 
 
-    public JpaInvocationHandler(Class clazz, EntityManagerFactory entityManagerFactory) {
-        this.entityManagerFactory = entityManagerFactory;
+    public JpaInvocationHandler(Class clazz) {
         Method[] declaredMethods = ClassUtil.getDeclaredMethods(clazz);
         for (Method declaredMethod : declaredMethods) {
             Query query = AnnotationUtil.getAnnotation(declaredMethod, Query.class);
@@ -69,44 +64,45 @@ public class JpaInvocationHandler implements InvocationHandler {
             throw new IllegalArgumentException("method: " + method.getName() + " 没有对应的Hql语句");
         }
 
-        TranslationEntityManager translationEntityManager = getTranslationEntityManager();
-        EntityManager entityManager = translationEntityManager.getEntityManager();
+        TranslationSessionManager translationSessionManager = HibernateUtil.currentSession();
         try {
             if (jpaMethod.isSave) {
-                save(args[0], entityManager);
-                translationEntityManager.commit();
+                save(args[0], translationSessionManager);
+                translationSessionManager.commit();
                 return null;
             }
 
             Class<?> returnType = method.getReturnType();
             if (ClassUtil.isSimpleValueType(returnType)) {
-                TypedQuery<?> query = entityManager.createQuery(jpaMethod.getSql(), returnType);
+                Session session = translationSessionManager.getSession();
+                TypedQuery<?> query = session.createQuery(jpaMethod.getSql(), returnType);
                 String[] params = jpaMethod.getParams();
                 for (int i = 0; i < params.length; i++) {
                     query.setParameter(params[i], args[i]);
                 }
-                translationEntityManager.commit();
+                translationSessionManager.commit();
                 //普通类型
                 return query.getSingleResult();
             }
             if (returnType.isArray()) {
+                Session session = translationSessionManager.getSession();
                 Class<?> componentType = returnType.getComponentType();
-                TypedQuery<?> query = entityManager.createQuery(jpaMethod.getSql(), componentType);
+                TypedQuery<?> query = session.createQuery(jpaMethod.getSql(), componentType);
                 String[] params = jpaMethod.getParams();
                 for (int i = 0; i < params.length; i++) {
                     query.setParameter(params[i], args[i]);
                 }
                 List<?> resultList = query.getResultList();
                 Object[] objects = resultList.toArray();
-                translationEntityManager.commit();
+                translationSessionManager.commit();
                 return objects;
             }
             if (ClassUtil.isAssignable(Collection.class, returnType)) {
                 Type genericReturnType = method.getGenericReturnType();
                 ParameterizedType parameterizedType = (ParameterizedType) genericReturnType;
                 Class<?> actualTypeArgument = (Class<?>) parameterizedType.getActualTypeArguments()[0];
-
-                TypedQuery<?> query = entityManager.createQuery(jpaMethod.getSql(), actualTypeArgument);
+                Session session = translationSessionManager.getSession();
+                TypedQuery<?> query = session.createQuery(jpaMethod.getSql(), actualTypeArgument);
                 String[] params = jpaMethod.getParams();
                 for (int i = 0; i < params.length; i++) {
                     query.setParameter(params[i], args[i]);
@@ -114,31 +110,21 @@ public class JpaInvocationHandler implements InvocationHandler {
 
                 List<?> resultList = query.getResultList();
                 Collection<?> collect = resultList.stream().collect(Collectors.toList());
-                translationEntityManager.commit();
+                translationSessionManager.commit();
                 return collect;
             }
-
-            TypedQuery<?> query = entityManager.createQuery(jpaMethod.getSql(), returnType);
+            Session session = translationSessionManager.getSession();
+            TypedQuery<?> query = session.createQuery(jpaMethod.getSql(), returnType);
             String[] params = jpaMethod.getParams();
             for (int i = 0; i < params.length; i++) {
                 query.setParameter(params[i], args[i]);
             }
-            translationEntityManager.commit();
+            translationSessionManager.commit();
             return query.getSingleResult();
         } catch (Exception e) {
-            translationEntityManager.rollback();
+            translationSessionManager.rollback();
             throw e;
         }
-    }
-
-    @NotNull
-    private TranslationEntityManager getTranslationEntityManager() {
-        TranslationEntityManager translationEntityManager = threadLocal.get();
-        if (translationEntityManager == null) {
-            translationEntityManager = new TranslationEntityManager(entityManagerFactory);
-            threadLocal.set(translationEntityManager);
-        }
-        return translationEntityManager;
     }
 
     /**
@@ -147,15 +133,15 @@ public class JpaInvocationHandler implements InvocationHandler {
      * @param arg1
      * @param entityManager
      */
-    private void save(Object arg1, EntityManager entityManager) {
+    private void save(Object arg1, TranslationSessionManager entityManager) {
         Object arg = arg1;
         if (ClassUtil.isAssignable(List.class, arg.getClass())) {
             List list = (List) arg;
             for (Object o : list) {
-                entityManager.persist(o);
+                entityManager.getSession().save(o);
             }
         } else {
-            entityManager.persist(arg);
+            entityManager.getSession().save(arg);
         }
     }
 }

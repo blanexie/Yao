@@ -1,32 +1,32 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<persistence xmlns="http://java.sun.com/xml/ns/persistence" version="2.0">
-    <persistence-unit name="PersistenceUnit" transaction-type="RESOURCE_LOCAL">
-        <provider>org.hibernate.ejb.HibernatePersistence</provider>
-        <properties>
-            <property name="javax.persistence.jdbc.user" value="xxxxx"></property>
-            <property name="javax.persistence.jdbc.password" value="xxxxx"></property>
-            <property name="javax.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"></property>
-            <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:306/daily&amp;characterEncoding=UTF-8&amp;serverTimezone=Asia/Shanghai"></property>
+<!--<?xml version="1.0" encoding="UTF-8"?>-->
+<!--<persistence xmlns="http://java.sun.com/xml/ns/persistence" version="2.0">-->
+<!--    <persistence-unit name="PersistenceUnit" transaction-type="RESOURCE_LOCAL">-->
+<!--        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>-->
+<!--        <properties>-->
+<!--            <property name="javax.persistence.jdbc.user" value="xxxxx"></property>-->
+<!--            <property name="javax.persistence.jdbc.password" value="xxxxx"></property>-->
+<!--            <property name="javax.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"></property>-->
+<!--            <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:306/daily&amp;characterEncoding=UTF-8&amp;serverTimezone=Asia/Shanghai"></property>-->
 
-            <property name="hibernate.dialect" value="org.hibernate.dialect.MySQL8Dialect"/>
-            <property name="hibernate.hbm2ddl.auto" value="update"/>
-            <property name="hibernate.show_sql" value="true"/>
-            <property name="hibernate.format_sql" value="true"/>
+<!--            <property name="hibernate.dialect" value="org.hibernate.dialect.MySQL8Dialect"/>-->
+<!--            <property name="hibernate.hbm2ddl.auto" value="update"/>-->
+<!--            <property name="hibernate.show_sql" value="true"/>-->
+<!--            <property name="hibernate.format_sql" value="true"/>-->
 
-            <!-- Important -->
-<!--            <property name="hibernate.connection.provider_class"-->
-<!--                      value="org.hibernate.connection.C3P0ConnectionProvider" />-->
+<!--            &lt;!&ndash; Important &ndash;&gt;-->
+<!--&lt;!&ndash;            <property name="hibernate.connection.provider_class"&ndash;&gt;-->
+<!--&lt;!&ndash;                      value="org.hibernate.connection.C3P0ConnectionProvider" />&ndash;&gt;-->
 
-<!--            <property name="hibernate.c3p0.max_size" value="100" />-->
-<!--            <property name="hibernate.c3p0.min_size" value="0" />-->
-<!--            <property name="hibernate.c3p0.acquire_increment" value="1" />-->
-<!--            <property name="hibernate.c3p0.idle_test_period" value="300" />-->
-<!--            <property name="hibernate.c3p0.max_statements" value="0" />-->
-<!--            <property name="hibernate.c3p0.timeout" value="100" />-->
+<!--&lt;!&ndash;            <property name="hibernate.c3p0.max_size" value="100" />&ndash;&gt;-->
+<!--&lt;!&ndash;            <property name="hibernate.c3p0.min_size" value="0" />&ndash;&gt;-->
+<!--&lt;!&ndash;            <property name="hibernate.c3p0.acquire_increment" value="1" />&ndash;&gt;-->
+<!--&lt;!&ndash;            <property name="hibernate.c3p0.idle_test_period" value="300" />&ndash;&gt;-->
+<!--&lt;!&ndash;            <property name="hibernate.c3p0.max_statements" value="0" />&ndash;&gt;-->
+<!--&lt;!&ndash;            <property name="hibernate.c3p0.timeout" value="100" />&ndash;&gt;-->
 
-        </properties>
-    </persistence-unit>
-</persistence>
+<!--        </properties>-->
+<!--    </persistence-unit>-->
+<!--</persistence>-->
 
 
 
