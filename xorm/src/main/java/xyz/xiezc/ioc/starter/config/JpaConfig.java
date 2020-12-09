@@ -53,34 +53,6 @@ public class JpaConfig implements ApplicationContext {
 
     ApplicationContext applicationContext;
 
-    private void initJpa() {
-        if (factory != null) {
-            factory.close();
-            factory = null;
-        }
-        Properties properties = applicationContext.getProperties();
-//        HibernatePersistenceProvider hibernatePersistenceProvider=new HibernatePersistenceProvider();
-//        factory = hibernatePersistenceProvider.createEntityManagerFactory("PersistenceUnit", properties);
-        factory = Persistence.createEntityManagerFactory("PersistenceUnit", properties);
-        //找到所有的接口类， 生成代理类
-        Class appRunClass = applicationContext.getAppRunClass();
-        //获取
-        String property = applicationContext.getProperty("jpa.repository.package");
-        if (StrUtil.isEmpty(property)) {
-            property = appRunClass.getPackageName();
-        }
-        //扫描到的接口
-        Set<Class<?>> classes = ClassUtil.scanPackageByAnnotation(property, Repository.class);
-        for (Class<?> aClass : classes) {
-            Object proxy = ProxyUtil.newProxyInstance(new JpaInvocationHandler(aClass, factory), aClass);
-            BeanDefinition beanDefinition = new BeanDefinition();
-            beanDefinition.setBeanTypeEnum(BeanTypeEnum.bean);
-            beanDefinition.setBean(proxy);
-            beanDefinition.setBeanStatus(BeanStatusEnum.Completed);
-            beanDefinition.setBeanClass(aClass);
-            applicationContext.addBean(beanDefinition);
-        }
-    }
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) {
@@ -106,7 +78,44 @@ public class JpaConfig implements ApplicationContext {
 
     @Override
     public void loadBeanDefinition(String... packageNames) {
+        if (factory != null) {
+            factory.close();
+            factory = null;
+        }
 
+        Properties properties = applicationContext.getProperties();
+        HibernatePersistenceProvider hibernatePersistenceProvider=new HibernatePersistenceProvider();
+        factory = hibernatePersistenceProvider.createEntityManagerFactory("PersistenceUnit", properties);
+        //factory = Persistence.createEntityManagerFactory("PersistenceUnit", properties);
+        //获取
+        String property = applicationContext.getProperty("jpa.repository.package");
+        if (StrUtil.isNotEmpty(property)) {
+            //扫描到的接口
+            scanRepository(property);
+        } else {
+            for (String packageName : packageNames) {
+                //扫描到的接口
+                scanRepository(packageName);
+            }
+        }
+    }
+
+    /**
+     * 扫描Repository 注解的类到容器中
+     *
+     * @param property
+     */
+    private void scanRepository(String property) {
+        Set<Class<?>> classes = ClassUtil.scanPackageByAnnotation(property, Repository.class);
+        for (Class<?> aClass : classes) {
+            Object proxy = ProxyUtil.newProxyInstance(new JpaInvocationHandler(aClass, factory), aClass);
+            BeanDefinition beanDefinition = new BeanDefinition();
+            beanDefinition.setBeanTypeEnum(BeanTypeEnum.bean);
+            beanDefinition.setBean(proxy);
+            beanDefinition.setBeanStatus(BeanStatusEnum.Completed);
+            beanDefinition.setBeanClass(aClass);
+            applicationContext.addBean(beanDefinition);
+        }
     }
 
     @Override
@@ -121,7 +130,7 @@ public class JpaConfig implements ApplicationContext {
 
     @Override
     public void initBeanPostProcess() {
-        this.initJpa();
+
     }
 
     @Override

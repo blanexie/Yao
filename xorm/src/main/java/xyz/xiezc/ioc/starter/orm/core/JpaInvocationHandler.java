@@ -3,6 +3,7 @@ package xyz.xiezc.ioc.starter.orm.core;
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.ClassUtil;
+import org.jetbrains.annotations.NotNull;
 import xyz.xiezc.ioc.starter.common.asm.AsmUtil;
 import xyz.xiezc.ioc.starter.config.JpaConfig;
 import xyz.xiezc.ioc.starter.orm.annotation.Query;
@@ -67,11 +68,8 @@ public class JpaInvocationHandler implements InvocationHandler {
         if (jpaMethod == null) {
             throw new IllegalArgumentException("method: " + method.getName() + " 没有对应的Hql语句");
         }
-        TranslationEntityManager translationEntityManager = threadLocal.get();
-        if (translationEntityManager == null) {
-            translationEntityManager = new TranslationEntityManager(entityManagerFactory);
-            threadLocal.set(translationEntityManager);
-        }
+
+        TranslationEntityManager translationEntityManager = getTranslationEntityManager();
         EntityManager entityManager = translationEntityManager.getEntityManager();
         try {
             if (jpaMethod.isSave) {
@@ -131,6 +129,16 @@ public class JpaInvocationHandler implements InvocationHandler {
             translationEntityManager.rollback();
             throw e;
         }
+    }
+
+    @NotNull
+    private TranslationEntityManager getTranslationEntityManager() {
+        TranslationEntityManager translationEntityManager = threadLocal.get();
+        if (translationEntityManager == null) {
+            translationEntityManager = new TranslationEntityManager(entityManagerFactory);
+            threadLocal.set(translationEntityManager);
+        }
+        return translationEntityManager;
     }
 
     /**

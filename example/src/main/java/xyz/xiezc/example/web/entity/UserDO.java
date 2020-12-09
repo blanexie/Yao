@@ -6,7 +6,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 
 /**
- * 相册集表(Album)实体类
+ *
  *
  * @author xiezc
  * @since 2020-06-09 17:59:52

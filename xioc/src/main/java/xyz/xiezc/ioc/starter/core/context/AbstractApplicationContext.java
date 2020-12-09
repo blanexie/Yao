@@ -75,7 +75,7 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
     EventDispatcher eventDispatcher;
 
 
-    List<ApplicationContext> applicationContexts=new ArrayList<>();
+    List<ApplicationContext> applicationContexts = new ArrayList<>();
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) {
@@ -92,7 +92,7 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
         loadProperties();
         addApplictionEvent(new ApplicationEvent(EventNameConstant.loadPropertiesEvent));
 
-        loadBeanDefinition("xyz.xiezc.ioc.starter",clazz.getPackageName());
+        loadBeanDefinition("xyz.xiezc.ioc.starter", clazz.getPackageName());
         addApplictionEvent(new ApplicationEvent(EventNameConstant.loadBeanDefinitionEvent));
 
         beforeInvoke();
@@ -192,6 +192,11 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
     }
 
     /**
+     * 用于注解的注解情况
+     */
+    private Set<Class> annotationSet = new HashSet<>();
+
+    /**
      * 扫描特定的目录结构，加载bean信息到容器中
      *
      * @param packageNames
@@ -204,7 +209,6 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
         rootBeanDefinition.setBeanStatus(BeanStatusEnum.Completed);
         rootBeanDefinition.setBeanTypeEnum(BeanTypeEnum.bean);
         this.addBean(rootBeanDefinition);
-        Set<Class> annotationSet = new HashSet<>();
 
         for (String packageName : packageNames) {
             Set<Class<?>> classConfiguration = ClassUtil.scanPackageByAnnotation(packageName, Configuration.class);
@@ -234,6 +238,7 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
             applicationContext.loadBeanDefinition(packageNames);
         }
     }
+
 
     @Override
     public void beforeInvoke() {

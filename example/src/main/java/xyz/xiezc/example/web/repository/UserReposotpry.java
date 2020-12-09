@@ -11,7 +11,7 @@ import java.util.List;
  *
  */
 @Repository
-public interface UserReposotpry extends BasicRepository {
+public interface UserReposotpry extends BasicRepository<UserDO> {
 
     @Query("from UserDO")
     List<UserDO> findAll();
