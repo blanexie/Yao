@@ -16,7 +16,7 @@
         <maven.test.skip>false</maven.test.skip>
         <java.version>11</java.version>
         <java.encoding>UTF-8</java.encoding>
-        <dubbo.version>2.7.7</dubbo.version>
+        <dubbo.version>2.7.13</dubbo.version>
         <project.build.sourceEncoding>${java.encoding}</project.build.sourceEncoding>
         <maven.build.timestamp.format>yyyy-MM-dd_HH_mm</maven.build.timestamp.format>
         <maven.compiler.source>${java.version}</maven.compiler.source>
